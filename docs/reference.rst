@@ -1,4 +1,4 @@
-BitBacker PostgreSQL Backup and Restore Tools
+Command Reference
 =============================================
 
 .. _archivepgsql:
@@ -13,7 +13,7 @@ The :program:`archivepgsql` program archives a PostgreSQL database.  It is calle
     $ archivepgsql
 
 The operation of the :program:`archivepgsql` is controlled by the
-:term:`configuration file`.
+:term:`configuration file`.  It accepts no options.
 
 .. _restorepgsql:
 
@@ -25,7 +25,7 @@ restorepgsql
 The :program:`restorepgsql` program restores a PostgreSQL database.
 
 The operation of the :program:`restorepgsql` program is controlled by the
-:term:`configuration file`.
+:term:`configuration file`, but unlike the other programs provided, it is an interactive application, since restoring a PostgreSQL database is a multi-step operation that requires operator intervention and confirmations at various points.
 
 .. _archiveWAL:
 
@@ -34,7 +34,21 @@ archiveWAL
 
 .. program:: archiveWAL
 
-The :program:`archiveWAL` program archives a WAL file.
+The :program:`archiveWAL` program archives a WAL file and is called like this::
+    
+    $ archiveWAL absolute_path_to_WAL
+
+where ``absolute_path_to_WAL`` is the absolute path to the WAL file that should be archived.
+
+  .. note::
+
+    This is meant to be used only within the PostgreSQL configuration file
+    (:file:`postgresql.conf`) with the ``archive_command`` parameter like so::
+
+      archive_command = '/ABSOLUTE_PATH/archiveWAL %p'
+
+    Please see :ref:`Configuring PostgreSQL for Backup` and `PostgreSQL archive_command <http://www.postgresql.org/docs/8.4/interactive/runtime-config-wal.html#GUC-ARCHIVE-MODE>`_ for more information.
+
 
 The operation of the :program:`archiveWAL` program is controlled by the
 :term:`configuration file`.

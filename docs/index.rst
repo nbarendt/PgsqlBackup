@@ -11,19 +11,16 @@ Contents:
 .. toctree::
     :maxdepth: 2
 
+    intro
+    tutorial
+    postgresql
+    troubleshooting
     reference
     glossary
 
-.. todo::
-    intro
+ToDo List
 
-.. todo::
-    tutorial    
-
-
-.. todo::
-    troubleshooting
-
+.. todolist::
 
 Indices and tables
 ==================
