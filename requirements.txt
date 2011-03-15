@@ -1,0 +1,8 @@
+## The following requirements were added by pip --freeze:
+Jinja2==2.5.5
+Pygments==1.4
+Sphinx==1.0.7
+boto==2.0b4
+docutils==0.7
+nose==1.0.0
+wsgiref==0.1.2
