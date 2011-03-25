@@ -255,4 +255,4 @@ epub_copyright = u'2011, BitBacker, Inc.'
 # Allow duplicate toc entries.
 #epub_tocdup = True
 
-todo_include_todos = False
+todo_include_todos = True

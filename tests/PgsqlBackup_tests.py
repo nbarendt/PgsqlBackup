@@ -1,7 +1,7 @@
 from nose.tools import *
-import PgsqlBackup
+import bbpgsql
 #from tar_create import tar_create
-from PgsqlBackup.file_system_archive import create_file_system_archive
+from bbpgsql.file_system_archive import create_file_system_archive
 
 
 def setup():
@@ -14,6 +14,6 @@ def test_basic():
 	print "I RAN!"
 
 def test_create_file_system_archive():
-	create_file_system_archive()
+	create_file_system_archive('archive.tar')
 	
 
