@@ -1,5 +1,17 @@
 #! /usr/bin/env python
 import sys
+from optparse import OptionParser
+import os
+
+def parse_command_line_options():
+    parser = OptionParser()
+    parser.add_option('-c', '--config', dest='config_file',
+        help='configuration file', default='/etc/bbpgsql.ini')
+    options, args = parser.parse_args()
+    
+    if not os.path.exists(options.config_file):
+        raise Exception("File %s does not exist" % (options.config_file))
 
 if __name__ == '__main__':
-    sys.exit(0)
+    parse_command_line_options()
+
