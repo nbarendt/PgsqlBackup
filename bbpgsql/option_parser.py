@@ -19,3 +19,5 @@ def parse_args(args=None):
 def validate_options_and_args(options=None, args=None):
     if not os.path.exists(options.config_file):
         raise Exception("File %s does not exist" % (options.config_file))
+
+    return True

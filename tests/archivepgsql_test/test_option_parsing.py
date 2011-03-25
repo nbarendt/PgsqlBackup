@@ -39,8 +39,11 @@ class Test_OptionParsing_and_Validation(TestCase):
         self.tempdir.cleanup()
 
     def test_validation_raises_exception_if_config_file_does_not_exist(self):
-        config_path = '/tmp/blah/blah/bbpgsql.ini'
         def validate():
             validate_options_and_args(*parse_args(args=[
-                '--config', config_path]))
+                '--config', '/tmp/blah/blah/bbpgsql.ini']))
         self.assertRaises(Exception, validate)
+
+    def test_options_validate_if_config_file_exists(self):
+        self.assertTrue(validate_options_and_args(*parse_args(args=[
+            '--config', self.config_path])))
