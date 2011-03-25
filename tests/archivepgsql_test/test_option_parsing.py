@@ -24,7 +24,7 @@ class Test_CommandLineOptionParsing(TestCase):
 
     def test_can_execute_dry_run(self):
         options, args = parse_args(args=['--dry-run'])
-        self.assertTrue(options.dry_run) 
+        self.assertTrue(options.dry_run)
 
 
 class Test_OptionParsing_and_Validation(TestCase):
