@@ -6,9 +6,7 @@ def parse_args(args=None):
     parser = OptionParser()
     parser.add_option('-c', '--config', dest='config_file',
         help='configuration file', default='/etc/bbpgsql.ini')
-
     options, args = parser.parse_args(args)
-
     return options, args
 
 
