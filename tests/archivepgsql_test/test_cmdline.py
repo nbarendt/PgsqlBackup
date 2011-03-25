@@ -5,12 +5,12 @@ import os
 from copy import deepcopy
 from testfixtures import TempDirectory
 
-class Test_archivepgsql_BasicCommandLineOperation(object):
-    ARCHIVEPGSQL_PATH=os.path.join('PgsqlBackup', 'cmdline_scripts')
+class Test_archivepgsql_BasicCommandLineOperation(TestCase):
+    ARCHIVEPGSQL_PATH=os.path.join('bbpgsql', 'cmdline_scripts')
     CONFIG_FILE = 'config.ini' 
     exe_script = 'archivepgsql'
 
-    def setup(self):
+    def setUp(self):
         self.setup_environment()
         self.setup_config()
         self.cmd = [self.exe_script, '--config', self.config_path]
@@ -26,7 +26,7 @@ class Test_archivepgsql_BasicCommandLineOperation(object):
     def setup_config(self):
         self.config_path = self.tempdir.write(self.CONFIG_FILE, '')
 
-    def teardown(self):
+    def tearDown(self):
         self.tempdir.cleanup()
 
     def test_can_execute_archivepgsql(self):

@@ -1,5 +1,5 @@
 from nose.tools import *
-import PgsqlBackup
+import bbpgsql
 
 def setup():
 	print "SETUP!"

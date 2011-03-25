@@ -11,9 +11,9 @@ config = {
 	'author_email': 'My email.',
 	'version': '0.1',
 	'instal_requires': ['nose'],
-	'packages': ['PgsqlBackup'],
+	'packages': ['bbpgsql'],
 	'scripts': [],
-	'name': 'PgsqlBackup'
+	'name': 'bbpgsql'
 }
 
 setup(**config)
