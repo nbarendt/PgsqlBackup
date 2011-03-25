@@ -1,5 +1,5 @@
 from unittest import TestCase
-from bbpgsql.option_parser import parse_args
+from bbpgsql.option_parser import parse_args, validate_options_and_args
 from testfixtures import TempDirectory
 
 
@@ -38,7 +38,9 @@ class Test_OptionParsing_and_Validation(TestCase):
     def tearDown(self):
         self.tempdir.cleanup()
 
-    def test_config_file_must_exist(self):
+    def test_validation_raises_exception_if_config_file_does_not_exist(self):
         config_path = '/tmp/blah/blah/bbpgsql.ini'
-        options, args = parse_args(args=['--config', config_path])
-        self.assertEqual(config_path, options.config_file)
+        def validate():
+            validate_options_and_args(*parse_args(args=[
+                '--config', config_path]))
+        self.assertRaises(Exception, validate)
