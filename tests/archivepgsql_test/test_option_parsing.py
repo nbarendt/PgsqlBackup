@@ -18,6 +18,14 @@ class Test_CommandLineOptionParsing(TestCase):
         options, args = parse_args(args=['--config', config_path])
         self.assertEqual(config_path, options.config_file)
 
+    def test_not_dry_run_by_default(self):
+        options, args = parse_args(args=[])
+        self.assertFalse(options.dry_run)
+
+    def test_can_execute_dry_run(self):
+        options, args = parse_args(args=['--dry-run'])
+        self.assertTrue(options.dry_run) 
+
 
 class Test_OptionParsing_and_Validation(TestCase):
     def setUp(self):

@@ -1,13 +1,19 @@
-from optparse import OptionParser
 import os
+from optparse import OptionParser
 
 
 def parse_args(args=None):
     parser = OptionParser()
+
     parser.add_option('-c', '--config', dest='config_file',
         help='configuration file', default='/etc/bbpgsql.ini')
-    options, args = parser.parse_args(args)
-    return options, args
+
+    parser.add_option('--dry-run', dest='dry_run',
+        help='test run - do not actually modify any files',
+        action='store_true',
+        default=False)
+
+    return parser.parse_args(args)
 
 
 def validate_options_and_args(options=None, args=None):

@@ -13,7 +13,7 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
     def setUp(self):
         self.setup_environment()
         self.setup_config()
-        self.cmd = [self.exe_script, '--config', self.config_path]
+        self.cmd = [self.exe_script, '--dry-run', '--config', self.config_path]
 
     def setup_environment(self):
         self.env = deepcopy(os.environ)
