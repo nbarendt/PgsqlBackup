@@ -2,7 +2,7 @@
 Jinja2==2.5.5
 Pygments==1.4
 Sphinx==1.0.7
-boto==2.0b4
+#boto==2.0b4
 docutils==0.7
 nose==1.0.0
 pep8==0.6.1
