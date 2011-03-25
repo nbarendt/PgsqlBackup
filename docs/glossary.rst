@@ -16,7 +16,7 @@ Glossary
         configuration used for :ref:`archivepgsql`, :ref:`restorepgsql`,
         :ref:`archiveWAL`, :ref:`restoreWAL`.
 
-        See :ref:`configuration file` for details.
+        See :ref:`configuration_file` for details.
 
     PostgreSQL
         A very advanced, open-source database system.
@@ -32,6 +32,10 @@ Glossary
 
     WAL files
         See :term:`write ahead log`.
+
+    snapshots
+        Filesystem snapshots of the PostgreSQL database files (e.g.,
+        ``data_directory`` of ``postgresql.conf``).
 
     Amazon Web Services
         A collection of "cloud" services offered by `Amazon`_, including

@@ -14,8 +14,10 @@ Contents:
     intro
     tutorial
     postgresql
+    crypto
     troubleshooting
     reference
+    configuration
     glossary
 
 ToDo List
