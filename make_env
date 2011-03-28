@@ -1,2 +1,11 @@
 #!/bin/bash
-pip install -E env -r requirements.txt
+PIP_CACHE_DIR=.pip_cache
+set -e
+echo $PIP_CACHE_DIR
+if [ ! -d $PIP_CACHE_DIR ];  then
+        echo "making cache dir"
+        mkdir $PIP_CACHE_DIR
+fi
+pip install -E env -r requirements.txt --download-cache=$PIP_CACHE_DIR
+. env/bin/activate
+python setup.py develop

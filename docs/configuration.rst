@@ -78,25 +78,28 @@ These fields must contain your AWS Access Key and Secret Keys, respectively.  Pl
 
 General backup configuration.
 
-+--------------+-----------+-------------+-----------------------------+
-| Key Name     |   Type    |   Default   |  Description                |
-+==============+===========+=============+=============================+
-| bucket       |   String  | None        | S3 Bucket to store snapshots|
-|              |           |             | and WAL files               |
-+--------------+-----------+-------------+-----------------------------+
-| pg_conf_path | String    | None        | Absolute path to the        |
-|              |           |             | postgresql.conf file        | 
-+--------------+-----------+-------------+-----------------------------+
-| backup_days  | Integer   | 7           | Number of days of backup    |
-|              |           |             | history                     |
-|              |           |             | to retain.  Backup data     |
-|              |           |             | (:term:`snapshots` and      | 
-|              |           |             | :term:`WAL files`)          | 
-|              |           |             | older                       |
-|              |           |             | than this will be           |
-|              |           |             | deleted during the cleanup  |
-|              |           |             | phase of :ref:`archivepgsql`|
-+--------------+-----------+-------------+-----------------------------+
++----------------------+-----------+-------------+-----------------------------+
+| Key Name             |   Type    |   Default   |  Description                |
++======================+===========+=============+=============================+
+| bucket               |   String  | None        | S3 Bucket to store snapshots|
+|                      |           |             | and WAL files               |
++----------------------+-----------+-------------+-----------------------------+
+| pgsql_data_directory | String    | None        | Absolute path to the        |
+|                      |           |             | postgresql data directory   |
+|                      |           |             | (e.g., value of             |
+|                      |           |             | ``data_directory`` in       |
+|                      |           |             | ``postgresql.conf``)        |
++----------------------+-----------+-------------+-----------------------------+
+| backup_days          | Integer   | 7           | Number of days of backup    |
+|                      |           |             | history                     |
+|                      |           |             | to retain.  Backup data     |
+|                      |           |             | (:term:`snapshots` and      |
+|                      |           |             | :term:`WAL files`)          |
+|                      |           |             | older                       |
+|                      |           |             | than this will be           |
+|                      |           |             | deleted during the cleanup  |
+|                      |           |             | phase of :ref:`archivepgsql`|
++----------------------+-----------+-------------+-----------------------------+
 
 .. _config_snapshot:
 
