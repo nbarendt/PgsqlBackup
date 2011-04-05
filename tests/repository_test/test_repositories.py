@@ -16,7 +16,7 @@ class Test_Repository_Operations_With_MemoryCommitStorage(TestCase):
         self.tempdir = TempDirectory()
         self.store = MemoryCommitStorage()
         self.repo = BBRepository(self.store)
-        self.file1 = self.tempdir.write('self.file1', 'some contents')
+        self.file1 = self.tempdir.write('file1', 'some contents')
         self.file2 = self.tempdir.write('file2', 'some other contents')
 
     def tearDown(self):
