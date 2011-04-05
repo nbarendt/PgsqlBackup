@@ -19,9 +19,6 @@ class MemoryCommitStorage(object):
     def get_tags(self):
         return self.data.keys()
 
-    def get_contents_for_tag(self, tag):
-        return self.data[tag]['data']
-
     def get_commit_contents_to_filename(self, tag, filename):
         open(filename, 'wb').write(self.data[tag]['data'])
 
