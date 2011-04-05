@@ -1,8 +1,9 @@
 from unittest import TestCase
 from testfixtures import TempDirectory
 from bbpgsql.repository import DuplicateTagError
-from bbpgsql.repository import BBMemoryRepository
-from bbpgsql.repository import BBFilesystemRepository
+from bbpgsql.repository import BBRepository
+from bbpgsql.repository import MemoryCommitStorage
+from bbpgsql.repository import FilesystemCommitStorage
 
 class Test_DuplicateTagError(TestCase):
     def test_str_output(self):
@@ -10,10 +11,11 @@ class Test_DuplicateTagError(TestCase):
                     ' exists in the repository'
         self.assertEqual(expected, str(DuplicateTagError('badtag')))
 
-class Test_Basic_Rpository_Operations_On_MemoryRepository(TestCase):
+class Test_Repository_Operations_With_MemoryCommitStorage(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
-        self.repo = BBMemoryRepository()
+        self.store = MemoryCommitStorage()
+        self.repo = BBRepository(self.store)
         self.file1 = self.tempdir.write('self.file1', 'some contents')
         self.file2 = self.tempdir.write('file2', 'some other contents')
 
@@ -94,11 +96,12 @@ class Test_Basic_Rpository_Operations_On_MemoryRepository(TestCase):
 
 
 class Test_Basic_Rpository_Operations_On_FilesystemRepository(
-        Test_Basic_Rpository_Operations_On_MemoryRepository):
+        Test_Repository_Operations_With_MemoryCommitStorage):
     def setUp(self):
         self.tempdir = TempDirectory()
         self.repo_path = self.tempdir.makedir('repo')
-        self.repo = BBFilesystemRepository(self.repo_path)
+        self.store = FilesystemCommitStorage(self.repo_path)
+        self.repo = BBRepository(self.store)
         self.file1 = self.tempdir.write('self.file1', 'some contents')
         self.file2 = self.tempdir.write('file2', 'some other contents')
 
