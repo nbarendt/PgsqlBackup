@@ -21,7 +21,7 @@ class BBCommit(object):
         open(filename, 'wb').write(self.contents)
 
 
-class BBRepository(object):
+class BBMemoryRepository(object):
     character_regex = r'^[a-zA-Z0-9\_]*$'
 
     def __init__(self):

@@ -1,6 +1,6 @@
 from unittest import TestCase
 from testfixtures import TempDirectory
-from bbpgsql.repository import BBRepository, DuplicateTagError
+from bbpgsql.repository import BBMemoryRepository, DuplicateTagError
 
 class Test_DuplicateTagError(TestCase):
     def test_str_output(self):
@@ -11,7 +11,7 @@ class Test_DuplicateTagError(TestCase):
 class Test_Basic_Rpository_Operations_On_MemoryRepository(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
-        self.repo = BBRepository()
+        self.repo = BBMemoryRepository()
         self.file1 = self.tempdir.write('self.file1', 'some contents')
         self.file2 = self.tempdir.write('file2', 'some other contents')
 
