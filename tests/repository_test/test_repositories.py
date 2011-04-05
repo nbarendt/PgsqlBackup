@@ -1,6 +1,8 @@
 from unittest import TestCase
 from testfixtures import TempDirectory
-from bbpgsql.repository import BBMemoryRepository, DuplicateTagError
+from bbpgsql.repository import DuplicateTagError
+from bbpgsql.repository import BBMemoryRepository
+from bbpgsql.repository import BBFilesystemRepository
 
 class Test_DuplicateTagError(TestCase):
     def test_str_output(self):
@@ -89,3 +91,14 @@ class Test_Basic_Rpository_Operations_On_MemoryRepository(TestCase):
         def will_raise_Exception():
             self.commit_file1('a', 'some illegal message')
         self.assertRaises(Exception, will_raise_Exception)
+
+
+class Test_Basic_Rpository_Operations_On_FilesystemRepository(
+        Test_Basic_Rpository_Operations_On_MemoryRepository):
+    def setUp(self):
+        self.tempdir = TempDirectory()
+        self.repo_path = self.tempdir.makedir('repo')
+        self.repo = BBFilesystemRepository(self.repo_path)
+        self.file1 = self.tempdir.write('self.file1', 'some contents')
+        self.file2 = self.tempdir.write('file2', 'some other contents')
+
