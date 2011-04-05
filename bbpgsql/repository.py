@@ -15,22 +15,24 @@ class DuplicateTagError(Exception):
 
 
 class BBCommit(object):
-    def __init__(self, tag, contents, message):
+    def __init__(self, store, tag,  message):
+        self.store = store
         self.tag = tag
-        self.contents = contents
         self.message = message
 
-    def get_to_filename(self, filename):
-        open(filename, 'wb').write(self.contents)
+    def get_contents_to_filename(self, filename):
+        self.store.get_commit_contents_to_filename(self.tag, filename)
 
 
 class MemoryCommitStorage(object):
-
     def __init__(self):
         self.data = {}
 
+    def __getitem__(self, tag):
+        return BBCommit(self, tag, self.get_message_for_tag(tag))
+
     def add_commit(self, tag, contents, message):
-        self.data[tag] = dict(data=contents, message=message)          
+        self.data[tag] = dict(data=contents, message=message)
 
     def delete_commit(self, tag):
         del self.data[tag]
@@ -41,6 +43,9 @@ class MemoryCommitStorage(object):
     def get_contents_for_tag(self, tag):
         return self.data[tag]['data']
 
+    def get_commit_contents_to_filename(self, tag, filename):
+        open(filename, 'wb').write(self.data[tag]['data'])
+
     def get_message_for_tag(self, tag):
         return self.data[tag]['message']
 
@@ -50,6 +55,9 @@ class FilesystemCommitStorage(object):
 
     def __init__(self, directory):
         self.path_to_storage = directory
+
+    def __getitem__(self, tag):
+        return BBCommit(self, tag, self.get_message_for_tag(tag))
 
     def _commit_filename_to_absolute_path(self, commit_filename):
         return os.path.join(self.path_to_storage, commit_filename)
@@ -85,8 +93,9 @@ class FilesystemCommitStorage(object):
     def get_tags(self):
         return self._get_commits().keys()
 
-    def get_contents_for_tag(self, tag):
-        return open(self._tag_to_absolute_path(tag), 'rb').read()
+    def get_commit_contents_to_filename(self, tag, filename):
+        return open(filename, 'wb').write(
+            open(self._tag_to_absolute_path(tag), 'rb').read())
 
     def get_message_for_tag(self, tag):
         commit_file = self._get_commits()[tag]
@@ -100,9 +109,7 @@ class BBRepository(object):
         self.store = store
 
     def _get_commit_by_tag(self, tag):
-        return BBCommit(tag,
-             self.store.get_contents_for_tag(tag),
-            self.store.get_message_for_tag(tag))
+        return self.store[tag]
 
     def __iter__(self):
         for tag in self._sorted_tags():

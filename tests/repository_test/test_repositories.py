@@ -46,7 +46,7 @@ class Test_Repository_Operations_With_MemoryCommitStorage(TestCase):
     def test_can_commit_and_retrieve_contents(self):
         self.commit_file1('some_tag')
         commit = self.repo['some_tag']
-        commit.get_to_filename(self.file2)
+        commit.get_contents_to_filename(self.file2)
         self.assertEqual('some contents', open(self.file2, 'rb').read())
     
     def test_tags_are_unique(self):
