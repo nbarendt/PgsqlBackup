@@ -1,6 +1,7 @@
-import os
+import tarfile
 
-def create_archive(srcPath, destPath, archiveName):
-    archivePath = os.path.join(destPath, archiveName)
-    fhandle = file(archivePath, 'a')
+
+def create_archive(srcPath, archivePath):
+    fhandle = tarfile.open(name=archivePath, mode='w')
+    fhandle.add(srcPath)
     fhandle.close()
