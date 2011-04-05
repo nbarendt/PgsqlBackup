@@ -1,5 +1,6 @@
 from re import match
 
+
 class DuplicateTagError(Exception):
     def __init__(self, tag):
         self.tag = tag
@@ -8,6 +9,7 @@ class DuplicateTagError(Exception):
         msg = 'DuplicateTagError: the tag "{0}" already exists in' \
               ' the repository'.format(self.tag)
         return msg
+
 
 class BBCommit(object):
     def __init__(self, tag, contents, message):
@@ -18,8 +20,10 @@ class BBCommit(object):
     def get_to_filename(self, filename):
         open(filename, 'wb').write(self.contents)
 
- 
+
 class BBRepository(object):
+    character_regex = r'^[a-zA-Z0-9\_]*$'
+
     def __init__(self):
         self.data = {}
 
@@ -42,14 +46,19 @@ class BBRepository(object):
             raise DuplicateTagError(tag)
 
     def _message_is_legal(self, message):
-        message_regex = r'^[a-zA-Z0-9\_]*$'
-        if message and not match(message_regex, message):
+        if message and not match(self.character_regex, message):
             raise Exception('Message "{0}" does not match regex "{1}"'.format(
-                message, message_regex))        
+                message, self.character_regex))
+
+    def _tag_is_legal(self, tag):
+        if not match(self.character_regex, tag):
+            raise Exception('Tag "{0}" does not match regex "{1}"'.format(
+                tag, self.character_regex))
 
     def create_commit_from_filename(self, tag, filename, message=None):
         message = message or ''
         self._tag_is_unique(tag)
+        self._tag_is_legal(tag)
         self._message_is_legal(message)
         self.data[tag] = dict(data=open(filename, 'rb').read(),
                                 message=message)
@@ -58,7 +67,7 @@ class BBRepository(object):
         new_oldest_tag = new_oldest_commit.tag
         tags_to_delete = [k for k in self._sorted_tags() if k < new_oldest_tag]
         for tag in tags_to_delete:
-            del self.data[tag] 
+            del self.data[tag]
 
     def get_commit_before(self, commit_N):
         tags = self._sorted_tags()
