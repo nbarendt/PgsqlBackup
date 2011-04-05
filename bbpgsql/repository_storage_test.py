@@ -9,8 +9,9 @@ class MemoryCommitStorage(object):
     def __getitem__(self, tag):
         return BBCommit(self, tag, self.get_message_for_tag(tag))
 
-    def add_commit(self, tag, contents, message):
-        self.data[tag] = dict(data=contents, message=message)
+    def add_commit(self, tag, filename, message):
+        self.data[tag] = dict(data=open(filename, 'rb').read(),
+            message=message)
 
     def delete_commit(self, tag):
         del self.data[tag]
@@ -60,10 +61,10 @@ class FilesystemCommitStorage(object):
     def _get_message_from_commit_filename(self, commit_filename):
         return commit_filename.split(self.tag_separator, 1)[1]
 
-    def add_commit(self, tag, contents, message):
+    def add_commit(self, tag, filename, message):
         commit_filename = self.tag_separator.join([tag, message])
         commit_path = self._commit_filename_to_absolute_path(commit_filename)
-        open(commit_path, 'wb').write(contents)
+        open(commit_path, 'wb').write(open(filename, 'rb').read())
 
     def delete_commit(self, tag):
         os.remove(self._tag_to_absolute_path(tag))
