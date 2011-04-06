@@ -1,7 +1,6 @@
 from unittest import TestCase
 from testfixtures import TempDirectory
 from bbpgsql.repository_storage_s3 import S3CommitStorage
-from bbpgsql.repository_storage_s3 import TagAlreadyExistsError
 from bbpgsql.repository_storage_s3 import FileAlreadyExistsError
 from bbpgsql.repository_storage_s3 import UnknownTagError
 from mock import Mock
@@ -59,14 +58,6 @@ class Test_S3CommitStorage_Against_Mock(TestCase):
         self.store.add_commit('tag1', file1, 'some_message')
         new_key_mock = self.mock_bucket.new_key.return_value
         new_key_mock.set_contents_from_filename.assert_called_with(file1)
-
-    def test_add_commit_raises_Exception_if_tag_already_exists(self):
-        self.set_bucket_list(['tag1-msg1'])
-        file1 = self.tempdir.write('file1', 'some file contents')
-
-        def will_raise_Exception():
-            self.store.add_commit('tag1', file1, 'some_message')
-        self.assertRaises(TagAlreadyExistsError, will_raise_Exception)
 
     def test_delete_commit_calls_get_key(self):
         self.set_bucket_list(['tag1-msg1'])

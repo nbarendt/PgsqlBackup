@@ -2,14 +2,6 @@ import os
 from bbpgsql.repository_commit import BBCommit
 
 
-class TagAlreadyExistsError(Exception):
-    def __init__(self, tag):
-        self.tag = tag
-
-    def __str__(self):
-        return 'Tag "{0}" already exists!'.format(self.tag)
-
-
 class FileAlreadyExistsError(Exception):
     def __init__(self, filename):
         self.filename = filename
@@ -60,8 +52,6 @@ class S3CommitStorage(object):
         return [k.name for k in self.bucket.list()]
 
     def add_commit(self, tag, filename, message):
-        if tag in self.get_tags():
-            raise TagAlreadyExistsError('Tag {0} already exists'.format(tag))
         new_key_name = self.tag_separator.join([tag, message])
         new_key = self.bucket.new_key(new_key_name)
         new_key.set_contents_from_filename(filename)
