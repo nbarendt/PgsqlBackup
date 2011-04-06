@@ -1,4 +1,4 @@
-from bbpgsql.repository_storage_test import MemoryCommitStorage
+from bbpgsql.repository_storage_memory import MemoryCommitStorage
 from tests.repository_test.repository_test_skeleton import (
     Skeleton_Repository_Operations_With_SpecificCommitStorage
     )

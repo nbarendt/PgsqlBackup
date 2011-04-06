@@ -1,4 +1,4 @@
-from bbpgsql.repository_storage_test import FilesystemCommitStorage
+from bbpgsql.repository_storage_filesystem import FilesystemCommitStorage
 from tests.repository_test.repository_test_skeleton import (
     Skeleton_Repository_Operations_With_SpecificCommitStorage
     )
