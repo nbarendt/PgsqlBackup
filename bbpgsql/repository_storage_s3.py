@@ -49,6 +49,8 @@ class S3CommitStorage(object):
     def __init__(self, bucket, prefix=None):
         self.bucket = bucket
         self.bucket_prefix = prefix or ''
+        if self.bucket_prefix.startswith('/'):
+            raise Exception('Bucket prefix must not start with leading slash')
         self.bucket_prefix_len = len(self.bucket_prefix)
 
     def _get_keyname_mapper(self, keyname=None, tag=None, message=None):

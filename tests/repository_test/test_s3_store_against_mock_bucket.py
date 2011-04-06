@@ -116,6 +116,10 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
     def test_contains_interface_returns_false_for_tags_not_in_bucket(self):
         self.assertFalse('tag2' in self.store)
 
+    def test_raises_Exception_if_prefix_has_leading_slash(self):
+        def will_raise_Exception():
+            S3CommitStorage(self.mock_bucket, '/illegal_prefix')
+        self.assertRaises(Exception, will_raise_Exception)
 
 
 class Test_S3CommitStorage_Against_Mock(Skeleton_S3CommitStorage_Against_Mock):
