@@ -7,15 +7,13 @@ from tests.repository_test.repository_test_skeleton import (
     )
 
 
-class Test_Repository_Operations_With_S3CommitStorage(
+class Skeleton_Repository_Operations_With_S3CommitStorage(
     Skeleton_Repository_Operations_With_SpecificCommitStorage):
-    __test__ = True
 
     def setUp(self):
         self.setup_tempdir()
         self.setup_bucket()
-        self.store = S3CommitStorage(self.bucket)
-        self.repo_path = self.tempdir.makedir('repo')
+        self.store = self.create_storage() # tests need to provide
         self.setup_repository()
 
     def setup_bucket(self):
@@ -36,3 +34,18 @@ class Test_Repository_Operations_With_S3CommitStorage(
             key.delete()
         self.bucket.delete()
 
+
+class Test_Repository_Operations_with_S3CommitStorage(
+    Skeleton_Repository_Operations_With_S3CommitStorage):
+    __test__ = True
+
+    def create_storage(self):
+        return S3CommitStorage(self.bucket)
+
+
+class Test_Repository_Operations_with_S3CommitStorage_with_Bucket_Prefix(
+    Skeleton_Repository_Operations_With_S3CommitStorage):
+    __test__ = True
+
+    def create_storage(self):
+        return S3CommitStorage(self.bucket, 'some_test_prefix/')
