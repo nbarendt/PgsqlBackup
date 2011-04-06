@@ -48,16 +48,17 @@ class Test_S3CommitStorage_Against_Mock(TestCase):
         self.assertEqual('msg1', self.store.get_message_for_tag('tag1'))
 
     def test_add_commit_calls_new_key_with_expected_format(self):
-        file1 = self.tempdir.write('file1', 'some file contents')
-        self.store.add_commit('tag1', file1, 'some_message')
+        filename1 = self.tempdir.write('file1', 'some file contents')
+        self.store.add_commit('tag1', open(filename1, 'rb'), 'some_message')
         expected_key_name = '-'.join(['tag1', 'some_message'])
         self.mock_bucket.new_key.assert_called_with(expected_key_name)
 
     def test_add_commit_calls_set_contents_from_filename(self):
-        file1 = self.tempdir.write('file1', 'some file contents')
-        self.store.add_commit('tag1', file1, 'some_message')
+        filename1 = self.tempdir.write('file1', 'some file contents')
+        fp1 = open(filename1, 'rb')
+        self.store.add_commit('tag1', fp1, 'some_message')
         new_key_mock = self.mock_bucket.new_key.return_value
-        new_key_mock.set_contents_from_filename.assert_called_with(file1)
+        new_key_mock.set_contents_from_file.assert_called_with(fp1)
 
     def test_delete_commit_calls_get_key(self):
         self.set_bucket_list(['tag1-msg1'])

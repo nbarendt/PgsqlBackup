@@ -42,7 +42,7 @@ class BBRepository(object):
         self._tag_is_unique(tag)
         self._tag_is_legal(tag)
         self._message_is_legal(message)
-        self.store.add_commit(tag, filename, message)
+        self.store.add_commit(tag, open(filename, 'rb'), message)
 
     def delete_commits_before(self, new_oldest_commit):
         new_oldest_tag = new_oldest_commit.tag

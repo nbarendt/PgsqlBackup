@@ -40,10 +40,10 @@ class S3CommitStorage(object):
     def _get_commit_keynames(self):
         return [k.name for k in self.bucket.list()]
 
-    def add_commit(self, tag, filename, message):
+    def add_commit(self, tag, fp, message):
         new_key_name = self.tag_separator.join([tag, message])
         new_key = self.bucket.new_key(new_key_name)
-        new_key.set_contents_from_filename(filename)
+        new_key.set_contents_from_file(fp)
 
     def delete_commit(self, tag):
         keyname_to_delete = self._get_keyname_for_tag(tag)

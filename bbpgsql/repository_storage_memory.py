@@ -7,14 +7,13 @@ class MemoryCommitStorage(object):
         self.data = {}
 
     def __contains__(self, tag):
-        return tag in self.data 
+        return tag in self.data
 
     def __getitem__(self, tag):
         return BBCommit(self, tag, self.get_message_for_tag(tag))
 
-    def add_commit(self, tag, filename, message):
-        self.data[tag] = dict(data=open(filename, 'rb').read(),
-            message=message)
+    def add_commit(self, tag, fp, message):
+        self.data[tag] = dict(data=fp.read(), message=message)
 
     def delete_commit(self, tag):
         del self.data[tag]

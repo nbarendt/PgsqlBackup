@@ -11,7 +11,7 @@ class FilesystemCommitStorage(object):
     def __contains__(self, tag):
         commit_files = self._get_list_of_commit_files()
         tags = [self._get_tag_from_commit_filename(f) for f in commit_files]
-        return tag in tags 
+        return tag in tags
 
     def __getitem__(self, tag):
         return BBCommit(self, tag, self.get_message_for_tag(tag))
@@ -39,10 +39,10 @@ class FilesystemCommitStorage(object):
     def _get_message_from_commit_filename(self, commit_filename):
         return commit_filename.split(self.tag_separator, 1)[1]
 
-    def add_commit(self, tag, filename, message):
+    def add_commit(self, tag, fp, message):
         commit_filename = self.tag_separator.join([tag, message])
         commit_path = self._commit_filename_to_absolute_path(commit_filename)
-        open(commit_path, 'wb').write(open(filename, 'rb').read())
+        open(commit_path, 'wb').write(fp.read())
 
     def delete_commit(self, tag):
         os.remove(self._tag_to_absolute_path(tag))
