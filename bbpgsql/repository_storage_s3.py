@@ -19,12 +19,17 @@ class KeynameTagMessageMapper(object):
 
     def _strip_prefix(self, keyname):
         return keyname[self.bucket_prefix_len:]
-    
+
+    def _get_key_part(self, part_number):
+        stripped_keyname = self._strip_prefix(self._keyname)
+        parts = stripped_keyname.split(self.tag_separator, 1)
+        return parts[part_number]
+
     def tag_from_keyname(self):
-        return self._strip_prefix(self._keyname).split(self.tag_separator, 1)[0]
+        return self._get_key_part(0)
 
     def message_from_keyname(self):
-        return self._strip_prefix(self._keyname).split(self.tag_separator, 1)[1]
+        return self._get_key_part(1)
 
     def keyname_from_tag_and_message(self):
         return ''.join([self.bucket_prefix, self._tag, self.tag_separator,
