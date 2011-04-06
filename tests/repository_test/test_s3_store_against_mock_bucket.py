@@ -6,7 +6,6 @@ from bbpgsql.repository_storage_s3 import FileAlreadyExistsError
 from bbpgsql.repository_storage_s3 import UnknownTagError
 from mock import Mock
 from boto.s3.bucket import Bucket
-from boto.s3.key import Key
 
 
 class Test_S3CommitStorage_Against_Mock(TestCase):
