@@ -4,6 +4,11 @@ from bbpgsql.repository import DuplicateTagError
 from bbpgsql.repository import BBRepository
 from bbpgsql.repository_storage_test import MemoryCommitStorage
 from bbpgsql.repository_storage_test import FilesystemCommitStorage
+from bbpgsql.repository_storage_s3 import S3CommitStorage
+from ConfigParser import SafeConfigParser
+from boto import connect_s3
+from uuid import uuid4
+
 
 class Test_DuplicateTagError(TestCase):
     def test_str_output(self):
@@ -46,8 +51,9 @@ class Test_Repository_Operations_With_MemoryCommitStorage(TestCase):
     def test_can_commit_and_retrieve_contents(self):
         self.commit_file1('some_tag')
         commit = self.repo['some_tag']
-        commit.get_contents_to_filename(self.file2)
-        self.assertEqual('some contents', open(self.file2, 'rb').read())
+        restore_file = self.tempdir.getpath('file3')
+        commit.get_contents_to_filename(restore_file)
+        self.assertEqual('some contents', open(restore_file, 'rb').read())
     
     def test_tags_are_unique(self):
         self.commit_file1('some_tag')
@@ -95,13 +101,38 @@ class Test_Repository_Operations_With_MemoryCommitStorage(TestCase):
         self.assertRaises(Exception, will_raise_Exception)
 
 
-class Test_Basic_Rpository_Operations_On_FilesystemRepository(
+class Test_Basic_Repository_Operations_On_FilesystemRepository(
         Test_Repository_Operations_With_MemoryCommitStorage):
     def setUp(self):
         self.tempdir = TempDirectory()
         self.repo_path = self.tempdir.makedir('repo')
         self.store = FilesystemCommitStorage(self.repo_path)
         self.repo = BBRepository(self.store)
-        self.file1 = self.tempdir.write('self.file1', 'some contents')
+        self.file1 = self.tempdir.write('file1', 'some contents')
         self.file2 = self.tempdir.write('file2', 'some other contents')
 
+class Test_Basic_Repository_Operations_On_S3CommitStorage(
+        Test_Repository_Operations_With_MemoryCommitStorage):
+        #TestCase):
+    def setUp(self):
+        self.tempdir = TempDirectory()
+        configFile = SafeConfigParser()
+        configFile.read('aws_test.ini')
+        aws_access_key = configFile.get('aws', 'aws_access_key')
+        aws_secret_key = configFile.get('aws', 'aws_secret_key')
+        self.s3_connection = connect_s3(aws_access_key, aws_secret_key)
+        self.bucket_name = '.'.join(['test', uuid4().hex])
+        self.bucket = self.s3_connection.create_bucket(self.bucket_name)
+        self.store = S3CommitStorage(self.bucket)
+        self.repo = BBRepository(self.store)
+        self.file1 = self.tempdir.write('file1', 'some contents')
+        self.file2 = self.tempdir.write('file2', 'some other contents')
+
+    def tearDown(self):
+        for key in self.bucket:
+            key.delete()
+        self.bucket.delete()
+
+    def test_can_create_a_key_in_test_bucket(self):
+        self.bucket.new_key('test_key').set_contents_from_string(
+            'hello world!')
