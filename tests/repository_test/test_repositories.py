@@ -1,7 +1,5 @@
 from unittest import TestCase
-from testfixtures import TempDirectory
 from bbpgsql.repository import DuplicateTagError
-from bbpgsql.repository import BBRepository
 from bbpgsql.repository_storage_test import MemoryCommitStorage
 from bbpgsql.repository_storage_test import FilesystemCommitStorage
 from bbpgsql.repository_storage_s3 import S3CommitStorage
