@@ -1,21 +1,7 @@
 import os
 from bbpgsql.repository_commit import BBCommit
-
-
-class FileAlreadyExistsError(Exception):
-    def __init__(self, filename):
-        self.filename = filename
-
-    def __str__(self):
-        return 'File "{0}" already exists!'.format(self.filename)
-
-
-class UnknownTagError(Exception):
-    def __init__(self, tag):
-        self.tag = tag
-
-    def __str__(self):
-        return 'Unknown Tag "{0}"!'.format(self.tag)
+from bbpgsql.repository_exceptions import FileAlreadyExistsError
+from bbpgsql.repository_exceptions import UnknownTagError
 
 
 class S3CommitStorage(object):

@@ -1,16 +1,7 @@
 from re import match
+from bbpgsql.repository_exceptions import DuplicateTagError
 
 CHARACTER_REGEX = r'^[a-zA-Z0-9\_]*$'
-
-
-class DuplicateTagError(Exception):
-    def __init__(self, tag):
-        self.tag = tag
-
-    def __str__(self):
-        msg = 'DuplicateTagError: the tag "{0}" already exists in' \
-              ' the repository'.format(self.tag)
-        return msg
 
 
 class BBRepository(object):
