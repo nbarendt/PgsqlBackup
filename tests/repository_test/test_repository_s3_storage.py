@@ -13,6 +13,12 @@ class Test_Repository_Operations_With_S3CommitStorage(
 
     def setUp(self):
         self.setup_tempdir()
+        self.setup_bucket()
+        self.store = S3CommitStorage(self.bucket)
+        self.repo_path = self.tempdir.makedir('repo')
+        self.setup_repository()
+
+    def setup_bucket(self):
         configFile = SafeConfigParser()
         configFile.read('aws_test.ini')
         aws_access_key = configFile.get('aws', 'aws_access_key')
@@ -20,12 +26,13 @@ class Test_Repository_Operations_With_S3CommitStorage(
         self.s3_connection = connect_s3(aws_access_key, aws_secret_key)
         self.bucket_name = '.'.join(['test', uuid4().hex])
         self.bucket = self.s3_connection.create_bucket(self.bucket_name)
-        self.store = S3CommitStorage(self.bucket)
-        self.repo_path = self.tempdir.makedir('repo')
-        self.setup_repository()
 
     def tearDown(self):
+        self.teardown_bucket()
+        self.teardown_tempdir()
+
+    def teardown_bucket(self):
         for key in self.bucket:
             key.delete()
         self.bucket.delete()
-        self.teardown_tempdir()
+
