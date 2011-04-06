@@ -6,6 +6,7 @@ from bbpgsql.repository_storage_s3 import FileAlreadyExistsError
 from bbpgsql.repository_storage_s3 import UnknownTagError
 from mock import Mock
 from boto.s3.bucket import Bucket
+from boto.s3.key import Key
 
 
 class Test_S3CommitStorage_Against_Mock(TestCase):
@@ -21,8 +22,9 @@ class Test_S3CommitStorage_Against_Mock(TestCase):
     def tearDown(self):
         self.tempdir.cleanup()
 
-    def set_bucket_list(self, keys):
-        self.mock_bucket.list.return_value = keys
+    def set_bucket_list(self, keynames):
+        key_objs = [Key(None, key) for key in keynames]
+        self.mock_bucket.list.return_value = key_objs
 
     def test_get_tags_calls_bucket_list__empty(self):
         self.assertEqual([], self.store.get_tags())
@@ -40,7 +42,7 @@ class Test_S3CommitStorage_Against_Mock(TestCase):
     def test_get_message_for_tag_calls_bucket_list(self):
         self.set_bucket_list(['tag1-msg1'])
         self.store.get_message_for_tag('tag1')
-        self.mock_bucket.list.assert_called_with() 
+        self.mock_bucket.list.assert_called_with()
 
     def test_get_message_for_tag_parses_keyname_properly(self):
         self.set_bucket_list(['tag1-msg1'])
@@ -96,5 +98,5 @@ class Test_S3CommitStorage_Against_Mock(TestCase):
     def test_dictionary_interface_raises_Exception_if_unknown_tag(self):
 
         def will_raise_UnknownTagError():
-            commit = self.store['tag1']
+            self.store['tag1']
         self.assertRaises(UnknownTagError, will_raise_UnknownTagError)
