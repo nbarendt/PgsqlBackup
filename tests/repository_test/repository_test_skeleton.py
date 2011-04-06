@@ -34,9 +34,14 @@ class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
     def test_can_commit_files_to_repository(self):
         self.commit_file1('some_tag')
 
-    def test_commit_tag_characters_limited(self):
+    def test_commit_tag_characters_are_limited(self):
         def will_raise_Exception():
             self.commit_file1('illegal tag with spaces')
+        self.assertRaises(Exception, will_raise_Exception)
+
+    def test_commit_tag_must_be_non_empty(self):
+        def will_raise_Exception():
+            self.commit_file1('')
         self.assertRaises(Exception, will_raise_Exception)
 
     def test_repo_is_empty_to_start(self):

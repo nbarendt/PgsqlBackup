@@ -33,7 +33,7 @@ class BBRepository(object):
                 message, self.character_regex))
 
     def _tag_is_legal(self, tag):
-        if not match(self.character_regex, tag):
+        if not tag or not match(self.character_regex, tag):
             raise Exception('Tag "{0}" does not match regex "{1}"'.format(
                 tag, self.character_regex))
 
