@@ -64,18 +64,21 @@ class S3CommitStorage(object):
     def __contains__(self, tag):
         return 0 < len(self._get_keys_that_start_with_tag(tag))
 
+    def _get_keynames_that_start_with(self, prefix):
+        return [k.name for k in self.bucket.list(prefix=prefix)]
+
     def _get_commit_keynames(self):
-        return [k.name for k in self.bucket.list(prefix=self.bucket_prefix)]
+        return self._get_keynames_that_start_with(self.bucket_prefix)
 
     def _get_keys_that_start_with_tag(self, tag):
         search_prefix = self._get_keyname_mapper(tag=tag).keyname
-        return [k.name for k in self.bucket.list(prefix=search_prefix)]
+        return self._get_keynames_that_start_with(search_prefix)
 
     def _get_mapping_of_tags_to_keynames(self):
         keynames = self._get_commit_keynames()
         mapping = {}
-        for key in keynames:
-            mapping[self._get_keyname_mapper(key).tag] = key
+        for keyname in keynames:
+            mapping[self._get_keyname_mapper(keyname).tag] = keyname
         return mapping
 
     def _get_keyname_for_tag(self, tag):
@@ -86,7 +89,8 @@ class S3CommitStorage(object):
             raise UnknownTagError(tag)
 
     def add_commit(self, tag, fp, message):
-        new_key_name = self._get_keyname_mapper(tag=tag, message=message).keyname
+        new_key_name = self._get_keyname_mapper(tag=tag,
+            message=message).keyname
         new_key = self.bucket.new_key(new_key_name)
         new_key.set_contents_from_file(fp)
 
