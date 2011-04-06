@@ -28,7 +28,7 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         return ''.join([self.bucket_prefix or '', key])
 
     def set_bucket_list(self, keynames):
-        prefixed_keynames = [self.prefix_key(key) for key in keynames] 
+        prefixed_keynames = [self.prefix_key(key) for key in keynames]
         key_objs = [Key(None, key) for key in prefixed_keynames]
         self.mock_bucket.list.return_value = key_objs
 
@@ -59,7 +59,7 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         filename1 = self.tempdir.write('file1', 'some file contents')
         self.store.add_commit('tag1', open(filename1, 'rb'), 'some_message')
         expected_key_name = self.prefix_key(''.join(['tag1',
-            '-','some_message']))
+            '-', 'some_message']))
         self.mock_bucket.new_key.assert_called_with(expected_key_name)
 
     def test_add_commit_calls_set_contents_from_filename(self):
