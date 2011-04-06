@@ -1,35 +1,29 @@
 from unittest import TestCase
 from testfixtures import TempDirectory
-from bbpgsql.repository import DuplicateTagError
 from bbpgsql.repository import BBRepository
-from bbpgsql.repository_storage_test import MemoryCommitStorage
-from bbpgsql.repository_storage_test import FilesystemCommitStorage
-from bbpgsql.repository_storage_s3 import S3CommitStorage
-from ConfigParser import SafeConfigParser
-from boto import connect_s3
-from uuid import uuid4
-from tests.repository_test.repository_test_skeleton import (
-    Skeleton_Repository_Operations_With_SpecificCommitStorage
-    )
+from bbpgsql.repository import DuplicateTagError
 
 
-class Test_DuplicateTagError(TestCase):
-    def test_str_output(self):
-        expected = 'DuplicateTagError: the tag "badtag" already' \
-                    ' exists in the repository'
-        self.assertEqual(expected, str(DuplicateTagError('badtag')))
-
-class Test_Repository_Operations_With_MemoryCommitStorage(
-    Skeleton_Repository_Operations_With_SpecificCommitStorage):
-    __test__ = True
+class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
+    __test__ = False  # to prevent nose from running this skeleton
 
     def setUp(self):
-        self.setup_tempdir()
-        self.store = MemoryCommitStorage()
-        self.setup_repository()
+        raise Exception('This is a skeleton for test - you need to provide'
+                        ' your own setUp() and tearDown()')
 
-    def tearDown(self):
-        self.teardown_tempdir()
+    def setup_tempdir(self):
+        # call this from your setUp
+        self.tempdir = TempDirectory()
+        self.file1 = self.tempdir.write('file1', 'some contents')
+        self.file2 = self.tempdir.write('file2', 'some other contents')
+
+    def teardown_tempdir(self):
+        # call this from your tearDown
+        self.tempdir.cleanup()
+
+    def setup_repository(self):
+        # call this from your setUp after creating your store
+        self.repo = BBRepository(self.store)
 
     def commit_file1(self, tag, message=None):
         self.repo.create_commit_from_filename(tag, self.file1, message)
@@ -104,39 +98,3 @@ class Test_Repository_Operations_With_MemoryCommitStorage(
             self.commit_file1('a', 'some illegal message')
         self.assertRaises(Exception, will_raise_Exception)
 
-
-class Test_Repository_Operations_With_FileSystemCommitStore(
-    Skeleton_Repository_Operations_With_SpecificCommitStorage):
-    __test__ = True
-
-    def setUp(self):
-        self.setup_tempdir()
-        self.repo_path = self.tempdir.makedir('repo')
-        self.store = FilesystemCommitStorage(self.repo_path)
-        self.setup_repository()
-
-    def tearDown(self):
-        self.teardown_tempdir()
-
-class Test_Repository_Operations_With_S3CommitStorage(
-    Skeleton_Repository_Operations_With_SpecificCommitStorage):
-    __test__ = True
-
-    def setUp(self):
-        self.setup_tempdir()
-        configFile = SafeConfigParser()
-        configFile.read('aws_test.ini')
-        aws_access_key = configFile.get('aws', 'aws_access_key')
-        aws_secret_key = configFile.get('aws', 'aws_secret_key')
-        self.s3_connection = connect_s3(aws_access_key, aws_secret_key)
-        self.bucket_name = '.'.join(['test', uuid4().hex])
-        self.bucket = self.s3_connection.create_bucket(self.bucket_name)
-        self.store = S3CommitStorage(self.bucket)
-        self.repo_path = self.tempdir.makedir('repo')
-        self.setup_repository()
-
-    def tearDown(self):
-        for key in self.bucket:
-            key.delete()
-        self.bucket.delete()
-        self.teardown_tempdir()
