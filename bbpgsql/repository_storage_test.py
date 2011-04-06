@@ -6,6 +6,9 @@ class MemoryCommitStorage(object):
     def __init__(self):
         self.data = {}
 
+    def __contains__(self, tag):
+        return tag in self.data 
+
     def __getitem__(self, tag):
         return BBCommit(self, tag, self.get_message_for_tag(tag))
 
@@ -31,6 +34,11 @@ class FilesystemCommitStorage(object):
 
     def __init__(self, directory):
         self.path_to_storage = directory
+
+    def __contains__(self, tag):
+        commit_files = self._get_list_of_commit_files()
+        tags = [self._get_tag_from_commit_filename(f) for f in commit_files] 
+        return tag in tags 
 
     def __getitem__(self, tag):
         return BBCommit(self, tag, self.get_message_for_tag(tag))

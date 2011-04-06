@@ -24,7 +24,7 @@ class BBRepository(object):
         return sorted(self.store.get_tags())
 
     def _tag_is_unique(self, tag):
-        if tag in self.store.get_tags():
+        if tag in self.store:
             raise DuplicateTagError(tag)
 
     def _message_is_legal(self, message):

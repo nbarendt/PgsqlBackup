@@ -15,6 +15,9 @@ class S3CommitStorage(object):
         message = self._message_from_keyname(keyname)
         return BBCommit(self, tag, message)
 
+    def __contains__(self, tag):
+        return 0 < len([k for k in self.bucket.list(prefix=tag)])
+
     def _tag_from_keyname(self, keyname):
         return keyname.split(self.tag_separator, 1)[0]
 

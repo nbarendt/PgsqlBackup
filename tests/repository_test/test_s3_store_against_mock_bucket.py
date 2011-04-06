@@ -91,3 +91,16 @@ class Test_S3CommitStorage_Against_Mock(TestCase):
         def will_raise_UnknownTagError():
             self.store['tag1']
         self.assertRaises(UnknownTagError, will_raise_UnknownTagError)
+
+    def test_contains_interface_calls_bucket_list_with_prefix(self):
+        self.set_bucket_list(['tag1-msg1'])
+        'tag1' in self.store
+        self.mock_bucket.list.assert_called_with(prefix='tag1')
+
+    def test_contains_interface_returns_true_for_tags_in_bucket(self):
+        self.set_bucket_list(['tag1-msg1'])
+        self.assertTrue('tag1' in self.store)
+
+    def test_contains_interface_returns_false_for_tags_not_in_bucket(self):
+        self.assertFalse('tag2' in self.store)
+
