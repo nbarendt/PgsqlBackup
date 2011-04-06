@@ -57,7 +57,7 @@ class S3CommitStorage(object):
             raise UnknownTagError(tag)
 
     def _get_commit_keynames(self):
-        return [k for k in self.bucket.list()]
+        return [k.name for k in self.bucket.list()]
 
     def add_commit(self, tag, filename, message):
         if tag in self.get_tags():
@@ -84,5 +84,5 @@ class S3CommitStorage(object):
 
     def get_message_for_tag(self, tag):
         keyname = self._get_keyname_for_tag(tag)
-        return self._message_from_keyname(keyname)        
+        return self._message_from_keyname(keyname)
 
