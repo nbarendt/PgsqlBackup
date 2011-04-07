@@ -2,7 +2,7 @@ import os
 from optparse import OptionParser
 
 
-def parse_args(args=None):
+def common_parse_args(args=None):
     parser = OptionParser()
 
     parser.add_option('-c', '--config', dest='config_file',
@@ -16,7 +16,7 @@ def parse_args(args=None):
     return parser.parse_args(args)
 
 
-def validate_options_and_args(options=None, args=None):
+def common_validate_options_and_args(options=None, args=None):
     if not os.path.exists(options.config_file):
         raise Exception("File %s does not exist" % (options.config_file))
 
