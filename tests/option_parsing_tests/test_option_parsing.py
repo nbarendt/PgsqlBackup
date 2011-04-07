@@ -41,10 +41,10 @@ class Test_OptionParsing_and_Validation(TestCase):
 
     def test_validation_raises_exception_if_config_file_does_not_exist(self):
         def validate():
-            common_validate_options_and_args(*parse_args(args=[
+            common_validate_options_and_args(*common_parse_args(args=[
                 '--config', '/tmp/blah/blah/bbpgsql.ini']))
         self.assertRaises(Exception, validate)
 
     def test_options_validate_if_config_file_exists(self):
-        self.assertTrue(common_validate_options_and_args(*common_parse_args(args=[
-            '--config', self.config_path])))
+        self.assertTrue(common_validate_options_and_args(
+            *common_parse_args(args=['--config', self.config_path])))
