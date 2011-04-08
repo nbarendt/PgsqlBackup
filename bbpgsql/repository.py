@@ -1,7 +1,7 @@
 from re import match
 from bbpgsql.repository_exceptions import DuplicateTagError
 
-CHARACTER_REGEX = r'^[a-zA-Z0-9\_]*$'
+CHARACTER_REGEX = r'^[a-zA-Z0-9\-\:\.]*$'
 
 
 class BBRepository(object):

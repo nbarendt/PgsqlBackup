@@ -49,7 +49,7 @@ class KeynameTagMessageMapper(object):
 
 
 class S3CommitStorage(object):
-    tag_separator = '-'
+    tag_separator = '_'
 
     def __init__(self, bucket, prefix=None):
         self.bucket = bucket
