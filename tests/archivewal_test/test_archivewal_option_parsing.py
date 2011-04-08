@@ -40,14 +40,15 @@ class Test_archivewal_requires_WAL_file(TestCase):
             'bbpgsql.option_parser.common_validate_options_and_args',
             spec=True)
         self.common_validate_options_and_args_mock = self.patchers[
-            'common_validate_options_and_args'].start() 
+            'common_validate_options_and_args'].start()
 
     def tearDown(self):
         self.patchers['common_validate_options_and_args'].stop()
         self.tempdir.cleanup()
 
-    def test_will_raise_exception(self):
+    def test_will_raise_exception_with_no_WAL_file(self):
         self.common_validate_options_and_args_mock.return_value = True
+
         def will_raise_Exception():
             archivewal_validate_options_and_args(None, [])
         self.assertRaises(Exception, will_raise_Exception)
@@ -59,8 +60,9 @@ class Test_archivewal_requires_WAL_file(TestCase):
         except Exception, e:
             self.assertTrue('path to a WAL file' in str(e))
 
-    def test_will_raise_exception(self):
+    def test_will_raise_exception_with_relative_WAL_file_path(self):
         self.common_validate_options_and_args_mock.return_value = True
+
         def will_raise_Exception():
             archivewal_validate_options_and_args(None, ['path_to/WAL_file'])
         self.assertRaises(Exception, will_raise_Exception)
