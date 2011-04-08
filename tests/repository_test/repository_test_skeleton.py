@@ -109,4 +109,4 @@ class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
 
     def test_UTC_iso_datetime_is_a_valid_message(self):
         self.commit_filename1('a', datetime.utcnow().isoformat())
-        self.commit_filename1(datetime.utcnow().isoformat())  
+        self.commit_filename1(datetime.utcnow().isoformat())

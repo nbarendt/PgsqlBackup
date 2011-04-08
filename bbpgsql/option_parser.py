@@ -46,8 +46,10 @@ def archivewal_parse_args(args=None):
     options, args = parser.parse_args(args)
     return parser, options, args
 
+
 def is_valid_file(wal_path):
     return os.path.isabs(wal_path) and os.path.isfile(wal_path)
+
 
 def archivewal_validate_options_and_args(options=None, args=None):
     if not common_validate_options_and_args(options, args):
