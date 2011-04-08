@@ -46,11 +46,13 @@ def archivewal_parse_args(args=None):
     options, args = parser.parse_args(args)
     return parser, options, args
 
+def is_valid_file(wal_path):
+    return os.path.isabs(wal_path) and os.path.isfile(wal_path)
 
 def archivewal_validate_options_and_args(options=None, args=None):
     if not common_validate_options_and_args(options, args):
         return False
-    if len(args) != 1:
-        raise Exception('An absolute path to a WAL file to be archive' \
+    if len(args) != 1 or not is_valid_file(args[0]):
+        raise Exception('An absolute path to a WAL file to be archived' \
                         ' must be provided!')
     return True
