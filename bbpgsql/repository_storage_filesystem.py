@@ -3,7 +3,7 @@ from bbpgsql.repository_commit import BBCommit
 
 
 class FilesystemCommitStorage(object):
-    tag_separator = '-'
+    tag_separator = '_'
 
     def __init__(self, directory):
         self.path_to_storage = directory

@@ -2,6 +2,7 @@ from unittest import TestCase
 from testfixtures import TempDirectory
 from bbpgsql.repository import BBRepository
 from bbpgsql.repository import DuplicateTagError
+from datetime import datetime
 
 
 class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
@@ -32,7 +33,7 @@ class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
         self.repo.create_commit_from_filename(tag, self.filename2, message)
 
     def test_can_commit_filenames_to_repository(self):
-        self.commit_filename1('some_tag')
+        self.commit_filename1('some-tag')
 
     def test_commit_tag_characters_are_limited(self):
         def will_raise_Exception():
@@ -48,21 +49,21 @@ class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
         self.assertEqual([], [c for c in self.repo])
 
     def test_can_commit_files_and_list_commits(self):
-        self.commit_filename1('some_tag')
-        self.assertEqual(['some_tag'], [c.tag for c in self.repo])
+        self.commit_filename1('some-tag')
+        self.assertEqual(['some-tag'], [c.tag for c in self.repo])
 
     def test_can_commit_and_retrieve_contents(self):
-        self.commit_filename1('some_tag')
-        commit = self.repo['some_tag']
+        self.commit_filename1('some-tag')
+        commit = self.repo['some-tag']
         restore_file = self.tempdir.getpath('file3')
         commit.get_contents_to_filename(restore_file)
         self.assertEqual('some contents', open(restore_file, 'rb').read())
 
     def test_tags_are_unique(self):
-        self.commit_filename1('some_tag')
+        self.commit_filename1('some-tag')
 
         def will_raise_DuplicateTagError():
-            self.repo.create_commit_from_filename('some_tag', self.filename1)
+            self.repo.create_commit_from_filename('some-tag', self.filename1)
         self.assertRaises(DuplicateTagError, will_raise_DuplicateTagError)
 
     def test_can_get_commit_before_a_given_commit(self):
@@ -92,7 +93,7 @@ class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
         self.assertEqual(['c'], [c.tag for c in self.repo])
 
     def test_can_store_and_retrieve_message_with_commit(self):
-        message = 'some_extra_data'
+        message = 'some-extra-data'
         self.commit_filename1('a', message)
         commit = self.repo['a']
         self.assertEqual(message, commit.message)
@@ -102,3 +103,10 @@ class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
         def will_raise_Exception():
             self.commit_filename1('a', 'some illegal message')
         self.assertRaises(Exception, will_raise_Exception)
+
+    def test_UTC_iso_datetime_is_a_valid_tag(self):
+        self.commit_filename1(datetime.utcnow().isoformat())
+
+    def test_UTC_iso_datetime_is_a_valid_message(self):
+        self.commit_filename1('a', datetime.utcnow().isoformat())
+        self.commit_filename1(datetime.utcnow().isoformat())

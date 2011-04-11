@@ -20,13 +20,16 @@ class KeynameTagMessageMapper(object):
     def _strip_prefix(self, keyname):
         return keyname[self.bucket_prefix_len:]
 
+    def _get_key_part(self, part_number):
+        stripped_keyname = self._strip_prefix(self._keyname)
+        parts = stripped_keyname.split(self.tag_separator, 1)
+        return parts[part_number]
+
     def tag_from_keyname(self):
-        return self._strip_prefix(self._keyname).split(self.tag_separator,
-            1)[0]
+        return self._get_key_part(0)
 
     def message_from_keyname(self):
-        return self._strip_prefix(self._keyname).split(self.tag_separator,
-            1)[1]
+        return self._get_key_part(1)
 
     def keyname_from_tag_and_message(self):
         return ''.join([self.bucket_prefix, self._tag, self.tag_separator,
@@ -46,11 +49,13 @@ class KeynameTagMessageMapper(object):
 
 
 class S3CommitStorage(object):
-    tag_separator = '-'
+    tag_separator = '_'
 
     def __init__(self, bucket, prefix=None):
         self.bucket = bucket
         self.bucket_prefix = prefix or ''
+        if self.bucket_prefix.startswith('/'):
+            raise Exception('Bucket prefix must not start with leading slash')
         self.bucket_prefix_len = len(self.bucket_prefix)
 
     def _get_keyname_mapper(self, keyname=None, tag=None, message=None):
@@ -64,18 +69,21 @@ class S3CommitStorage(object):
     def __contains__(self, tag):
         return 0 < len(self._get_keys_that_start_with_tag(tag))
 
+    def _get_keynames_that_start_with(self, prefix):
+        return [k.name for k in self.bucket.list(prefix=prefix)]
+
     def _get_commit_keynames(self):
-        return [k.name for k in self.bucket.list(prefix=self.bucket_prefix)]
+        return self._get_keynames_that_start_with(self.bucket_prefix)
 
     def _get_keys_that_start_with_tag(self, tag):
         search_prefix = self._get_keyname_mapper(tag=tag).keyname
-        return [k.name for k in self.bucket.list(prefix=search_prefix)]
+        return self._get_keynames_that_start_with(search_prefix)
 
     def _get_mapping_of_tags_to_keynames(self):
         keynames = self._get_commit_keynames()
         mapping = {}
-        for key in keynames:
-            mapping[self._get_keyname_mapper(key).tag] = key
+        for keyname in keynames:
+            mapping[self._get_keyname_mapper(keyname).tag] = keyname
         return mapping
 
     def _get_keyname_for_tag(self, tag):

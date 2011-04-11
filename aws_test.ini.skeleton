@@ -1,0 +1,5 @@
+# skeleton AWS configuration file, needed for testing
+[aws]
+aws_access_key=YOUR ACCESS KEY GOES HERE
+aws_secret_key=YOUR SECRET KEY GOES HERE
+
