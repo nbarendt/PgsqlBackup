@@ -2,8 +2,10 @@
 Jinja2==2.5.5
 Pygments==1.4
 Sphinx==1.0.7
-#boto==2.0b4
+-e git+git@github.com:nbarendt/PgsqlBackup.git@84b98024c3d9d94f21c261dd19ea2fd5595ed803#egg=bbpgsql-dev
+boto==2.0b4
 docutils==0.7
+mock==0.7.0
 nose==1.0.0
 pep8==0.6.1
 pyflakes==0.4.0
