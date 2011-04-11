@@ -16,7 +16,7 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         self.tempdir = TempDirectory()
         self.setup_mock_defaults()
         self.store = S3CommitStorage(self.mock_bucket, self.bucket_prefix)
-    
+
     def setup_mock_defaults(self):
         self.mock_bucket = Mock(spec=Bucket)
         self.set_bucket_list([])
@@ -28,7 +28,7 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         return ''.join([self.bucket_prefix or '', key])
 
     def set_bucket_list(self, keynames):
-        prefixed_keynames = [self.prefix_key(key) for key in keynames] 
+        prefixed_keynames = [self.prefix_key(key) for key in keynames]
         key_objs = [Key(None, key) for key in prefixed_keynames]
         self.mock_bucket.list.return_value = key_objs
 
@@ -59,7 +59,7 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         filename1 = self.tempdir.write('file1', 'some file contents')
         self.store.add_commit('tag1', open(filename1, 'rb'), 'some_message')
         expected_key_name = self.prefix_key(''.join(['tag1',
-            '-','some_message']))
+            '-', 'some_message']))
         self.mock_bucket.new_key.assert_called_with(expected_key_name)
 
     def test_add_commit_calls_set_contents_from_filename(self):
@@ -86,7 +86,7 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
     def test_get_commit_contents_raises_Exception_if_file_exists(self):
         self.set_bucket_list(['tag1-msg1'])
         file1 = self.tempdir.write('file1', 'some file contents')
-        
+
         def will_raise_Exception():
             self.store.get_commit_contents_to_filename('tag1', file1)
         self.assertRaises(FileAlreadyExistsError, will_raise_Exception)
@@ -117,10 +117,10 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         self.assertFalse('tag2' in self.store)
 
 
-
 class Test_S3CommitStorage_Against_Mock(Skeleton_S3CommitStorage_Against_Mock):
     __test__ = True
     bucket_prefix = None
+
 
 class Test_S3CommitStorage_Against_Mock_with_prefix(
     Skeleton_S3CommitStorage_Against_Mock):

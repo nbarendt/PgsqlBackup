@@ -1,9 +1,10 @@
 from unittest import TestCase
 from testfixtures import TempDirectory
-from nose.plugins.skip import Skip, SkipTest
+from nose.plugins.skip import SkipTest
 import os
 import tarfile
 from bbpgsql.create_archive import create_archive
+
 
 class Test_archive_create(TestCase):
     def setUp(self):
@@ -19,11 +20,13 @@ class Test_archive_create(TestCase):
 
     def test_archive_is_nonempty(self):
         create_archive(self.srcPath, self.archivePath)
-        self.assertTrue(os.stat(self.archivePath).st_size > 0, msg='Created archive size was 0 or less')
+        self.assertTrue(os.stat(self.archivePath).st_size > 0,
+            msg='Created archive size was 0 or less')
 
     def test_archive_is_a_tar_archive(self):
         create_archive(self.srcPath, self.archivePath)
-        self.assertTrue(tarfile.is_tarfile(self.archivePath), msg='Created archive not a valid tar file')
+        self.assertTrue(tarfile.is_tarfile(self.archivePath),
+            msg='Created archive not a valid tar file')
 
     def test_archive_fails_when_source_does_not_exist(self):
 
@@ -53,7 +56,7 @@ class Test_archive_create(TestCase):
         raise(SkipTest)
         self.fill_directory_tree(self)
         create_archive(self.srcPath, self.archivePath)
-        # compare tree to archive -- Hey!  It needs the extract_archive function
+        # compare tree to archive -- Hey! It needs the extract_archive function
         self.fail(msg='Extracted archive and original tree differ')
 
     def fill_directory_tree(self):

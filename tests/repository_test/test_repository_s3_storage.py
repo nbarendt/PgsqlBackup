@@ -13,7 +13,7 @@ class Skeleton_Repository_Operations_With_S3CommitStorage(
     def setUp(self):
         self.setup_tempdir()
         self.setup_bucket()
-        self.store = self.create_storage() # tests need to provide
+        self.store = self.create_storage()  # tests need to provide
         self.setup_repository()
 
     def setup_bucket(self):

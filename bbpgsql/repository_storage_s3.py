@@ -19,12 +19,14 @@ class KeynameTagMessageMapper(object):
 
     def _strip_prefix(self, keyname):
         return keyname[self.bucket_prefix_len:]
-    
+
     def tag_from_keyname(self):
-        return self._strip_prefix(self._keyname).split(self.tag_separator, 1)[0]
+        return self._strip_prefix(self._keyname).split(self.tag_separator,
+            1)[0]
 
     def message_from_keyname(self):
-        return self._strip_prefix(self._keyname).split(self.tag_separator, 1)[1]
+        return self._strip_prefix(self._keyname).split(self.tag_separator,
+            1)[1]
 
     def keyname_from_tag_and_message(self):
         return ''.join([self.bucket_prefix, self._tag, self.tag_separator,
@@ -84,7 +86,8 @@ class S3CommitStorage(object):
             raise UnknownTagError(tag)
 
     def add_commit(self, tag, fp, message):
-        new_key_name = self._get_keyname_mapper(tag=tag, message=message).keyname
+        new_key_name = self._get_keyname_mapper(tag=tag,
+            message=message).keyname
         new_key = self.bucket.new_key(new_key_name)
         new_key.set_contents_from_file(fp)
 
@@ -107,4 +110,3 @@ class S3CommitStorage(object):
     def get_message_for_tag(self, tag):
         keyname = self._get_keyname_for_tag(tag)
         return self._get_keyname_mapper(keyname).message
-

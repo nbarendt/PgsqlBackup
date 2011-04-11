@@ -22,4 +22,3 @@ class UnknownTagError(Exception):
 
     def __str__(self):
         return 'Unknown Tag "{0}"!'.format(self.tag)
-

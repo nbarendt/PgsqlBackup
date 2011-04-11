@@ -2,6 +2,7 @@ from unittest import TestCase
 from bbpgsql.repository_commit import BBCommit
 from mock import Mock
 
+
 class TestBBCommit(TestCase):
     def setUp(self):
         self.mock_store = Mock()
@@ -15,4 +16,3 @@ class TestBBCommit(TestCase):
         self.commit.get_contents_to_filename('somefile')
         self.mock_store.get_commit_contents_to_filename.assert_called_with(
             'tag1', 'somefile')
-    
