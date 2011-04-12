@@ -23,3 +23,7 @@ def config(filenames=None):
     configure_defaults(config_parser)
     config_parser.read(filenames)
     return config_parser
+
+
+def get_config_from_filename(filename):
+    return config([filename])

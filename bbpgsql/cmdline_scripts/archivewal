@@ -2,17 +2,13 @@
 from sys import stdout, exit
 from bbpgsql.option_parser import archivewal_parse_args
 from bbpgsql.option_parser import archivewal_validate_options_and_args
-from bbpgsql.repository import BBRepository
-from bbpgsql.configuration import config
-import os
-from datetime import datetime
+from bbpgsql.configuration import get_config_from_filename
 from bbpgsql.archive_wal import commit_wal_to_repository
-from bbpgsql.configuration.repository_storage import (
-    get_WAL_storage_from_config
+from bbpgsql.configuration.repository import (
+    get_WAL_repository
 )
 
-
-if __name__ == '__main__':
+def handle_args():
     parser, options, args = archivewal_parse_args()
 
     try:
@@ -21,13 +17,17 @@ if __name__ == '__main__':
         stdout.write(str(e)+'\n')
         parser.print_help()
         exit(1)
+    
+    return options, args
+
+if __name__ == '__main__':
+
+    options, args = handle_args()
 
     wal_filename_to_archive = args[0]
 
-    conf = config([options.config_file])
+    conf = get_config_from_filename(options.config_file)
 
-    commit_storage = get_WAL_storage_from_config(conf)
-
-    repository = BBRepository(commit_storage)
+    repository = get_WAL_repository(conf) 
     
     wal_commit = commit_wal_to_repository(repository, wal_filename_to_archive)
