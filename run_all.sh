@@ -1,5 +1,4 @@
 #!/bin/bash
 find . -name "*.pyc" | xargs rm
-./run_tests.sh
-./run_integration_tests.sh
-
+./check_all.sh
+nosetests tests tests/integration
