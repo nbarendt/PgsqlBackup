@@ -80,7 +80,6 @@ aws_secret_key_id={3}
         self.validate_wal_file(WAL_FILENAME, WAL_CONTENTS)
 
     def validate_wal_file(self, wal_filename, wal_contents):
-        bucket = self.get_bucket()
         keys = [k.name for k in self.get_bucket()]
         self.assertEqual(1, len(keys))
         wal_keyname = keys[0]
