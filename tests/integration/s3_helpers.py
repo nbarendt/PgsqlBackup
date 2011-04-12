@@ -3,6 +3,7 @@ from boto import connect_s3
 
 TEST_AWS_CREDENTIAL_FILE = 'aws_test.ini'
 
+
 def get_test_aws_credentials():
     configFile = SafeConfigParser()
     configFile.read(TEST_AWS_CREDENTIAL_FILE)
@@ -10,8 +11,10 @@ def get_test_aws_credentials():
     aws_secret_key = configFile.get('aws', 'aws_secret_key')
     return aws_access_key, aws_secret_key
 
+
 def get_s3_connection(access_key, secret_key):
     return connect_s3(access_key, secret_key)
+
 
 class S3TestFixture(object):
     def __init__(self, access_key, secret_key, bucket_name):
@@ -32,10 +35,7 @@ class S3TestFixture(object):
             key.delete()
         self.bucket.delete()
 
+
 def setup_s3_and_bucket(bucket_name):
     access_key, secret_key = get_test_aws_credentials()
     return S3TestFixture(access_key, secret_key, bucket_name)
-    
-    
-
-

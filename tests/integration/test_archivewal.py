@@ -41,7 +41,7 @@ class Test_archivewal_commits_to_S3(TestCase):
             },
             'Credentials': {
                 'aws_access_key_id': self.temps3.access_key,
-                'aws_secret_key_id' : self.temps3.secret_key,
+                'aws_secret_key_id': self.temps3.secret_key,
             },
         }
         write_config_to_filename(config_dict, self.config_path)
