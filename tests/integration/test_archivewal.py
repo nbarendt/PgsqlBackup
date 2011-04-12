@@ -4,8 +4,8 @@ import os
 from uuid import uuid4
 from copy import deepcopy
 from testfixtures import TempDirectory
-from ConfigParser import SafeConfigParser
-from boto import connect_s3
+from tests.integration.s3_helpers import setup_s3_and_bucket
+from tests.integration.config_helpers import write_config_to_filename
 
 
 class Test_archivewal_commits_to_S3(TestCase):
@@ -28,45 +28,27 @@ class Test_archivewal_commits_to_S3(TestCase):
         self.tempdir = TempDirectory()
 
     def setup_s3(self):
-        configFile = SafeConfigParser()
-        configFile.read('aws_test.ini')
-        self.aws_access_key = configFile.get('aws', 'aws_access_key')
-        self.aws_secret_key = configFile.get('aws', 'aws_secret_key')
-        self.s3_connection = connect_s3(self.aws_access_key,
-            self.aws_secret_key)
         self.bucket_name = '.'.join(['test', uuid4().hex])
         self.prefix = 'wal/'
+        self.temps3 = setup_s3_and_bucket(self.bucket_name)
 
     def setup_config(self):
         self.config_path = self.tempdir.getpath(self.CONFIG_FILE)
-        f = open(self.config_path, 'wb')
-        f.write("""
-[WAL storage]
-driver=s3
-bucket={0}
-prefix={1}
-[Credentials]
-aws_access_key_id={2}
-aws_secret_key_id={3}
-""".format(self.bucket_name, self.prefix,
-            self.aws_access_key, self.aws_secret_key))
-        f.close()
-        #print '----'
-        #print open(self.config_path, 'rb').read()
-        #print '----'
+        config_dict = {
+            'WAL storage': {
+                'bucket': self.bucket_name,
+                'prefix': self.prefix,
+            },
+            'Credentials': {
+                'aws_access_key_id': self.temps3.access_key,
+                'aws_secret_key_id' : self.temps3.secret_key,
+            },
+        }
+        write_config_to_filename(config_dict, self.config_path)
 
     def tearDown(self):
-        self.teardown_bucket()
+        self.temps3.cleanup()
         self.tempdir.cleanup()
-
-    def get_bucket(self):
-        return self.s3_connection.create_bucket(self.bucket_name)
-
-    def teardown_bucket(self):
-        bucket = self.get_bucket()
-        for key in bucket:
-            key.delete()
-        bucket.delete()
 
     def test_will_archive_WAL_file_to_S3(self):
         WAL_CONTENTS = 'some data'
@@ -80,11 +62,11 @@ aws_secret_key_id={3}
         self.validate_wal_file(WAL_FILENAME, WAL_CONTENTS)
 
     def validate_wal_file(self, wal_filename, wal_contents):
-        keys = [k.name for k in self.get_bucket()]
+        keys = [k.name for k in self.temps3.bucket]
         self.assertEqual(1, len(keys))
         wal_keyname = keys[0]
         print "wal_keyname", wal_keyname
         expected_keyname_prefix = ''.join([self.prefix, wal_filename])
         self.assertTrue(wal_keyname.startswith(expected_keyname_prefix))
-        key = self.get_bucket().get_key(wal_keyname)
+        key = self.temps3.bucket.get_key(wal_keyname)
         self.assertEqual(wal_contents, key.get_contents_as_string())
