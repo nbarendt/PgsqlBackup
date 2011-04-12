@@ -1,4 +1,5 @@
 #!/bin/bash
 find bbpgsql tests -name "*.py" | xargs pyflakes
-pep8 bbpgsql tests
+find bbpgsql/cmdline_scripts -name "*" | xargs pyflakes
+pep8 bbpgsql/cmdline_scripts/*
 
