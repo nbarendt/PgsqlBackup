@@ -59,6 +59,7 @@ path={0}
         self.cmd.append(wal_filename)
         proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
         proc.wait()
+        print proc.stdout.read()
         self.assertEqual(0, proc.returncode)
         archives = os.listdir(self.storage_path)
         print archives
