@@ -60,4 +60,3 @@ def get_WAL_storage_from_config(config):
     storage_driver = config.get(SECTION_NAME, 'driver')
     storage_driver_factory = STORAGE_DRIVERS[storage_driver]
     return storage_driver_factory(config, SECTION_NAME)
-

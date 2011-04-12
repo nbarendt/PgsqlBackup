@@ -63,4 +63,3 @@ path={0}
         archives = os.listdir(self.storage_path)
         print archives
         self.assertTrue(archives[0].startswith('walfile_'))
-

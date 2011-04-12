@@ -7,6 +7,7 @@ from bbpgsql.configuration.credentials import (
     )
 from mock import patch
 
+
 class Test_AWSCredentials(TestCase):
     def setUp(self):
         self.config = config()
