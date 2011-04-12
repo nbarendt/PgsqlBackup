@@ -8,17 +8,18 @@ from bbpgsql.configuration.repository import (
     get_WAL_repository
 )
 
+
 def handle_args():
     parser, options, args = archivewal_parse_args()
 
     try:
         archivewal_validate_options_and_args(options, args)
     except Exception, e:
-        stdout.write(str(e)+'\n')
+        stdout.write(str(e) + '\n')
         parser.print_help()
         exit(1)
-    
     return options, args
+
 
 if __name__ == '__main__':
 
@@ -28,6 +29,6 @@ if __name__ == '__main__':
 
     conf = get_config_from_filename(options.config_file)
 
-    repository = get_WAL_repository(conf) 
-    
+    repository = get_WAL_repository(conf)
+
     wal_commit = commit_wal_to_repository(repository, wal_filename_to_archive)
