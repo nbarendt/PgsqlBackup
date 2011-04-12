@@ -57,4 +57,3 @@ class FilesystemCommitStorage(object):
     def get_message_for_tag(self, tag):
         commit_file = self._get_commits()[tag]
         return self._get_message_from_commit_filename(commit_file)
-

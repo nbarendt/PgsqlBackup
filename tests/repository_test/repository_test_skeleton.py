@@ -58,7 +58,7 @@ class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
         restore_file = self.tempdir.getpath('file3')
         commit.get_contents_to_filename(restore_file)
         self.assertEqual('some contents', open(restore_file, 'rb').read())
-    
+
     def test_tags_are_unique(self):
         self.commit_filename1('some-tag')
 

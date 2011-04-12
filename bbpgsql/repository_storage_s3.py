@@ -118,4 +118,3 @@ class S3CommitStorage(object):
     def get_message_for_tag(self, tag):
         keyname = self._get_keyname_for_tag(tag)
         return self._get_keyname_mapper(keyname).message
-

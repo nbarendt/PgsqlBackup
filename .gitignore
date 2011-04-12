@@ -1,3 +1,7 @@
 *.pyc
 *.swp
 *.egg-info
+.pip_cache/
+env/
+.DS_Store
+_build/

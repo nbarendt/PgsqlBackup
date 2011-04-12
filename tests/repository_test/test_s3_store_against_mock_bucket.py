@@ -16,7 +16,7 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         self.tempdir = TempDirectory()
         self.setup_mock_defaults()
         self.store = S3CommitStorage(self.mock_bucket, self.bucket_prefix)
-    
+
     def setup_mock_defaults(self):
         self.mock_bucket = Mock(spec=Bucket)
         self.set_bucket_list([])
@@ -86,7 +86,7 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
     def test_get_commit_contents_raises_Exception_if_file_exists(self):
         self.set_bucket_list(['tag1_msg1'])
         file1 = self.tempdir.write('file1', 'some file contents')
-        
+
         def will_raise_Exception():
             self.store.get_commit_contents_to_filename('tag1', file1)
         self.assertRaises(FileAlreadyExistsError, will_raise_Exception)
@@ -125,6 +125,7 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
 class Test_S3CommitStorage_Against_Mock(Skeleton_S3CommitStorage_Against_Mock):
     __test__ = True
     bucket_prefix = None
+
 
 class Test_S3CommitStorage_Against_Mock_with_prefix(
     Skeleton_S3CommitStorage_Against_Mock):
