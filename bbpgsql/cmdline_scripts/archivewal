@@ -8,6 +8,15 @@ from bbpgsql.configuration.repository import (
     get_WAL_repository
 )
 
+#PYINSTALLER KLUDGES
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+
+MIMEMultipart
+MIMEBase
+MIMEText
+
 
 def handle_args():
     parser, options, args = archivewal_parse_args()
