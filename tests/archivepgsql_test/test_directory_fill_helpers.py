@@ -5,6 +5,8 @@ from directory_fill_helpers import generate_filenames
 from directory_fill_helpers import generate_file_contents
 from directory_fill_helpers import write_files
 from directory_fill_helpers import create_files
+from directory_fill_helpers import generate_dirnames
+from directory_fill_helpers import create_directories
 
 class Test_directory_fill_helpers(TestCase):
     def setUp(self):
@@ -58,3 +60,23 @@ class Test_directory_fill_helpers(TestCase):
     def test_create_files_ten_files(self):
         create_files(self.testDir, 10)
         self.testDir.check(*generate_filenames(10))
+
+    def test_generate_dirnames_one_dir(self):
+        dirNames = generate_dirnames(1)
+        self.assertTrue(dirNames == ['dir0'])
+
+    def test_generate_dirnames_two_dirs(self):
+        dirNames = generate_dirnames(2)
+        self.assertTrue(dirNames == ['dir0', 'dir1'])
+
+    def test_generate_dirnames_number_out_of_range(self):
+        self.assertRaises(ValueError, generate_dirnames, 0)
+        self.assertRaises(ValueError, generate_dirnames, 11)
+
+    def test_create_directories_one_dir(self):
+        create_directories(self.testDir, 1)
+        self.testDir.check(*generate_dirnames(1))
+
+    def test_create_directories_ten_dirs(self):
+        create_directories(self.testDir, 10)
+        self.testDir.check(*generate_dirnames(10))
