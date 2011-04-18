@@ -32,6 +32,7 @@ class Test_archivewal_validate_options_Uses_Common_Functions(TestCase):
         archivewal_validate_options_and_args()
         self.assertTrue(mock_func.called)
 
+
 class Test_archivewal_requires_WAL_file(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
@@ -78,5 +79,3 @@ class Test_archivewal_requires_WAL_file(TestCase):
         self.common_validate_options_and_args_mock.return_value = True
         wal_file = self.tempdir.write('walfile', '')
         self.assertTrue(archivewal_validate_options_and_args(None, [wal_file]))
-
-

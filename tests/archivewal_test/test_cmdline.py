@@ -24,13 +24,43 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
         self.tempdir = TempDirectory()
 
     def setup_config(self):
-        self.config_path = self.tempdir.write(self.CONFIG_FILE, '')
+        self.config_path = self.tempdir.getpath(self.CONFIG_FILE)
+        self.storage_path = self.tempdir.makedir('repo')
+        f = open(self.config_path, 'wb')
+        f.write("""
+[WAL storage]
+driver=filesystem
+path={0}
+""".format(self.storage_path))
+        f.close()
+        #print '----'
+        #print open(self.config_path, 'rb').read()
+        #print '----'
 
     def tearDown(self):
         self.tempdir.cleanup()
 
-    def test_archivewal_returns_error_with_if_less_2_arguments(self):
+    def test_archivewal_returns_error_with_if_less_than_one_argument(self):
         proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
         proc.wait()
         print(proc.stdout.read())
         self.assertNotEqual(0, proc.returncode)
+
+    def test_archivewal_success_with_file(self):
+        wal_filename = self.tempdir.write('walfile', '')
+        self.cmd.append(wal_filename)
+        proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
+        proc.wait()
+        print proc.stdout.read()
+        self.assertEqual(0, proc.returncode)
+
+    def test_archivewal_actually_archives_file(self):
+        wal_filename = self.tempdir.write('walfile', '')
+        self.cmd.append(wal_filename)
+        proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
+        proc.wait()
+        print proc.stdout.read()
+        self.assertEqual(0, proc.returncode)
+        archives = os.listdir(self.storage_path)
+        print archives
+        self.assertTrue(archives[0].startswith('walfile_'))

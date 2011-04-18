@@ -1,15 +1,43 @@
 #! /usr/bin/env python
-from sys import stdout
+from sys import stdout, exit
 from bbpgsql.option_parser import archivewal_parse_args
 from bbpgsql.option_parser import archivewal_validate_options_and_args
+from bbpgsql.configuration import get_config_from_filename
+from bbpgsql.archive_wal import commit_wal_to_repository
+from bbpgsql.configuration.repository import (
+    get_WAL_repository
+)
 
-if __name__ == '__main__':
+#PYINSTALLER KLUDGES
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+
+MIMEMultipart
+MIMEBase
+MIMEText
+
+
+def handle_args():
     parser, options, args = archivewal_parse_args()
 
     try:
         archivewal_validate_options_and_args(options, args)
     except Exception, e:
-        stdout.write(e)
+        stdout.write(str(e) + '\n')
         parser.print_help()
+        exit(1)
+    return options, args
 
-        
+
+if __name__ == '__main__':
+
+    options, args = handle_args()
+
+    wal_filename_to_archive = args[0]
+
+    conf = get_config_from_filename(options.config_file)
+
+    repository = get_WAL_repository(conf)
+
+    wal_commit = commit_wal_to_repository(repository, wal_filename_to_archive)

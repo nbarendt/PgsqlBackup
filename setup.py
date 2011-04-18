@@ -10,9 +10,9 @@ config = {
 	'download_url': 'Where to download it.',
 	'author_email': 'My email.',
 	'version': '0.1',
-	'instal_requires': ['nose'],
+	'install_requires': [''],
 	'packages': ['bbpgsql'],
-	'scripts': [],
+	'scripts': ['bbpgsql/cmdline_scripts/archivewal'],
 	'name': 'bbpgsql'
 }
 
