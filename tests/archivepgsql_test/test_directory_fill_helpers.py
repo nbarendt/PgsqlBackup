@@ -1,5 +1,5 @@
 from unittest import TestCase
-from nose.plugins.skip import SkipTest
+#from nose.plugins.skip import SkipTest
 from testfixtures import TempDirectory
 from directory_fill_helpers import generate_filenames
 from directory_fill_helpers import generate_file_contents
