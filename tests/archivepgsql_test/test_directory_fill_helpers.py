@@ -13,10 +13,6 @@ class Test_directory_fill_helpers(TestCase):
     def tearDown(self):
         self.testDir.cleanup()
 
-    def test_create_files(self):
-        raise SkipTest
-        self.fail()
-
     def test_generate_filenames_one_file(self):
         fileNames = generate_filenames(1)
         self.assertTrue(fileNames == ['file0'])
