@@ -72,13 +72,83 @@ class Test_archive_create(TestCase):
         self.assertFalse(dcmp.diff_files)
         self.assertFalse(dcmp.funny_files)
 
+    def test_create_archive_excludes_directory(self):
+        fill_directory_tree(self.srcDir)
+        self.excludeList = ['./dir2']
+        create_archive(self.srcPath, self.archivePath, self.excludeList)
+        tf=tarfile.open(self.archivePath, mode='r')
+
+        def getExcludedMember(name):
+            tarinfo=tf.getmember(name)
+
+        self.assertRaises(KeyError, getExcludedMember, './dir2')
+
+    def test_create_archive_excludes_two_directories(self):
+        fill_directory_tree(self.srcDir)
+        self.excludeList = ['./dir2', './dir0']
+        create_archive(self.srcPath, self.archivePath, self.excludeList)
+        tf=tarfile.open(self.archivePath, mode='r')
+
+        def getExcludedMember(name):
+            tarinfo=tf.getmember(name)
+
+        for root, dirs, files in os.walk(self.srcPath):
+            relativeRoot = os.path.relpath(root, self.srcPath)
+            if relativeRoot != '.':
+                relativeRoot = ''.join(['./',relativeRoot])
+            print('RelativeRoot is', relativeRoot)
+            for file in files:
+                file = os.path.join(relativeRoot, file)
+                if file in self.excludeList:
+                    self.assertRaises(KeyError,
+                        getExcludedMember, file)
+                else:
+                    self.assertNotEqual(None,
+                        tf.getmember(file))
+            for dir in dirs:
+                reldir = os.path.join(relativeRoot, dir)
+                print(reldir, self.excludeList)
+                if reldir in self.excludeList:
+                    self.assertRaises(KeyError,
+                        getExcludedMember, reldir)
+                    # need to verify that everything below this dir is also not in archive before removing the directory from the os.walk
+                    dirs.remove(dir)
+                else:
+                    self.assertNotEqual(None,
+                        tf.getmember(reldir))
+
+
 class Test_generate_exclude(TestCase):
     def setUp(self):
-        pass
+        self.excludeList = ['exclude_this', 'exclude_this_too']
+        self.keepList = ['keep_this', 'keep_this_too']
+        self.excluded = tarfile.TarInfo(name = self.excludeList[0])
+        self.excluded_too = tarfile.TarInfo(name = self.excludeList[1])
+        self.kept = tarfile.TarInfo(name = self.keepList[0])
+        self.kept_too = tarfile.TarInfo(name = self.keepList[1])
+        self.function = generate_exclude(self.excludeList)
 
     def tearDown(self):
         pass
 
     def test_generate_exclude_returns_function(self):
-        self.function = generate_exclude([])
         self.assertTrue(hasattr(self.function, '__call__'))
+
+    def test_generate_exclude_function_takes_one_argument(self):
+        self.retval = self.function(self.kept)
+
+    def test_generated_function_returns_input_kept_object(self):
+        self.retval = self.function(self.kept)
+        self.assertEqual(self.retval, self.kept)
+
+    def test_generated_function_returns_input_kept_too_object(self):
+        self.retval = self.function(self.kept_too)
+        self.assertEqual(self.retval, self.kept_too)
+
+    def test_generated_function_returns_none_for_excluded_object(self):
+        self.retval = self.function(self.excluded)
+        self.assertEqual(self.retval, None)
+
+    def test_generated_function_returns_none_for_excluded_too_object(self):
+        self.retval = self.function(self.excluded_too)
+        self.assertEqual(self.retval, None)
