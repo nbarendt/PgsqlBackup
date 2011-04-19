@@ -4,6 +4,7 @@ import os
 import tarfile
 import filecmp
 from bbpgsql.create_archive import create_archive
+from bbpgsql.create_archive import generate_exclude
 from bbpgsql.extract_archive import extract_archive
 from tar_archive_helpers import fill_directory_tree
 from tar_archive_helpers import create_valid_source_and_destination_paths
@@ -70,3 +71,14 @@ class Test_archive_create(TestCase):
         self.assertFalse(dcmp.right_only)
         self.assertFalse(dcmp.diff_files)
         self.assertFalse(dcmp.funny_files)
+
+class Test_generate_exclude(TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_generate_exclude_returns_function(self):
+        self.function = generate_exclude([])
+        self.assertTrue(hasattr(self.function, '__call__'))
