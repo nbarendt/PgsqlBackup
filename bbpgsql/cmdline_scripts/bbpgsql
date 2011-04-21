@@ -1,50 +1,20 @@
 #! /usr/bin/env python
-from sys import stdout, exit, argv
-from bbpgsql.option_parser import archivewal_parse_args
-from bbpgsql.option_parser import archivewal_validate_options_and_args
-from bbpgsql.configuration import get_config_from_filename
-from bbpgsql.archive_wal import commit_wal_to_repository
-from bbpgsql.configuration.repository import (
-    get_WAL_repository
-)
 from os.path import basename
+from sys import stdout, exit, argv
+from bbpgsql.archive_wal import archivewal_main
+from bbpgsql.archive_pgsql import archivepgsql_main
 
 #PYINSTALLER KLUDGES
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
-
 MIMEMultipart
 MIMEBase
 MIMEText
 
-
-def archivewal_handle_args():
-    parser, options, args = archivewal_parse_args()
-
-    try:
-        archivewal_validate_options_and_args(options, args)
-    except Exception, e:
-        stdout.write(str(e) + '\n')
-        parser.print_help()
-        exit(1)
-    return options, args
-
-
-def archivewal_main():
-    options, args = archivewal_handle_args()
-
-    wal_filename_to_archive = args[0]
-
-    conf = get_config_from_filename(options.config_file)
-
-    repository = get_WAL_repository(conf)
-
-    commit_wal_to_repository(repository, wal_filename_to_archive)
-
-
 CMD_DISPATCH_MAP = {
     'archivewal': archivewal_main,
+    'archivepgsql': archivepgsql_main,
 }
 
 if __name__ == '__main__':
