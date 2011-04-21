@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-from sys import stdout, exit
+from sys import stdout, exit, argv
 from bbpgsql.option_parser import archivewal_parse_args
 from bbpgsql.option_parser import archivewal_validate_options_and_args
 from bbpgsql.configuration import get_config_from_filename
@@ -7,6 +7,7 @@ from bbpgsql.archive_wal import commit_wal_to_repository
 from bbpgsql.configuration.repository import (
     get_WAL_repository
 )
+from os.path import basename
 
 #PYINSTALLER KLUDGES
 from email.mime.multipart import MIMEMultipart
@@ -18,7 +19,7 @@ MIMEBase
 MIMEText
 
 
-def handle_args():
+def archivewal_handle_args():
     parser, options, args = archivewal_parse_args()
 
     try:
@@ -29,10 +30,8 @@ def handle_args():
         exit(1)
     return options, args
 
-
-if __name__ == '__main__':
-
-    options, args = handle_args()
+def archivewal_main():
+    options, args = archivewal_handle_args()
 
     wal_filename_to_archive = args[0]
 
@@ -41,3 +40,16 @@ if __name__ == '__main__':
     repository = get_WAL_repository(conf)
 
     wal_commit = commit_wal_to_repository(repository, wal_filename_to_archive)
+
+CMD_DISPATCH_MAP = {
+    'archivewal' : archivewal_main,
+}
+
+if __name__ == '__main__':
+    cmd_name = basename(argv[0])
+    if cmd_name in CMD_DISPATCH_MAP:
+        CMD_DISPATCH_MAP[cmd_name]()
+    else:
+        stdout.write('Unknown command: {0}\n'.format(cmd_name))
+        exit(1)
+
