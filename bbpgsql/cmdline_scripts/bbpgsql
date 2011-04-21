@@ -30,6 +30,7 @@ def archivewal_handle_args():
         exit(1)
     return options, args
 
+
 def archivewal_main():
     options, args = archivewal_handle_args()
 
@@ -39,10 +40,11 @@ def archivewal_main():
 
     repository = get_WAL_repository(conf)
 
-    wal_commit = commit_wal_to_repository(repository, wal_filename_to_archive)
+    commit_wal_to_repository(repository, wal_filename_to_archive)
+
 
 CMD_DISPATCH_MAP = {
-    'archivewal' : archivewal_main,
+    'archivewal': archivewal_main,
 }
 
 if __name__ == '__main__':
@@ -52,4 +54,3 @@ if __name__ == '__main__':
     else:
         stdout.write('Unknown command: {0}\n'.format(cmd_name))
         exit(1)
-
