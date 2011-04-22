@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+. env/bin/activate
+rm -rf pyinstaller/dist pyinstaller/build
+python pyinstaller/pyinstaller-1.5-rc1/Configure.py
+python pyinstaller/pyinstaller-1.5-rc1/Build.py pyinstaller/bbpgsql.spec
