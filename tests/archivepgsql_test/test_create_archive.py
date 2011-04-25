@@ -96,24 +96,42 @@ class Test_archive_create(TestCase):
             relativeRoot = os.path.relpath(root, self.srcPath)
             if relativeRoot != '.':
                 relativeRoot = ''.join(['./',relativeRoot])
-            print('RelativeRoot is', relativeRoot)
             for file in files:
-                file = os.path.join(relativeRoot, file)
-                if file in self.excludeList:
+                relfile = os.path.join(relativeRoot, file)
+                if relfile in self.excludeList:
+                    print('Checking file is excluded:', root, file, relfile)
                     self.assertRaises(KeyError,
-                        getExcludedMember, file)
+                        getExcludedMember, relfile)
                 else:
+                    print('Checking file is included:', root, file, relfile)
                     self.assertNotEqual(None,
-                        tf.getmember(file))
+                        tf.getmember(relfile))
             for dir in dirs:
                 reldir = os.path.join(relativeRoot, dir)
-                print(reldir, self.excludeList)
                 if reldir in self.excludeList:
+                    print('Checking dir is excluded:', root, dir, reldir)
                     self.assertRaises(KeyError,
                         getExcludedMember, reldir)
-                    # need to verify that everything below this dir is also not in archive before removing the directory from the os.walk
+                    subTreePath = os.path.join(root,dir)
+                    print('checking subtree', subTreePath)
+                    for root2, dirs2, files2 in os.walk(subTreePath):
+                        print('element subtree', root2, dirs2, files2)
+                        relativeRoot2 = os.path.relpath(root2, self.srcPath)
+                        if relativeRoot2 != '.':
+                            relativeRoot2 = ''.join(['./', relativeRoot2])
+                        for file2 in files2:
+                            relfile2 = os.path.join(relativeRoot2, file2)
+                            print('Checking file is excluded:', root2, file2, relfile2)
+                            self.assertRaises(KeyError,
+                                getExcludedMember, relfile2)
+                        for dir2 in dirs2:
+                            reldir2 = os.path.join(relativeRoot2, dir2)
+                            print('Checking dir is excluded:', root2, dir2, reldir2)
+                            self.assertRaises(KeyError,
+                                getExcludedMember, reldir2)
                     dirs.remove(dir)
                 else:
+                    print('Checking dir is included:', root, dir, reldir)
                     self.assertNotEqual(None,
                         tf.getmember(reldir))
 
