@@ -29,21 +29,21 @@ class Test_StorageFactory_From_Configuration(TestCase):
                 '.create_memory_commit_store_from_config')
     def test_memory_driver_factory_called(self, factory_mock):
         self.configure_driver('memory')
-        get_repository_storage_from_config(self.config)
+        get_repository_storage_from_config(self.config, 'orf')
         factory_mock.assert_called_with(self.config, 'WAL storage')
 
     @patch('bbpgsql.configuration.repository_storage'\
                 '.create_filesystem_commit_store_from_config')
     def test_filesystem_driver_factory_called(self, factory_mock):
         self.configure_driver('filesystem')
-        get_repository_storage_from_config(self.config)
+        get_repository_storage_from_config(self.config, 'orf')
         factory_mock.assert_called_with(self.config, 'WAL storage')
 
     @patch('bbpgsql.configuration.repository_storage'\
                 '.create_s3_commit_store_from_config')
     def test_s3_driver_factory_called(self, factory_mock):
         self.configure_driver('s3')
-        get_repository_storage_from_config(self.config)
+        get_repository_storage_from_config(self.config, 'orf')
         factory_mock.assert_called_with(self.config, 'WAL storage')
 
 
@@ -54,7 +54,7 @@ class Test_MemoryCommit_Storage(TestCase):
 
     def test_will_build_storage_from_config(self):
         self.assertEqual(MemoryCommitStorage,
-            type(get_repository_storage_from_config(self.config)))
+            type(get_repository_storage_from_config(self.config, 'orf')))
 
 
 class Test_FilesystemCommitStorage(TestCase):
@@ -70,7 +70,7 @@ class Test_FilesystemCommitStorage(TestCase):
 
     def test_will_build_storage_from_config(self):
         self.assertEqual(FilesystemCommitStorage,
-            type(get_repository_storage_from_config(self.config)))
+            type(get_repository_storage_from_config(self.config, 'orf')))
 
 
 class Test_S3CommitStorage(TestCase):
@@ -83,7 +83,7 @@ class Test_S3CommitStorage(TestCase):
     def test_will_raise_MissingS3Configuration_without_bucket(self):
 
         def will_raise_MissingS3Configuration():
-            get_repository_storage_from_config(self.config)
+            get_repository_storage_from_config(self.config, 'orf')
         self.assertRaises(MissingS3Configuration,
             will_raise_MissingS3Configuration)
 
@@ -91,7 +91,7 @@ class Test_S3CommitStorage(TestCase):
         self.config.set('WAL storage', 'bucket', 'somebucket')
 
         def will_raise_MissingS3Configuration():
-            get_repository_storage_from_config(self.config)
+            get_repository_storage_from_config(self.config, 'orf')
         self.assertRaises(MissingS3Configuration,
             will_raise_MissingS3Configuration)
 
@@ -100,6 +100,6 @@ class Test_S3CommitStorage(TestCase):
         self.config.set('WAL storage', 'bucket', 'somebucket')
         self.config.set('WAL storage', 'prefix', 'someprefix')
         self.assertEqual(S3CommitStorage,
-            type(get_repository_storage_from_config(self.config)))
+            type(get_repository_storage_from_config(self.config, 'orf')))
         mock_get_s3_connection.assert_called_with('some_access_key',
             'some_secret_key')

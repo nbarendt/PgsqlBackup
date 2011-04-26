@@ -50,7 +50,7 @@ def create_s3_commit_store_from_config(config, section):
     return S3CommitStorage(bucket, key_prefix)
 
 
-def get_repository_storage_from_config(config):
+def get_repository_storage_from_config(config, repository_type):
     STORAGE_DRIVERS = {
         'memory': create_memory_commit_store_from_config,
         'filesystem': create_filesystem_commit_store_from_config,
