@@ -58,3 +58,17 @@ def archivewal_validate_options_and_args(options=None, args=None):
         raise Exception('An absolute path to a WAL file to be archived' \
                         ' must be provided!')
     return True
+
+def archivepgsql_parse_args(args=None):
+    archivepgsql_usage = ' '.join([
+        os.path.basename(sys.argv[0]),
+       '[options]'])
+    parser = create_common_parser(usage=archivepgsql_usage)
+    options, args = parser.parse_args(args)
+    return parser, options, args
+
+def archivepgsql_validate_options_and_args(options=None, args=None):
+    if not common_validate_options_and_args(options, args):
+        return False
+    return True
+
