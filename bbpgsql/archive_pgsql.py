@@ -2,9 +2,10 @@ from sys import stdout
 from bbpgsql.option_parser import archivepgsql_parse_args
 from bbpgsql.option_parser import archivepgsql_validate_options_and_args
 from bbpgsql.configuration import get_config_from_filename
+from bbpgsql.configuration.general import get_data_dir
 from datetime import datetime
 from re import match
-from tempfile import mkdtemp
+from tempfile import mkdtemp, template
 from shutil import rmtree
 from os.path import exists, join
 
