@@ -57,6 +57,6 @@ def get_repository_storage_from_config(config, repository_type):
         's3': create_s3_commit_store_from_config,
     }
 
-    storage_driver = config.get(SECTION_NAME, 'driver')
+    storage_driver = config.get(repository_type, 'driver')
     storage_driver_factory = STORAGE_DRIVERS[storage_driver]
-    return storage_driver_factory(config, SECTION_NAME)
+    return storage_driver_factory(config, repository_type)
