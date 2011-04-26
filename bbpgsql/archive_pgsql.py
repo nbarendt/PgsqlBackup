@@ -1,24 +1,65 @@
 from sys import stdout
-from bbpgsql.option_parser import common_parse_args
-from bbpgsql.option_parser import common_validate_options_and_args
+from bbpgsql.option_parser import archivepgsql_parse_args
+from bbpgsql.option_parser import archivepgsql_validate_options_and_args
+from bbpgsql.configuration import get_config_from_filename
+from bbpgsql.configuration.general import get_data_dir
 from datetime import datetime
 from re import match
+from tempfile import mkdtemp, template
+from shutil import rmtree
+from os.path import exists, join
 
-def archivepgsql_main():
-    parser, options, args = common_parse_args()
+
+def archivepgsql_handle_args():
+    parser, options, args = archivepgsql_parse_args()
 
     try:
-        common_validate_options_and_args(options, args)
+        archivepgsql_validate_options_and_args(options, args)
     except Exception, e:
-        stdout.write(e)
+        stdout.write(str(e) + '\n')
         parser.print_help()
+        exit(1)
+    return options, args
 
-    # need to do something like:
-    #  tag = generate_tag()
-    #  first_WAL = pg_start_backup
-    #  tar magic 
-    #  second_WAL = pg_stop_backup
-    #  commit_snapshot_to_repository(repo, tarfile, tag, first_wal, last_wal)
+# borrowing from Python 3
+class TemporaryDirectory:
+    """Create and return a temporary directory.  This has the same
+    behavior as mkdtemp but can be used as a context manager.  For
+    example:
+
+        with TemporaryDirectory() as tmpdir:
+            ...
+
+    Upon exiting the context, the directory and everthing contained
+    in it are removed.
+    """
+
+    def __init__(self, suffix="", prefix=template, dir=None):
+        self.name = mkdtemp(suffix, prefix, dir)
+
+    def __enter__(self):
+        return self.name
+
+    def cleanup(self):
+        if exists(self.name):
+            rmtree(self.name)
+
+    def __exit__(self, exc, value, tb):
+        self.cleanup()
+
+def archivepgsql_main():
+    options, args = archivepgsql_handle_args()
+    conf = get_config_from_filename(options.config_file)
+    data_dir = get_data_dir(conf)
+
+    with TemporaryDirectory(suffix='archivepgsql') as tempdir:
+        tag = generate_tag()
+        archive_dst_path = join(tempdir, 'pgsql.snapshot.tar')
+        #  first_WAL = pg_start_backup
+        #  tar magic using data_dir as src and archive_dst_path as destination 
+        #  second_WAL = pg_stop_backup
+        #  commit_snapshot_to_repository(repo, tarfile, tag, first_wal,
+        #    last_wal)
     
 
 def generate_tag():

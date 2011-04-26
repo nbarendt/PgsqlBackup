@@ -22,9 +22,13 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
             ':',
             self.ARCHIVEPGSQL_PATH])
         self.tempdir = TempDirectory()
+        self.data_dir = self.tempdir.makedir('pgsql_data')
 
     def setup_config(self):
-        self.config_path = self.tempdir.write(self.CONFIG_FILE, '')
+        self.config_path = self.tempdir.write(self.CONFIG_FILE, """
+[General]
+pgsql_data_directory={0}
+""".format(self.data_dir))
 
     def tearDown(self):
         self.tempdir.cleanup()

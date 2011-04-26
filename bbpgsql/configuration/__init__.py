@@ -1,6 +1,8 @@
 from ConfigParser import SafeConfigParser
 
 default_configuration = {
+    'General': {
+    },
     'WAL storage': {
         'driver': 's3',
     },
