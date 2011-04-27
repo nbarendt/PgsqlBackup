@@ -3,6 +3,7 @@ from os.path import basename
 from datetime import datetime
 from bbpgsql.option_parser import archivewal_parse_args
 from bbpgsql.option_parser import archivewal_validate_options_and_args
+from bbpgsql.option_parser import get_wal_filename
 from bbpgsql.configuration import get_config_from_filename
 from bbpgsql.configuration.repository import (
     get_WAL_repository
@@ -24,9 +25,9 @@ def archivewal_handle_args():
 def archivewal_main():
     options, args = archivewal_handle_args()
 
-    wal_filename_to_archive = args[0]
-
     conf = get_config_from_filename(options.config_file)
+
+    wal_filename_to_archive = get_wal_filename(conf, args[0])
 
     repository = get_WAL_repository(conf)
 

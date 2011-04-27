@@ -1,5 +1,7 @@
 import os
 from optparse import OptionParser
+from bbpgsql.configuration import get_config_from_filename
+from bbpgsql.configuration.general import get_data_dir
 import sys
 
 
@@ -47,15 +49,27 @@ def archivewal_parse_args(args=None):
     return parser, options, args
 
 
-def is_valid_file(wal_path):
-    return os.path.isabs(wal_path) and os.path.isfile(wal_path)
+def is_relative_path(wal_path):
+    return not os.path.isabs(wal_path)
+
+def wal_file_exists(config, wal_path):
+    return os.path.isfile(get_wal_filename(config, wal_path))
+
+def get_wal_filename(config, wal_path):
+    data_dir = get_data_dir(config)
+    return os.path.join(data_dir, wal_path)
+
+def is_valid_file(config, wal_path):
+    return is_relative_path(wal_path) and wal_file_exists(config, wal_path)
 
 
 def archivewal_validate_options_and_args(options=None, args=None):
+    args = args or []
     if not common_validate_options_and_args(options, args):
         return False
-    if len(args) != 1 or not is_valid_file(args[0]):
-        raise Exception('An absolute path to a WAL file to be archived' \
+    config = get_config_from_filename(options.config_file)
+    if len(args) != 1 or not is_valid_file(config, args[0]):
+        raise Exception('A relative path to a WAL file to be archived' \
                         ' must be provided!')
     return True
 

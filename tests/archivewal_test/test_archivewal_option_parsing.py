@@ -36,46 +36,40 @@ class Test_archivewal_validate_options_Uses_Common_Functions(TestCase):
 class Test_archivewal_requires_WAL_file(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
-        self.patchers = {}
-        self.patchers['common_validate_options_and_args'] = patch(
-            'bbpgsql.option_parser.common_validate_options_and_args',
-            spec=True)
-        self.common_validate_options_and_args_mock = self.patchers[
-            'common_validate_options_and_args'].start()
+        self.config_file = self.tempdir.write('config_file', """
+[General]
+pgsql_data_directory={0}
+""".format(self.tempdir.path))
+        parser, self.options, self.args = archivewal_parse_args(['-c',
+            self.config_file])
 
     def tearDown(self):
-        self.patchers['common_validate_options_and_args'].stop()
         self.tempdir.cleanup()
 
     def test_will_raise_exception_with_no_WAL_file(self):
-        self.common_validate_options_and_args_mock.return_value = True
 
         def will_raise_Exception():
-            archivewal_validate_options_and_args(None, [])
+            archivewal_validate_options_and_args(self.options, [])
         self.assertRaises(Exception, will_raise_Exception)
 
     def test_exception_is_explicit_about_error(self):
-        self.common_validate_options_and_args_mock.return_value = True
         try:
-            archivewal_validate_options_and_args(None, [])
+            archivewal_validate_options_and_args(self.options, [])
         except Exception, e:
+            print 'Exception', e
             self.assertTrue('path to a WAL file' in str(e))
+        else:
+            self.assertTrue(False, 'should never get here')
 
-    def test_will_raise_exception_with_relative_WAL_file_path(self):
-        self.common_validate_options_and_args_mock.return_value = True
-
-        def will_raise_Exception():
-            archivewal_validate_options_and_args(None, ['path_to/WAL_file'])
-        self.assertRaises(Exception, will_raise_Exception)
-
-    def test_path_to_WAL_file_must_be_absolute(self):
-        self.common_validate_options_and_args_mock.return_value = True
-        try:
-            archivewal_validate_options_and_args(None, ['path_to/WAL_file'])
-        except Exception, e:
-            self.assertTrue('path to a WAL file' in str(e))
+    def test_path_to_WAL_file_must_be_relative(self):
+        abs_wal_path = self.tempdir.write('WAL_file', '')
+        
+        def raises_exception():
+            archivewal_validate_options_and_args(self.options, [abs_wal_path])
+        self.assertRaises(Exception, raises_exception)
 
     def test_validates_if_wal_file_exists(self):
-        self.common_validate_options_and_args_mock.return_value = True
-        wal_file = self.tempdir.write('walfile', '')
-        self.assertTrue(archivewal_validate_options_and_args(None, [wal_file]))
+        wal_filename = 'WAL_file'
+        self.tempdir.write(wal_filename, '')
+        self.assertTrue(archivewal_validate_options_and_args(self.options,
+            [wal_filename]))

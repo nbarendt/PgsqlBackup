@@ -35,6 +35,9 @@ class Test_archivewal_commits_to_S3(TestCase):
     def setup_config(self):
         self.config_path = self.tempdir.getpath(self.CONFIG_FILE)
         config_dict = {
+            'General': {
+                'pgsql_data_directory': self.tempdir.path,
+            },
             'WAL storage': {
                 'bucket': self.bucket_name,
                 'prefix': self.prefix,
@@ -53,8 +56,8 @@ class Test_archivewal_commits_to_S3(TestCase):
     def test_will_archive_WAL_file_to_S3(self):
         WAL_CONTENTS = 'some data'
         WAL_FILENAME = 'walfile'
-        wal_file_path = self.tempdir.write(WAL_FILENAME, WAL_CONTENTS)
-        self.cmd.append(wal_file_path)
+        self.tempdir.write(WAL_FILENAME, WAL_CONTENTS)
+        self.cmd.append(WAL_FILENAME)
         proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
         proc.wait()
         print proc.stdout.read()

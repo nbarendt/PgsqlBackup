@@ -31,11 +31,19 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
 [WAL storage]
 driver=filesystem
 path={0}
-""".format(self.storage_path))
+[General]
+pgsql_data_directory={1}
+""".format(self.storage_path, self.tempdir.path))
         f.close()
         #print '----'
         #print open(self.config_path, 'rb').read()
         #print '----'
+        self.pg_xlog_path = 'pg_xlog'
+        self.tempdir.makedir(self.pg_xlog_path)
+        self.wal_basename = '00001'
+        self.wal_filename = os.path.join(self.pg_xlog_path, self.wal_basename)
+        self.tempdir.write(self.wal_filename, '')
+        print 'TEMPDIR', self.tempdir.listdir(recursive=True)
 
     def tearDown(self):
         self.tempdir.cleanup()
@@ -47,20 +55,19 @@ path={0}
         self.assertNotEqual(0, proc.returncode)
 
     def test_archivewal_success_with_file(self):
-        wal_filename = self.tempdir.write('walfile', '')
-        self.cmd.append(wal_filename)
+        self.cmd.append(self.wal_filename)
         proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
         proc.wait()
         print proc.stdout.read()
         self.assertEqual(0, proc.returncode)
 
     def test_archivewal_actually_archives_file(self):
-        wal_filename = self.tempdir.write('walfile', '')
-        self.cmd.append(wal_filename)
+        self.cmd.append(self.wal_filename)
         proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
         proc.wait()
         print proc.stdout.read()
         self.assertEqual(0, proc.returncode)
         archives = os.listdir(self.storage_path)
         print archives
-        self.assertTrue(archives[0].startswith('walfile_'))
+        self.assertTrue(archives[0].startswith(''.join([
+            self.wal_basename, '_'])))
