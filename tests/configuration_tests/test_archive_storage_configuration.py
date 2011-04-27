@@ -25,21 +25,21 @@ class Test_StorageFactory_From_Configuration(TestCase):
     def configure_driver(self, driver_type):
         self.config.set('Archive storage', 'driver', driver_type)
 
-    @patch('bbpgsql.configuration.repository_storage'\
+    @patch('bbpgsql.configuration.repository_storage'
                 '.create_memory_commit_store_from_config')
     def test_memory_driver_factory_called(self, factory_mock):
         self.configure_driver('memory')
         get_repository_storage_from_config(self.config, 'Archive storage')
         factory_mock.assert_called_with(self.config, 'Archive storage')
 
-    @patch('bbpgsql.configuration.repository_storage'\
+    @patch('bbpgsql.configuration.repository_storage'
                 '.create_filesystem_commit_store_from_config')
     def test_filesystem_driver_factory_called(self, factory_mock):
         self.configure_driver('filesystem')
         get_repository_storage_from_config(self.config, 'Archive storage')
         factory_mock.assert_called_with(self.config, 'Archive storage')
 
-    @patch('bbpgsql.configuration.repository_storage'\
+    @patch('bbpgsql.configuration.repository_storage'
                 '.create_s3_commit_store_from_config')
     def test_s3_driver_factory_called(self, factory_mock):
         self.configure_driver('s3')
