@@ -9,7 +9,7 @@ def get_WAL_repository(config):
     commit_storage = get_repository_storage_from_config(config, repository_type)
     return BBRepository(commit_storage)
 
-def get_Archive_repository(config):
-    repository_type = 'Archive storage'
+def get_Snapshot_repository(config):
+    repository_type = 'Snapshot'
     commit_storage = get_repository_storage_from_config(config, repository_type)
     return BBRepository(commit_storage)

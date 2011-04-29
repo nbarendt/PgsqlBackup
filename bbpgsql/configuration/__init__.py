@@ -6,7 +6,7 @@ default_configuration = {
     'WAL': {
         'driver': 's3',
     },
-    'Archive storage': {
+    'Snapshot': {
         'driver': 's3',
     },
     'Credentials': {
