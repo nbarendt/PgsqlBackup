@@ -97,8 +97,7 @@ class Test_S3CommitStorage(TestCase):
 
     @patch('bbpgsql.configuration.repository_storage.get_s3_connection')
     def test_will_build_storage_from_config(self, mock_get_s3_connection):
-        self.config.set('Snapshot', 'bucket', 'somebucket')
-        self.config.set('Snapshot', 'prefix', 'someprefix')
+        self.config.set('General', 'bucket', 'somebucket')
         self.assertEqual(S3CommitStorage,
             type(get_repository_storage_from_config(self.config, 'Snapshot')))
         mock_get_s3_connection.assert_called_with('some_access_key',

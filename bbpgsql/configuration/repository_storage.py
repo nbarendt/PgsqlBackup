@@ -24,24 +24,29 @@ def create_filesystem_commit_store_from_config(config, section):
     storage_directory = config.get(section, 'path')
     return FilesystemCommitStorage(storage_directory)
 
-BUCKET_KEY_NAME = 'bucket'
-KEY_PREFIX_NAME = 'prefix'
 
+def create_s3_commit_store_from_config(config, repository_name):
+    SECTION_NAME = 'General'
+    BUCKET_KEY_NAME = 'bucket'
+    KEY_PREFIX_NAME = 'prefix'
+    REPOSITORY_TO_KEY_PREFIX_MAP = {
+        'WAL': 'wals/',
+        'Snapshot': 'snapshots/',
+    }
 
-def create_s3_commit_store_from_config(config, section):
     try:
-        bucket_name = config.get(section, BUCKET_KEY_NAME)
+        bucket_name = config.get(SECTION_NAME, BUCKET_KEY_NAME)
     except NoOptionError:
-        raise MissingS3Configuration('A "{0}" value must be provided in the' \
+        raise MissingS3Configuration('A "{0}" value must be provided in the'
             ' "{1}" section when using the S3 driver.'.format(BUCKET_KEY_NAME,
-            section))
+            SECTION_NAME))
 
-    try:
-        key_prefix = config.get(section, KEY_PREFIX_NAME)
-    except NoOptionError:
-        raise MissingS3Configuration('A "{0}" value must be provided in the' \
-            ' "{1}" section when using the S3 driver.'.format(KEY_PREFIX_NAME,
-            section))
+    common_prefix = ''
+    if config.has_option(SECTION_NAME, KEY_PREFIX_NAME):
+        common_prefix = config.get(SECTION_NAME, KEY_PREFIX_NAME)
+
+    key_prefix = ''.join([common_prefix,
+        REPOSITORY_TO_KEY_PREFIX_MAP[repository_name]])
 
     access_key, secret_key = get_aws_credentials(config)
     conn = get_s3_connection(access_key, secret_key)

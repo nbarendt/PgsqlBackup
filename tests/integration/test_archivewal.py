@@ -29,7 +29,7 @@ class Test_archivewal_commits_to_S3(TestCase):
 
     def setup_s3(self):
         self.bucket_name = '.'.join(['test', uuid4().hex])
-        self.prefix = 'wal/'
+        self.prefix = 'wals/'
         self.temps3 = setup_s3_and_bucket(self.bucket_name)
 
     def setup_config(self):
@@ -37,10 +37,9 @@ class Test_archivewal_commits_to_S3(TestCase):
         config_dict = {
             'General': {
                 'pgsql_data_directory': self.tempdir.path,
+                'bucket': self.bucket_name,
             },
             'WAL': {
-                'bucket': self.bucket_name,
-                'prefix': self.prefix,
             },
             'Credentials': {
                 'aws_access_key_id': self.temps3.access_key,
