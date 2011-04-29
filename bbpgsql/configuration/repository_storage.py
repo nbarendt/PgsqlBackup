@@ -24,7 +24,6 @@ def create_filesystem_commit_store_from_config(config, section):
     storage_directory = config.get(section, 'path')
     return FilesystemCommitStorage(storage_directory)
 
-SECTION_NAME = 'WAL'
 BUCKET_KEY_NAME = 'bucket'
 KEY_PREFIX_NAME = 'prefix'
 
@@ -35,14 +34,14 @@ def create_s3_commit_store_from_config(config, section):
     except NoOptionError:
         raise MissingS3Configuration('A "{0}" value must be provided in the' \
             ' "{1}" section when using the S3 driver.'.format(BUCKET_KEY_NAME,
-            SECTION_NAME))
+            section))
 
     try:
         key_prefix = config.get(section, KEY_PREFIX_NAME)
     except NoOptionError:
         raise MissingS3Configuration('A "{0}" value must be provided in the' \
             ' "{1}" section when using the S3 driver.'.format(KEY_PREFIX_NAME,
-            SECTION_NAME))
+            section))
 
     access_key, secret_key = get_aws_credentials(config)
     conn = get_s3_connection(access_key, secret_key)
