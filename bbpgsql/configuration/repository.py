@@ -5,7 +5,7 @@ from bbpgsql.configuration.repository_storage import (
 
 
 def get_WAL_repository(config):
-    repository_type = 'WAL storage'
+    repository_type = 'WAL'
     commit_storage = get_repository_storage_from_config(config, repository_type)
     return BBRepository(commit_storage)
 

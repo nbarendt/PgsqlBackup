@@ -38,7 +38,7 @@ class Test_archivewal_commits_to_S3(TestCase):
             'General': {
                 'pgsql_data_directory': self.tempdir.path,
             },
-            'WAL storage': {
+            'WAL': {
                 'bucket': self.bucket_name,
                 'prefix': self.prefix,
             },

@@ -28,7 +28,7 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
         self.storage_path = self.tempdir.makedir('repo')
         f = open(self.config_path, 'wb')
         f.write("""
-[WAL storage]
+[WAL]
 driver=filesystem
 path={0}
 [General]

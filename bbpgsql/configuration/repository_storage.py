@@ -24,7 +24,7 @@ def create_filesystem_commit_store_from_config(config, section):
     storage_directory = config.get(section, 'path')
     return FilesystemCommitStorage(storage_directory)
 
-SECTION_NAME = 'WAL storage'
+SECTION_NAME = 'WAL'
 BUCKET_KEY_NAME = 'bucket'
 KEY_PREFIX_NAME = 'prefix'
 

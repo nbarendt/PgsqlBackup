@@ -3,7 +3,7 @@ from ConfigParser import SafeConfigParser
 default_configuration = {
     'General': {
     },
-    'WAL storage': {
+    'WAL': {
         'driver': 's3',
     },
     'Archive storage': {
