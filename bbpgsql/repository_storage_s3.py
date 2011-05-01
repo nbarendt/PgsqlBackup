@@ -2,6 +2,9 @@ import os
 from bbpgsql.repository_commit import BBCommit
 from bbpgsql.repository_exceptions import FileAlreadyExistsError
 from bbpgsql.repository_exceptions import UnknownTagError
+from gzip import GzipFile
+from shutil import copyfileobj
+from tempfile import mkstemp
 
 
 class KeynameTagMessageMapper(object):
@@ -97,7 +100,14 @@ class S3CommitStorage(object):
         new_key_name = self._get_keyname_mapper(tag=tag,
             message=message).keyname
         new_key = self.bucket.new_key(new_key_name)
-        new_key.set_contents_from_file(fp)
+        tmp_gzip_fp, tmp_gzip_filename = mkstemp()
+        try:
+            gzip_fp = GzipFile(mode='wb', fileobj=os.fdopen(tmp_gzip_fp,'wb'))
+            copyfileobj(fp, gzip_fp)
+            gzip_fp.close()
+            new_key.set_contents_from_file(open(tmp_gzip_filename, 'rb'))
+        finally:
+            os.remove(tmp_gzip_filename)
 
     def delete_commit(self, tag):
         keyname_to_delete = self._get_keyname_for_tag(tag)
@@ -113,7 +123,14 @@ class S3CommitStorage(object):
             raise FileAlreadyExistsError(filename)
         keyname = self._get_keyname_for_tag(tag)
         key = self.bucket.get_key(keyname)
-        key.get_contents_to_filename(filename)
+        tmp_gunzip_fp, tmp_gunzip_filename = mkstemp()
+        try:
+            os.close(tmp_gunzip_fp)
+            key.get_contents_to_filename(tmp_gunzip_filename)
+            gzip_fp = GzipFile(tmp_gunzip_filename)
+            copyfileobj(gzip_fp, open(filename, 'wb'))
+        finally:
+            os.remove(tmp_gunzip_filename) 
 
     def get_message_for_tag(self, tag):
         keyname = self._get_keyname_for_tag(tag)
