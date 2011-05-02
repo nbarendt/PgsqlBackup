@@ -2,8 +2,11 @@ import os
 from optparse import OptionParser
 from bbpgsql.configuration import get_config_from_filename
 from bbpgsql.configuration.general import get_data_dir
+from subprocess import check_output
 import sys
+import imp
 
+BBPGSQL_VERSION_FILE = 'bbpgsql_version'
 
 class BadArgumentException(Exception):
     def __init__(self, msg):
@@ -13,7 +16,18 @@ class BadArgumentException(Exception):
         return self.msg
 
 
+def get_version():
+    try:
+        name = BBPGSQL_VERSION_FILE
+        fp, pathname, description = imp.find_module(name)
+        module = imp.load_module(name, fp, pathname, description)
+        version = module.VERSION
+    except ImportError:
+        version = check_output(['git', 'describe']).strip()
+    return ' '.join(['%prog', version])
+    
 def create_common_parser(**kwargs):
+    kwargs['version'] = get_version()
     parser = OptionParser(**kwargs)
 
     parser.add_option('-c', '--config', dest='config_file',
