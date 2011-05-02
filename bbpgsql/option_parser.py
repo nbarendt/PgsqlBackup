@@ -4,7 +4,9 @@ from bbpgsql.configuration import get_config_from_filename
 from bbpgsql.configuration.general import get_data_dir
 from subprocess import check_output
 import sys
+import imp
 
+BBPGSQL_VERSION_FILE = 'bbpgsql_version'
 
 class BadArgumentException(Exception):
     def __init__(self, msg):
@@ -15,8 +17,14 @@ class BadArgumentException(Exception):
 
 
 def get_version():
-    version = check_output(['git', 'describe']).strip()
-    return '  '.join(['%prog', version])
+    try:
+        name = BBPGSQL_VERSION_FILE
+        fp, pathname, description = imp.find_module(name)
+        module = imp.load_module(name, fp, pathname, description)
+        version = module.VERSION
+    except ImportError:
+        version = check_output(['git', 'describe']).strip()
+    return ' '.join(['%prog', version])
     
 def create_common_parser(**kwargs):
     kwargs['version'] = get_version()
