@@ -94,6 +94,25 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         get_key = self.mock_bucket.get_key.return_value
         get_key.get_contents_to_filename.assert_called_once()
 
+    def test_if_no_content_encoding_restores_to_target_file(self):
+        self.set_bucket_list(['tag1_msg1'])
+        target_file = self.tempdir.getpath('restored_file')
+        self.store.get_commit_contents_to_filename('tag1', target_file)
+        get_key = self.mock_bucket.get_key.return_value
+        get_key.get_contents_to_filename.assert_called_with(target_file)
+
+    def test_if_content_encoding_gzip_calls_gunzip_key_to_filename(self):
+        self.set_bucket_list(['tag1_msg1'])
+        target_file = self.tempdir.getpath('restored_file')
+        self.store._gunzip_key_to_filename = Mock()
+        # set content-encoding on key
+        get_key = self.mock_bucket.get_key.return_value
+        get_key.content_encoding = 'gzip'
+        self.store.get_commit_contents_to_filename('tag1', target_file)
+        get_key.get_contents_to_filename.assert_called_once()
+        self.store._gunzip_key_to_filename.assert_called_with(get_key,
+            target_file)
+
     def test_get_commit_contents_raises_Exception_if_file_exists(self):
         self.set_bucket_list(['tag1_msg1'])
         file1 = self.tempdir.write('file1', 'some file contents')

@@ -24,11 +24,14 @@ class Skeleton_Repository_Operations_With_S3CommitStorage(
         self.temps3.cleanup()
         self.teardown_tempdir()
 
-    def test_key_in_s3_has_required_metadata(self):
-        self.commit_filename1('a')
+    def get_lone_key(self):
         keys = [k for k in self.bucket.list()]
         self.assertEqual(1, len(keys))
-        key = self.bucket.get_key(keys[0])
+        return self.bucket.get_key(keys[0])
+
+    def test_key_in_s3_has_required_metadata(self):
+        self.commit_filename1('a')
+        key = self.get_lone_key()
         self.assertIsNotNone(key.etag)
         self.assertEqual(key.content_encoding, 'gzip')
         self.assertEqual(key.content_type, 'application/octet-stream')

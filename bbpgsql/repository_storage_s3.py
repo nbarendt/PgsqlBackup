@@ -100,19 +100,7 @@ class S3CommitStorage(object):
         new_key_name = self._get_keyname_mapper(tag=tag,
             message=message).keyname
         new_key = self.bucket.new_key(new_key_name)
-        tmp_gzip_fp, tmp_gzip_filename = mkstemp()
-        try:
-            gzip_fp = GzipFile(mode='wb', fileobj=os.fdopen(tmp_gzip_fp,'wb'))
-            copyfileobj(fp, gzip_fp)
-            gzip_fp.close()
-            new_key.set_contents_from_file(
-                open(tmp_gzip_filename, 'rb'),
-                headers={
-                'Content-Type': 'application/octet-stream',
-                'Content-Encoding': 'gzip',
-                })
-        finally:
-            os.remove(tmp_gzip_filename)
+        self._gzip_file_to_key(new_key, fp)
 
     def delete_commit(self, tag):
         keyname_to_delete = self._get_keyname_for_tag(tag)
@@ -123,11 +111,22 @@ class S3CommitStorage(object):
         keys = self._get_commit_keynames()
         return [self._get_keyname_mapper(key).tag for key in keys]
 
-    def get_commit_contents_to_filename(self, tag, filename):
-        if os.path.exists(filename):
-            raise FileAlreadyExistsError(filename)
-        keyname = self._get_keyname_for_tag(tag)
-        key = self.bucket.get_key(keyname)
+    def _gzip_file_to_key(self, key, fp):
+        tmp_gzip_fp, tmp_gzip_filename = mkstemp()
+        try:
+            gzip_fp = GzipFile(mode='wb', fileobj=os.fdopen(tmp_gzip_fp,'wb'))
+            copyfileobj(fp, gzip_fp)
+            gzip_fp.close()
+            key.set_contents_from_file(
+                open(tmp_gzip_filename, 'rb'),
+                headers={
+                'Content-Type': 'application/octet-stream',
+                'Content-Encoding': 'gzip',
+                })
+        finally:
+            os.remove(tmp_gzip_filename)
+
+    def _gunzip_key_to_filename(self, key, filename):
         tmp_gunzip_fp, tmp_gunzip_filename = mkstemp()
         try:
             os.close(tmp_gunzip_fp)
@@ -136,6 +135,16 @@ class S3CommitStorage(object):
             copyfileobj(gzip_fp, open(filename, 'wb'))
         finally:
             os.remove(tmp_gunzip_filename) 
+
+    def get_commit_contents_to_filename(self, tag, filename):
+        if os.path.exists(filename):
+            raise FileAlreadyExistsError(filename)
+        keyname = self._get_keyname_for_tag(tag)
+        key = self.bucket.get_key(keyname)
+        if key.content_encoding and key.content_encoding.lower() == 'gzip':
+            self._gunzip_key_to_filename(key, filename)
+        else:
+            key.get_contents_to_filename(filename)
 
     def get_message_for_tag(self, tag):
         keyname = self._get_keyname_for_tag(tag)
