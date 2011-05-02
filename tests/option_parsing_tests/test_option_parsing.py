@@ -23,7 +23,7 @@ class Test_CommandLineOptionParsing_Defaults(TestCase):
 class Test_CommandLineOptionParsing_Versioning(TestCase):
     def test_can_get_version_provided_to_parser_constructor(self):
         parser = create_common_parser(version="%prog 1.0")
-        version_regex = r'^nosetests\s+(\d+)\.(\d+)\.(\d+)$' 
+        version_regex = r'^nosetests\s+(\d+)\.(\d+)\.(\d+)\-\d+-g[0-9A-Fa-f]+$' 
         version = parser.get_version()
         print "version_regex", version_regex
         print "version", version
