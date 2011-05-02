@@ -1,7 +1,9 @@
 from unittest import TestCase
 from bbpgsql.option_parser import common_parse_args
+from bbpgsql.option_parser import create_common_parser
 from bbpgsql.option_parser import common_validate_options_and_args
 from testfixtures import TempDirectory
+from re import match
 
 
 class Test_CommandLineOptionParsing_Defaults(TestCase):
@@ -16,6 +18,16 @@ class Test_CommandLineOptionParsing_Defaults(TestCase):
 
     def test_uses_etc_config_file_by_default(self):
         self.assertEqual('/etc/bbpgsql.ini', self.options.config_file)
+
+
+class Test_CommandLineOptionParsing_Versioning(TestCase):
+    def test_can_get_version_provided_to_parser_constructor(self):
+        parser = create_common_parser(version="%prog 1.0")
+        version_regex = r'^nosetests\s+(\d+)\.(\d+)\.(\d+)$' 
+        version = parser.get_version()
+        print "version_regex", version_regex
+        print "version", version
+        self.assertTrue(match(version_regex, version))
 
 
 class Test_CommandLineOptionParsing_With_Options(TestCase):
