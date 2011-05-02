@@ -105,7 +105,12 @@ class S3CommitStorage(object):
             gzip_fp = GzipFile(mode='wb', fileobj=os.fdopen(tmp_gzip_fp,'wb'))
             copyfileobj(fp, gzip_fp)
             gzip_fp.close()
-            new_key.set_contents_from_file(open(tmp_gzip_filename, 'rb'))
+            new_key.set_contents_from_file(
+                open(tmp_gzip_filename, 'rb'),
+                headers={
+                'Content-Type': 'application/octet-stream',
+                'Content-Encoding': 'gzip',
+                })
         finally:
             os.remove(tmp_gzip_filename)
 

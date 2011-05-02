@@ -67,6 +67,18 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         self.store.add_commit('tag1', fp1, 'some_message')
         new_key_mock = self.mock_bucket.new_key.return_value
         new_key_mock.set_contents_from_file.assert_called_once()
+        mock_last_called_kwargs = new_key_mock.set_contents_from_file.call_args[1]
+        mock_actual_headers = mock_last_called_kwargs['headers']
+        lower_headers = {}
+        for k in mock_actual_headers:
+            lower_headers[k.lower()] = mock_actual_headers[k]
+        expected_headers = {
+            'Content-Type': 'application/octet-stream',
+            'Content-Encoding': 'gzip'}
+        for header in expected_headers:
+            self.assertIn(header.lower(), lower_headers.keys())
+            self.assertEqual(expected_headers[header],
+                lower_headers[header.lower()])
 
     def test_delete_commit_calls_get_key(self):
         self.set_bucket_list(['tag1_msg1'])
