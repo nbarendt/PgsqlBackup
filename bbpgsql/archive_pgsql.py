@@ -3,6 +3,10 @@ from bbpgsql.option_parser import archivepgsql_parse_args
 from bbpgsql.option_parser import archivepgsql_validate_options_and_args
 from bbpgsql.configuration import get_config_from_filename
 from bbpgsql.configuration.general import get_data_dir
+from bbpgsql.configuration.repository import get_Snapshot_repository
+from bbpgsql.pg_backup_control import pg_start_backup
+from bbpgsql.pg_backup_control import pg_stop_backup
+from bbpgsql.create_archive import create_archive
 from datetime import datetime
 from re import match
 from tempfile import mkdtemp, template
@@ -55,12 +59,19 @@ def archivepgsql_main():
     with TemporaryDirectory(suffix='archivepgsql') as tempdir:
         tag = generate_tag()
         archive_dst_path = join(tempdir, 'pgsql.snapshot.tar')
-        #  first_WAL = pg_start_backup
-        #  tar magic using data_dir as src and archive_dst_path as destination 
-        #  second_WAL = pg_stop_backup
-        #  commit_snapshot_to_repository(repo, tarfile, tag, first_wal,
-        #    last_wal)
-    
+        repo = get_Snapshot_repository(conf)
+        if options.dry_run:
+            print("Dry Run")
+            return
+        else:
+            perform_backup(data_dir, archive_dst_path, tag, repo)
+
+def perform_backup(src_dir, archivefile, tag, repo):
+    print("This is perform_backup")
+    first_WAL = pg_start_backup(tag)
+    create_archive(src_dir, archivefile)
+    second_WAL = pg_stop_backup()
+    commit_snapshot_to_repository(repo, archivefile, tag, first_WAL, second_WAL)
 
 def generate_tag():
    return datetime.utcnow().isoformat() 

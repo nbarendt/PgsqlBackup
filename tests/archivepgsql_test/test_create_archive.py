@@ -80,6 +80,8 @@ class Test_archive_create(TestCase):
 
         def getExcludedMember(name):
             tarinfo=tf.getmember(name)
+            if(tarinfo):
+                pass
 
         self.assertRaises(KeyError, getExcludedMember, './dir2')
 
@@ -91,6 +93,8 @@ class Test_archive_create(TestCase):
 
         def getExcludedMember(name):
             tarinfo=tf.getmember(name)
+            if(tarinfo):
+                pass
 
         for root, dirs, files in os.walk(self.srcPath):
             relativeRoot = os.path.relpath(root, self.srcPath)
