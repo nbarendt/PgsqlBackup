@@ -6,7 +6,8 @@ from copy import deepcopy
 from testfixtures import TempDirectory
 from tests.integration.s3_helpers import setup_s3_and_bucket
 from tests.integration.config_helpers import write_config_to_filename
-
+from gzip import GzipFile
+from StringIO import StringIO
 
 class Test_archivewal_commits_to_S3(TestCase):
     ARCHIVEPGSQL_PATH = os.path.join('bbpgsql', 'cmdline_scripts')
@@ -71,4 +72,7 @@ class Test_archivewal_commits_to_S3(TestCase):
         expected_keyname_prefix = ''.join([self.prefix, wal_filename])
         self.assertTrue(wal_keyname.startswith(expected_keyname_prefix))
         key = self.temps3.bucket.get_key(wal_keyname)
-        self.assertEqual(wal_contents, key.get_contents_as_string())
+        compressed_wal_data = key.get_contents_as_string()
+        compressed_wal_fp = StringIO(compressed_wal_data)
+        uncompressed_data = GzipFile(fileobj=compressed_wal_fp).read()
+        self.assertEqual(wal_contents, uncompressed_data)

@@ -8,7 +8,6 @@ from boto.s3.bucket import Bucket
 from boto.s3.key import Key
 
 
-#class Test_S3CommitStorage_Against_Mock_with_Bucket_Prefix(TestCase):
 class Skeleton_S3CommitStorage_Against_Mock(TestCase):
     __test__ = False
 
@@ -67,7 +66,7 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         fp1 = open(filename1, 'rb')
         self.store.add_commit('tag1', fp1, 'some_message')
         new_key_mock = self.mock_bucket.new_key.return_value
-        new_key_mock.set_contents_from_file.assert_called_with(fp1)
+        new_key_mock.set_contents_from_file.assert_called_once()
 
     def test_delete_commit_calls_get_key(self):
         self.set_bucket_list(['tag1_msg1'])
@@ -81,7 +80,7 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         target_file = self.tempdir.getpath('restored_file')
         self.store.get_commit_contents_to_filename('tag1', target_file)
         get_key = self.mock_bucket.get_key.return_value
-        get_key.get_contents_to_filename.assert_called_with(target_file)
+        get_key.get_contents_to_filename.assert_called_once()
 
     def test_get_commit_contents_raises_Exception_if_file_exists(self):
         self.set_bucket_list(['tag1_msg1'])
