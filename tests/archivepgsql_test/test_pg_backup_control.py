@@ -1,10 +1,10 @@
 from unittest import TestCase
 from mock import patch
-from bbpgsql.pg_start_backup import pg_start_backup
-from bbpgsql.pg_start_backup import pg_stop_backup
-from bbpgsql.pg_start_backup import wal_name_cleanup
+from bbpgsql.pg_backup_control import pg_start_backup
+from bbpgsql.pg_backup_control import pg_stop_backup
+from bbpgsql.pg_backup_control import wal_name_cleanup
 
-@patch('bbpgsql.pg_start_backup.check_output')
+@patch('bbpgsql.pg_backup_control.check_output')
 class Test_pg_start_backup(TestCase):
     def setUp(self):
         self.WAL_FILENAME = '033300DF0'
@@ -31,7 +31,7 @@ class Test_pg_start_backup(TestCase):
         self.assertEqual(self.WAL_FILENAME, output)
 
 
-@patch('bbpgsql.pg_start_backup.check_output')
+@patch('bbpgsql.pg_backup_control.check_output')
 class Test_pg_stop_backup(TestCase):
     def setUp(self):
         self.WAL_FILENAME = '033300DF0'
