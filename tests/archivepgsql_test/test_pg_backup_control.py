@@ -47,6 +47,10 @@ class Test_pg_stop_backup(TestCase):
 
     def test_check_input_arguments_correct(self, mock_check_output):
         sql_cmd = "SELECT pg_xlogfile_name(pg_stop_backup())"
-        output = pg_stop_backup()
+        pg_stop_backup()
         mock_check_output.assert_called_with(['psql',
             'postgres', '-t', '-c', sql_cmd])
+
+    def test_wal_name_cleanup(self, mock_check_output):
+        output = wal_name_cleanup(self.pgsql_return)
+        self.assertEqual(self.WAL_FILENAME, output)

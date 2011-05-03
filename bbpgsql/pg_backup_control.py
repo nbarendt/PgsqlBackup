@@ -24,4 +24,3 @@ def pg_stop_backup():
     CMD.append('-c') # execute the following command
     CMD.append(sql_cmd)
     return wal_name_cleanup(check_output(CMD))
-    pass
