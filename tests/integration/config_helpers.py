@@ -1,6 +1,6 @@
 from ConfigParser import SafeConfigParser
 
-
+"""
 def write_config_to_filename(config_dictionary, config_filename):
     config = SafeConfigParser()
     for section in config_dictionary:
@@ -11,3 +11,4 @@ def write_config_to_filename(config_dictionary, config_filename):
     f = open(config_filename, 'wb')
     config.write(f)
     f.close()
+"""
