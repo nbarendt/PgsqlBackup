@@ -1,6 +1,7 @@
 from unittest import TestCase
 from subprocess import check_call
-from subprocess import check_output
+from subprocess import Popen
+from subprocess import PIPE
 import os
 from copy import deepcopy
 from testfixtures import TempDirectory
@@ -8,8 +9,6 @@ from mock import patch
 from bbpgsql.configuration import get_config_from_filename
 from bbpgsql.configuration.repository import get_Snapshot_repository
 import bbpgsql.archive_pgsql
-#from bbpgsql.archive_pgsql import perform_backup
-#from bbpgsql.archive_pgsql import generate_tag
 
 
 class Test_archivepgsql_BasicCommandLineOperation(TestCase):
@@ -44,11 +43,12 @@ driver=memory
         self.tempdir.cleanup()
 
     def test_can_execute_archivepgsql(self):
-        check_call(self.cmd, env=self.env)
+        check_call(self.cmd, env=self.env, stdout=PIPE)
 
     def test_obeys_dry_run_option(self):
-        output = check_output(self.cmd, env=self.env)
-        self.assertEqual("Dry Run\n", output)
+        proc = Popen(self.cmd, env=self.env, stdout=PIPE)
+        stdoutdata, stderrdata = proc.communicate()
+        self.assertEqual("Dry Run\n", stdoutdata)
 
 
 class Test_archivepgsql_backup_invocation(TestCase):

@@ -6,6 +6,7 @@ from bbpgsql.option_parser import BBPGSQL_VERSION_FILE
 from testfixtures import TempDirectory
 from re import match
 import sys
+import os
 
 
 class Test_CommandLineOptionParsing_Defaults(TestCase):
@@ -81,3 +82,9 @@ class Test_OptionParsing_and_Validation(TestCase):
         parser, options, args = common_parse_args(args=[
             '--config', self.config_path])
         self.assertTrue(common_validate_options_and_args(options, args))
+
+    #def test_validation_raises_exception_if_config_file_permissions_too_open(
+        #self):
+        #with TempDirectory as d:
+            #self.parent_dir = d.makedir('parent_dir')
+            #self.config_path = d.write('parent_dir/config.ini', '')
