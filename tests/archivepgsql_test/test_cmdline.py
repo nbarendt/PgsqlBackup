@@ -7,6 +7,7 @@ from copy import deepcopy
 from testfixtures import TempDirectory
 from mock import patch
 from bbpgsql.configuration import get_config_from_filename
+from bbpgsql.configuration import write_config_to_filename
 from bbpgsql.configuration.repository import get_Snapshot_repository
 import bbpgsql.archive_pgsql
 
@@ -31,12 +32,16 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
         self.data_dir = self.tempdir.makedir('pgsql_data')
 
     def setup_config(self):
-        self.config_path = self.tempdir.write(self.CONFIG_FILE, """
-[General]
-pgsql_data_directory={0}
-[Snapshot]
-driver=memory
-""".format(self.data_dir))
+        self.config_path = os.path.join(self.tempdir.path, self.CONFIG_FILE)
+        self.config_dict = {
+            'General': {
+                'pgsql_data_directory': self.data_dir,
+            },
+            'Snapshot': {
+                'driver': 'memory',
+            },
+        }
+        write_config_to_filename(self.config_dict, self.config_path)
         self.config = get_config_from_filename(self.config_path)
 
     def tearDown(self):
@@ -72,12 +77,16 @@ class Test_archivepgsql_backup_invocation(TestCase):
         self.archive_dir = self.tempdir.makedir('pgsql_archive')
 
     def setup_config(self):
-        self.config_path = self.tempdir.write(self.CONFIG_FILE, """
-[General]
-pgsql_data_directory={0}
-[Snapshot]
-driver=memory
-""".format(self.data_dir))
+        self.config_path = os.path.join(self.tempdir.path, self.CONFIG_FILE)
+        self.config_dict = {
+            'General': {
+                'pgsql_data_directory': self.data_dir,
+            },
+            'Snapshot': {
+                'driver': 'memory',
+            },
+        }
+        write_config_to_filename(self.config_dict, self.config_path)
         self.config = get_config_from_filename(self.config_path)
 
     def tearDown(self):
