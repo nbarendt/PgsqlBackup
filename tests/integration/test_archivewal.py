@@ -5,7 +5,7 @@ from uuid import uuid4
 from copy import deepcopy
 from testfixtures import TempDirectory
 from tests.integration.s3_helpers import setup_s3_and_bucket
-from tests.integration.config_helpers import write_config_to_filename
+from bbpgsql.configuration import write_config_to_filename
 from gzip import GzipFile
 from StringIO import StringIO
 

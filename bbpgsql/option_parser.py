@@ -1,4 +1,5 @@
 import os
+import stat
 from optparse import OptionParser
 from bbpgsql.configuration import get_config_from_filename
 from bbpgsql.configuration.general import get_data_dir
@@ -42,6 +43,11 @@ def common_parse_args(args=None):
 def common_validate_options_and_args(options=None, args=None):
     if not os.path.exists(options.config_file):
         raise Exception("File %s does not exist" % (options.config_file))
+    config_stats = os.stat(options.config_file)
+    if ((config_stats.st_mode & stat.S_IRWXG) |
+        (config_stats.st_mode & stat.S_IRWXO)):
+        raise Exception("File %s has open group or other permissions" %
+            (options.config_file))
     return True
 
 

@@ -2,8 +2,13 @@ from unittest import TestCase
 from bbpgsql.option_parser import common_parse_args
 from bbpgsql.option_parser import create_common_parser
 from bbpgsql.option_parser import common_validate_options_and_args
+from bbpgsql.option_parser import BBPGSQL_VERSION_FILE
+from bbpgsql.configuration import write_config_to_filename
 from testfixtures import TempDirectory
 from re import match
+import sys
+import os
+import stat
 
 
 class Test_CommandLineOptionParsing_Defaults(TestCase):
@@ -27,9 +32,20 @@ class Test_CommandLineOptionParsing_Versioning(TestCase):
     def tearDown(self):
         self.tempdir.cleanup()
 
-    def test_can_get_version_from_git(self):
+    def test_can_get_version_provided_to_parser_constructor(self):
         parser = create_common_parser()
         version_regex = r'^nosetests\s+(\d+)\.(\d+)\.(\d+)\-\d+-g[0-9A-Fa-f]+$' 
+        version = parser.get_version()
+        print "version_regex", version_regex
+        print "version", version
+        self.assertTrue(match(version_regex, version))
+
+    def test_will_use_version_from_bbpgsql_version_py_file_if_available(self):
+        version_filename = '.'.join([BBPGSQL_VERSION_FILE, 'py']) 
+        self.tempdir.write(version_filename, 'VERSION="0.1.2"\n')
+        sys.path.append(self.tempdir.path)
+        version_regex = r'^nosetests\s+0.1.2' 
+        parser = create_common_parser()
         version = parser.get_version()
         print "version_regex", version_regex
         print "version", version
@@ -52,7 +68,10 @@ class Test_CommandLineOptionParsing_With_Options(TestCase):
 class Test_OptionParsing_and_Validation(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
-        self.config_path = self.tempdir.write('config.ini', '')
+        self.config_dict = {
+        }
+        self.config_path = os.path.join(self.tempdir.path, 'config.ini')
+        write_config_to_filename(self.config_dict, self.config_path)
 
     def tearDown(self):
         self.tempdir.cleanup()
@@ -63,6 +82,19 @@ class Test_OptionParsing_and_Validation(TestCase):
                 '--config', '/tmp/blah/blah/bbpgsql.ini'])
             common_validate_options_and_args(options, args)
         self.assertRaises(Exception, validate)
+
+    def test_validation_raises_exception_if_config_file_permissions_too_open(
+        self):
+        with TempDirectory() as d:
+            self.parent_dir = d.makedir('parent_dir')
+            self.config_path = d.write('parent_dir/config.ini', '')
+            self.open_perm = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
+            os.chmod(self.config_path, self.open_perm)
+            def validate(config_path):
+                parser, options, args = common_parse_args(args=[
+                    '--config', config_path])
+                common_validate_options_and_args(options, args)
+            self.assertRaises(Exception, validate, self.config_path)
 
     def test_options_validate_if_config_file_exists(self):
         parser, options, args = common_parse_args(args=[

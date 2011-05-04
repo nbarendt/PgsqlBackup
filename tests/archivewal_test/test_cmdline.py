@@ -3,6 +3,7 @@ from subprocess import Popen, PIPE, STDOUT
 import os
 from copy import deepcopy
 from testfixtures import TempDirectory
+from bbpgsql.configuration import write_config_to_filename
 
 
 class Test_archivepgsql_BasicCommandLineOperation(TestCase):
@@ -24,17 +25,18 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
         self.tempdir = TempDirectory()
 
     def setup_config(self):
-        self.config_path = self.tempdir.getpath(self.CONFIG_FILE)
         self.storage_path = self.tempdir.makedir('repo')
-        f = open(self.config_path, 'wb')
-        f.write("""
-[WAL]
-driver=filesystem
-path={0}
-[General]
-pgsql_data_directory={1}
-""".format(self.storage_path, self.tempdir.path))
-        f.close()
+        self.config_path = self.tempdir.getpath(self.CONFIG_FILE)
+        self.config_dict = {
+            'WAL':  {
+                'driver': 'filesystem',
+                'path': self.storage_path,
+            },
+            'General': {
+                'pgsql_data_directory': self.tempdir.path,
+            },
+        }
+        write_config_to_filename(self.config_dict, self.config_path)
         #print '----'
         #print open(self.config_path, 'rb').read()
         #print '----'

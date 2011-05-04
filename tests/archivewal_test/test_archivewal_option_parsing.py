@@ -1,8 +1,10 @@
 from unittest import TestCase
 from bbpgsql.option_parser import archivewal_parse_args
 from bbpgsql.option_parser import archivewal_validate_options_and_args
+from bbpgsql.configuration import write_config_to_filename
 from mock import patch, Mock
 from testfixtures import TempDirectory
+import os
 
 
 class Test_archivewal_parse_args_Uses_Common_Functions(TestCase):
@@ -36,10 +38,13 @@ class Test_archivewal_validate_options_Uses_Common_Functions(TestCase):
 class Test_archivewal_requires_WAL_file(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
-        self.config_file = self.tempdir.write('config_file', """
-[General]
-pgsql_data_directory={0}
-""".format(self.tempdir.path))
+        self.config_dict = {
+            'General': {
+                'pgsql_data_directory': self.tempdir.path,
+            },
+        }
+        self.config_file = os.path.join(self.tempdir.path, 'config_file')
+        write_config_to_filename(self.config_dict, self.config_file)
         parser, self.options, self.args = archivewal_parse_args(['-c',
             self.config_file])
 
