@@ -16,7 +16,7 @@ class BadArgumentException(Exception):
 
 def get_version():
     # override "version" with a constant string for release
-    version = "0.1.1" #check_output(['git', 'describe']).strip()
+    version = "0.1.2" #check_output(['git', 'describe']).strip()
     return ' '.join(['%prog', version])
     
 def create_common_parser(**kwargs):
