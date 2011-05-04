@@ -2,6 +2,12 @@
 set -e
 
 . env/bin/activate
-rm -rf pyinstaller/dist pyinstaller/build
-python pyinstaller/pyinstaller-1.5-rc1/Configure.py
-python pyinstaller/pyinstaller-1.5-rc1/Build.py pyinstaller/bbpgsql.spec
+export WORKINGDIR=`pwd`
+cd pyinstaller
+rm -rf dist build
+python pyinstaller-1.5-rc1/Configure.py
+python pyinstaller-1.5-rc1/Build.py bbpgsql.spec
+cd dist
+ln -s bbpgsql archivewal
+ln -s bbpgsql archivepgsql
+cd ${WORKING_DIR}
