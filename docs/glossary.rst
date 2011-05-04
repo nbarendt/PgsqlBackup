@@ -14,7 +14,7 @@ Glossary
         The primary configuration file for the BitBacker PostgreSQL Backup and
         Restore Tools.  The :file:`/etc/bbpgsql.ini` file contains the
         configuration used for :ref:`archivepgsql`, :ref:`restorepgsql`,
-        :ref:`archiveWAL`, :ref:`restoreWAL`.
+        :ref:`archivewal`, :ref:`restorewal`.
 
         See :ref:`configuration_file` for details.
 
