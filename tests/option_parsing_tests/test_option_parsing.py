@@ -2,11 +2,9 @@ from unittest import TestCase
 from bbpgsql.option_parser import common_parse_args
 from bbpgsql.option_parser import create_common_parser
 from bbpgsql.option_parser import common_validate_options_and_args
-from bbpgsql.option_parser import BBPGSQL_VERSION_FILE
 from bbpgsql.configuration import write_config_to_filename
 from testfixtures import TempDirectory
 from re import match
-import sys
 import os
 import stat
 
@@ -26,26 +24,9 @@ class Test_CommandLineOptionParsing_Defaults(TestCase):
 
 
 class Test_CommandLineOptionParsing_Versioning(TestCase):
-    def setUp(self):
-        self.tempdir = TempDirectory()
-
-    def tearDown(self):
-        self.tempdir.cleanup()
-
     def test_can_get_version_provided_to_parser_constructor(self):
         parser = create_common_parser()
         version_regex = r'^nosetests\s+(\d+)\.(\d+)\.(\d+)\-\d+-g[0-9A-Fa-f]+$' 
-        version = parser.get_version()
-        print "version_regex", version_regex
-        print "version", version
-        self.assertTrue(match(version_regex, version))
-
-    def test_will_use_version_from_bbpgsql_version_py_file_if_available(self):
-        version_filename = '.'.join([BBPGSQL_VERSION_FILE, 'py']) 
-        self.tempdir.write(version_filename, 'VERSION="0.1.2"\n')
-        sys.path.append(self.tempdir.path)
-        version_regex = r'^nosetests\s+0.1.2' 
-        parser = create_common_parser()
         version = parser.get_version()
         print "version_regex", version_regex
         print "version", version
