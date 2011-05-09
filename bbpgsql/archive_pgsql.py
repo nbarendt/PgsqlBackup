@@ -67,7 +67,6 @@ def archivepgsql_main():
             perform_backup(data_dir, archive_dst_path, tag, repo)
 
 def perform_backup(src_dir, archivefile, tag, repo):
-    print("This is perform_backup")
     first_WAL = pg_start_backup(tag)
     create_archive(src_dir, archivefile)
     second_WAL = pg_stop_backup()
