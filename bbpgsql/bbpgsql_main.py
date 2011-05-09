@@ -12,7 +12,13 @@ MIMEBase
 MIMEText
 
 def bbpgsql_error():
-    pass
+    msg = '''You have invoked this script as bbpgsql.
+This script is supposed to be invoked through the commands archivepgsql
+and archivewal.  Please check with your adminstrator to make sure these
+commands were installed correctly.
+'''
+    stdout.write(msg)
+    exit(1)
 
 def get_dispatch_map():
     CMD_DISPATCH_MAP = {
