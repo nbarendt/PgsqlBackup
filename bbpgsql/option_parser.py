@@ -14,6 +14,22 @@ class BadArgumentException(Exception):
         return self.msg
 
 
+class TooManyArgumentsException(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
+
+
+class UsedArchivepgsqlAsArchiveWAL(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
+
+
 def get_version():
     # override "version" with a constant string for release
     version = check_output(['git', 'describe']).strip()
@@ -43,6 +59,8 @@ def common_parse_args(args=None):
 def common_validate_options_and_args(options=None, args=None):
     if not os.path.exists(options.config_file):
         raise Exception("File %s does not exist" % (options.config_file))
+    if not os.access(options.config_file, os.R_OK):
+        raise Exception("No read access for %s" % (options.config_file))
     config_stats = os.stat(options.config_file)
     if ((config_stats.st_mode & stat.S_IRWXG) |
         (config_stats.st_mode & stat.S_IRWXO)):
@@ -96,5 +114,14 @@ def archivepgsql_parse_args(args=None):
 def archivepgsql_validate_options_and_args(options=None, args=None):
     if not common_validate_options_and_args(options, args):
         return False
+    if args:
+        if args[0].startswith('pg_xlog'):
+            raise UsedArchivepgsqlAsArchiveWAL('archivepgsql was called with' \
+                            ' a WAL file path as an argument.  This is' \
+                            ' probably due to configuring archivepgsql' \
+                            ' as the archive_command in the PGSQL' \
+                            ' configuration instead of archivewal.')
+        raise TooManyArgumentsException('archivepgsql should not be called' \
+                        ' with any arguments.  Are you using it as the' \
+                        ' archive_command instead of archivewal?')
     return True
-

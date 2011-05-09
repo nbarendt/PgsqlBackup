@@ -3,6 +3,10 @@ from bbpgsql.option_parser import common_parse_args
 from bbpgsql.option_parser import create_common_parser
 from bbpgsql.option_parser import common_validate_options_and_args
 from bbpgsql.configuration import write_config_to_filename
+from bbpgsql.option_parser import archivepgsql_parse_args
+from bbpgsql.option_parser import archivepgsql_validate_options_and_args
+from bbpgsql.option_parser import UsedArchivepgsqlAsArchiveWAL
+from bbpgsql.option_parser import TooManyArgumentsException
 from testfixtures import TempDirectory
 from re import match
 import os
@@ -81,3 +85,38 @@ class Test_OptionParsing_and_Validation(TestCase):
         parser, options, args = common_parse_args(args=[
             '--config', self.config_path])
         self.assertTrue(common_validate_options_and_args(options, args))
+
+    def test_validation_raises_exception_if_cannot_read_config_file(self):
+        def validate():
+            parser, options, args = common_parse_args(args=[
+                '--config', self.config_path])
+            self.no_perm = 0
+            os.chmod(self.config_path, self.no_perm)
+            common_validate_options_and_args(options, args)
+        self.assertRaises(Exception, validate)
+
+
+class Test_archivepgsql_rejects_arguments(TestCase):
+    def setUp(self):
+        self.tempdir = TempDirectory()
+        self.config_dict = {
+        }
+        self.config_path = os.path.join(self.tempdir.path, 'config.ini')
+        write_config_to_filename(self.config_dict, self.config_path)
+
+    def tearDown(self):
+        self.tempdir.cleanup()
+
+    def test_archivepgsql_rejects_any_arguments(self):
+        def validate():
+            parser, options, args = archivepgsql_parse_args(args=[
+                '--config', self.config_path, 'some_argument'])
+            archivepgsql_validate_options_and_args(options, args)
+        self.assertRaises(TooManyArgumentsException, validate)
+
+    def test_archivepgsql_rejects_WAL_argument(self):
+        def validate():
+            parser, options, args = archivepgsql_parse_args(args=[
+                '--config', self.config_path, 'pg_xlog/some_arg'])
+            archivepgsql_validate_options_and_args(options, args)
+        self.assertRaises(UsedArchivepgsqlAsArchiveWAL, validate)
