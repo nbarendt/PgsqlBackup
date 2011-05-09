@@ -1,13 +1,6 @@
 #! /usr/bin/env python
+from sys import argv
 from bbpgsql.bbpgsql_main import bbpgsql_main
 
-#PYINSTALLER KLUDGES
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email.mime.text import MIMEText
-MIMEMultipart
-MIMEBase
-MIMEText
-
 if __name__ == '__main__':
-    bbpgsql_main()
+    bbpgsql_main(argv)

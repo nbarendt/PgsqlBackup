@@ -11,12 +11,16 @@ MIMEMultipart
 MIMEBase
 MIMEText
 
+def bbpgsql_error():
+    pass
+
 CMD_DISPATCH_MAP = {
     'archivewal': archivewal_main,
     'archivepgsql': archivepgsql_main,
+    'bbpgsql': bbpgsql_error,
 }
 
-def bbpgsql_main():
+def bbpgsql_main(argv):
     cmd_name = basename(argv[0])
     if cmd_name in CMD_DISPATCH_MAP:
         CMD_DISPATCH_MAP[cmd_name]()
