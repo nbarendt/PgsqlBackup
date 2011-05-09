@@ -1,8 +1,5 @@
 #! /usr/bin/env python
-from os.path import basename
-from sys import stdout, exit, argv
-from bbpgsql.archive_wal import archivewal_main
-from bbpgsql.archive_pgsql import archivepgsql_main
+from bbpgsql.bbpgsql_main import bbpgsql_main
 
 #PYINSTALLER KLUDGES
 from email.mime.multipart import MIMEMultipart
@@ -12,15 +9,5 @@ MIMEMultipart
 MIMEBase
 MIMEText
 
-CMD_DISPATCH_MAP = {
-    'archivewal': archivewal_main,
-    'archivepgsql': archivepgsql_main,
-}
-
 if __name__ == '__main__':
-    cmd_name = basename(argv[0])
-    if cmd_name in CMD_DISPATCH_MAP:
-        CMD_DISPATCH_MAP[cmd_name]()
-    else:
-        stdout.write('Unknown command: {0}\n'.format(cmd_name))
-        exit(1)
+    bbpgsql_main()
