@@ -1,5 +1,5 @@
 from os.path import basename
-from sys import stdout, exit, argv
+from sys import stdout, exit
 from bbpgsql.archive_wal import archivewal_main
 from bbpgsql.archive_pgsql import archivepgsql_main
 
