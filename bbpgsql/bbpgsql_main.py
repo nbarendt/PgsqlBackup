@@ -14,16 +14,19 @@ MIMEText
 def bbpgsql_error():
     pass
 
-CMD_DISPATCH_MAP = {
-    'archivewal': archivewal_main,
-    'archivepgsql': archivepgsql_main,
-    'bbpgsql': bbpgsql_error,
-}
+def get_dispatch_map():
+    CMD_DISPATCH_MAP = {
+        'archivewal': archivewal_main,
+        'archivepgsql': archivepgsql_main,
+        'bbpgsql': bbpgsql_error,
+    }
+    return CMD_DISPATCH_MAP
 
 def bbpgsql_main(argv):
     cmd_name = basename(argv[0])
-    if cmd_name in CMD_DISPATCH_MAP:
-        CMD_DISPATCH_MAP[cmd_name]()
+    dispatch_map = get_dispatch_map()
+    if cmd_name in dispatch_map:
+        dispatch_map[cmd_name]()
     else:
         stdout.write('Unknown command: {0}\n'.format(cmd_name))
         exit(1)
