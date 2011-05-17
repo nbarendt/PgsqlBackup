@@ -1,0 +1,45 @@
+## debian/packages for bbpgsql
+## Customised for bbpgsql by Mr. Nobody
+
+## This is an -example- packages file; read /usr/share/doc/yada-doc/yada.txt.gz
+## (from the yada-doc package) to find out how to customise it to your needs.
+
+Source: bbpgsql
+Section: unknown
+Priority: extra
+Maintainer: Mr. Nobody <nobody@root.org>
+Standards-Version: 3.7.2
+Upstream-Source: ftp://some.where/over/the/rainbow.tar.gz
+Homepage: http://some.thing/nasty/in/the/woodshed.html
+Description: Some package
+Copyright: GPL
+ Copyright 2002 A. Snide Badger
+Major-Changes:
+ Introduced many bugs by not editing debian/packages appropriately.
+Build: sh
+ CC=${CC:-gcc}
+ CFLAGS=${CFLAGS:--Wall -g}
+ CXXFLAGS=${CXXFLAGS:--Wall -g}
+ LDFLAGS=${LDFLAGS:-}
+ if [ "${DEB_BUILD_OPTIONS#*noopt}" != "$DEB_BUILD_OPTIONS" ]; then
+     CFLAGS="$CFLAGS -O0"
+     CXXFLAGS="$CXXFLAGS -O0"
+ else
+     CFLAGS="$CFLAGS -O2"
+     CXXFLAGS="$CXXFLAGS -O2"
+ fi
+ CC="$CC" CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" \
+     ./configure --prefix=/usr --infodir=/usr/share/info --mandir=/usr/share/man
+ make
+Clean: sh
+ make distclean || make clean || true
+
+Package: bbpgsql
+Architecture: any
+Depends: []
+Description: Some binary package
+ This is a generic binary package.  If you see this text, it hasn't been
+ built properly; the packager should have replaced this with something
+ appropriate.
+Install: sh
+ make install DESTDIR=$ROOT
