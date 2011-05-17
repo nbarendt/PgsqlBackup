@@ -6,6 +6,7 @@ from bbpgsql.repository_storage_s3 import UnknownTagError
 from mock import Mock
 from boto.s3.bucket import Bucket
 from boto.s3.key import Key
+from hashlib import md5
 
 
 class Skeleton_S3CommitStorage_Against_Mock(TestCase):
@@ -62,7 +63,8 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         self.mock_bucket.new_key.assert_called_with(expected_key_name)
 
     def test_add_commit_calls_set_contents_from_filename(self):
-        filename1 = self.tempdir.write('file1', 'some file contents')
+        commit_contents = 'some file contents'
+        filename1 = self.tempdir.write('file1', commit_contents)
         fp1 = open(filename1, 'rb')
         self.store.add_commit('tag1', fp1, 'some_message')
         new_key_mock = self.mock_bucket.new_key.return_value
@@ -74,7 +76,8 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
             lower_headers[k.lower()] = mock_actual_headers[k]
         expected_headers = {
             'Content-Type': 'application/octet-stream',
-            'Content-Encoding': 'gzip'}
+            'Content-Encoding': 'gzip',
+            'x-amz-meta-fingerprint': md5(commit_contents).hexdigest()}
         for header in expected_headers:
             self.assertIn(header.lower(), lower_headers.keys())
             self.assertEqual(expected_headers[header],
@@ -126,6 +129,14 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         commit = self.store['tag1']
         self.assertEqual('tag1', commit.tag)
         self.assertEqual('msg1', commit.message)
+
+    def test_dictionary_interface_uses_customer_header_to_get_fingerprint(self):
+        self.set_bucket_list(['tag1_msg1'])
+        self.mock_bucket.get_key.return_value.get_metadata.return_value = '123'
+        commit = self.store['tag1']
+        self.assertEqual('tag1', commit.tag)
+        self.assertEqual('msg1', commit.message)
+        self.assertEqual('123', commit.fingerprint)
 
     def test_dictionary_interface_raises_Exception_if_unknown_tag(self):
 
