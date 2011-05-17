@@ -1,0 +1,61 @@
+## debian/packages for bbpgsql
+## Customised for bbpgsql by Mr. Nobody
+
+## This is an -example- packages file; read /usr/share/doc/yada-doc/yada.txt.gz
+## (from the yada-doc package) to find out how to customise it to your needs.
+
+Source: bbpgsql-0.1
+Section: unknown
+Priority: extra
+Maintainer: Mr. Nobody <nobody@root.org>
+Standards-Version: 3.7.2
+Upstream-Source: ftp://some.where/over/the/rainbow.tar.gz
+Homepage: http://some.thing/nasty/in/the/woodshed.html
+Description: Some package
+Copyright: GPL
+ Copyright 2002 A. Snide Badger
+Major-Changes:
+ Introduced many bugs by not editing debian/packages appropriately.
+##### This is where the build commands would go.  Since we are just packaging
+#up the binary file, we do not need to do anything here so use the period to do
+#nothing. (Yada interprets a lone period as a blank line)
+#####
+#Build: sh
+# CC=${CC:-gcc}
+# CFLAGS=${CFLAGS:--Wall -g}
+# CXXFLAGS=${CXXFLAGS:--Wall -g}
+# LDFLAGS=${LDFLAGS:-}
+# if [ "${DEB_BUILD_OPTIONS#*noopt}" != "$DEB_BUILD_OPTIONS" ]; then
+#     CFLAGS="$CFLAGS -O0"
+#     CXXFLAGS="$CXXFLAGS -O0"
+# else
+#     CFLAGS="$CFLAGS -O2"
+#     CXXFLAGS="$CXXFLAGS -O2"
+# fi
+# CC="$CC" CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" \
+#     ./configure --prefix=/usr --infodir=/usr/share/info --mandir=/usr/share/man
+# make
+Build: sh
+ .
+##### Don't need a "clean" so again, replace with a "blank" line
+#Clean: sh
+# make distclean || make clean || true
+Clean: sh
+ .
+
+Package: bbpgsql
+Architecture: any
+Depends: []
+Description: Some binary package
+ This is a generic binary package.  If you see this text, it hasn't been
+ built properly; the packager should have replaced this with something
+ appropriate.
+#####
+# These are the commands that copy the exectuable and make the symlinks in the
+# default location for binary executables
+#####
+Install: sh
+ yada install -bin bbpgsql
+ yada symlink -bin -as archivepgsql bbpgsql
+ yada symlink -bin -as archivewal bbpgsql
+

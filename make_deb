@@ -1,0 +1,11 @@
+#!/bin/sh
+
+#####
+# Run this script in the directory containing the lone binary file after
+# creating the debian subdirectory with 'yada yada' and editing the
+# debian/packages file.  Make sure that the directory has a different name
+# than the binary contained within.  Also make sure that the directory name
+# fits the convention some-package-name-0.0.0.
+#####
+yada rebuild
+dpkg-buildpackage
