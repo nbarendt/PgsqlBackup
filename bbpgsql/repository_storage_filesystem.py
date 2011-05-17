@@ -1,5 +1,6 @@
 import os
 from bbpgsql.repository_commit import BBCommit
+from hashlib import md5
 
 
 class FilesystemCommitStorage(object):
@@ -14,7 +15,9 @@ class FilesystemCommitStorage(object):
         return tag in tags
 
     def __getitem__(self, tag):
-        return BBCommit(self, tag, self.get_message_for_tag(tag))
+        commit_file = self._get_commits()[tag]
+        fingerprint = self._get_fingerprint_from_commit_filename(commit_file)
+        return BBCommit(self, tag, self.get_message_for_tag(tag), fingerprint)
 
     def _commit_filename_to_absolute_path(self, commit_filename):
         return os.path.join(self.path_to_storage, commit_filename)
@@ -34,15 +37,20 @@ class FilesystemCommitStorage(object):
         return commits
 
     def _get_tag_from_commit_filename(self, commit_filename):
-        return commit_filename.split(self.tag_separator, 1)[0]
+        return commit_filename.split(self.tag_separator, 2)[0]
 
     def _get_message_from_commit_filename(self, commit_filename):
-        return commit_filename.split(self.tag_separator, 1)[1]
+        return commit_filename.split(self.tag_separator, 2)[1]
+
+    def _get_fingerprint_from_commit_filename(self, commit_filename):
+        return commit_filename.split(self.tag_separator, 2)[2]
 
     def add_commit(self, tag, fp, message):
-        commit_filename = self.tag_separator.join([tag, message])
+        contents = fp.read()
+        fingerprint = md5(contents).hexdigest() 
+        commit_filename = self.tag_separator.join([tag, message, fingerprint])
         commit_path = self._commit_filename_to_absolute_path(commit_filename)
-        open(commit_path, 'wb').write(fp.read())
+        open(commit_path, 'wb').write(contents)
 
     def delete_commit(self, tag):
         os.remove(self._tag_to_absolute_path(tag))
@@ -57,3 +65,9 @@ class FilesystemCommitStorage(object):
     def get_message_for_tag(self, tag):
         commit_file = self._get_commits()[tag]
         return self._get_message_from_commit_filename(commit_file)
+
+    def get_fingerprint_for_file(self, file):
+        m = md5()
+        for l in file:
+            m.update(l)
+        return m.hexdigest()

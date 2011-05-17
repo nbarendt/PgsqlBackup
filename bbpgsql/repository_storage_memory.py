@@ -1,5 +1,5 @@
 from bbpgsql.repository_commit import BBCommit
-
+from hashlib import md5
 
 class MemoryCommitStorage(object):
     def __init__(self):
@@ -9,10 +9,16 @@ class MemoryCommitStorage(object):
         return tag in self.data
 
     def __getitem__(self, tag):
-        return BBCommit(self, tag, self.get_message_for_tag(tag))
+        return BBCommit(self, tag, self.get_message_for_tag(tag),
+            self.get_fingerprint_for_tag(tag))
 
     def add_commit(self, tag, fp, message):
-        self.data[tag] = dict(data=fp.read(), message=message)
+        contents = fp.read()
+        fingerprint = md5(contents).hexdigest()
+        self.data[tag] = dict(
+            data=contents,
+            message=message,
+            fingerprint=fingerprint)
 
     def delete_commit(self, tag):
         del self.data[tag]
@@ -25,3 +31,12 @@ class MemoryCommitStorage(object):
 
     def get_message_for_tag(self, tag):
         return self.data[tag]['message']
+
+    def get_fingerprint_for_tag(self, tag):
+        return self.data[tag]['fingerprint']
+
+    def get_fingerprint_for_file(self, file):
+        m = md5()
+        for l in file:
+            m.update(l)
+        return m.hexdigest()

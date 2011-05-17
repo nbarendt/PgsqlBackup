@@ -39,10 +39,15 @@ class BBRepository(object):
 
     def create_commit_from_filename(self, tag, filename, message=None):
         message = message or ''
-        self._tag_is_unique(tag)
-        self._tag_is_legal(tag)
-        self._message_is_legal(message)
-        self.store.add_commit(tag, open(filename, 'rb'), message)
+        try:
+            self._tag_is_unique(tag)
+            self._tag_is_legal(tag)
+            self._message_is_legal(message)
+            self.store.add_commit(tag, open(filename, 'rb'), message)
+        except DuplicateTagError:
+            commit = self[tag]
+            if not commit.contents_are_identical_to_filename(filename):
+                raise
 
     def delete_commits_before(self, new_oldest_commit):
         new_oldest_tag = new_oldest_commit.tag

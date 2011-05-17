@@ -15,8 +15,10 @@ class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
     def setup_tempdir(self):
         # call this from your setUp
         self.tempdir = TempDirectory()
-        self.filename1 = self.tempdir.write('file1', 'some contents')
-        self.filename2 = self.tempdir.write('file2', 'some other contents')
+        self.file1_contents = 'some contents'
+        self.file2_contents = 'some other contents'
+        self.filename1 = self.tempdir.write('file1', self.file1_contents)
+        self.filename2 = self.tempdir.write('file2', self.file2_contents)
 
     def teardown_tempdir(self):
         # call this from your tearDown
@@ -57,14 +59,22 @@ class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
         commit = self.repo['some-tag']
         restore_file = self.tempdir.getpath('file3')
         commit.get_contents_to_filename(restore_file)
-        self.assertEqual('some contents', open(restore_file, 'rb').read())
+        self.assertEqual(self.file1_contents, open(restore_file, 'rb').read())
 
     def test_tags_are_unique(self):
         self.commit_filename1('some-tag')
 
         def will_raise_DuplicateTagError():
-            self.repo.create_commit_from_filename('some-tag', self.filename1)
+            self.repo.create_commit_from_filename('some-tag', self.filename2)
         self.assertRaises(DuplicateTagError, will_raise_DuplicateTagError)
+
+    def test_duplicate_tag_with_identical_contents_okay(self):
+        self.commit_filename1('some-tag')
+        self.commit_filename1('some-tag')
+        commit = self.repo['some-tag']
+        restore_file = self.tempdir.getpath('file3')
+        commit.get_contents_to_filename(restore_file)
+        self.assertEqual(self.file1_contents, open(restore_file, 'rb').read())
 
     def test_can_get_commit_before_a_given_commit(self):
         self.commit_filename1('a')

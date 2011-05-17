@@ -5,7 +5,12 @@ from bbpgsql.repository_exceptions import UnknownTagError
 from gzip import GzipFile
 from shutil import copyfileobj
 from tempfile import mkstemp
+from hashlib import md5
 
+
+FINGERPRINT_METADATA_KEY = 'fingerprint'
+CUSTOM_HTTP_FINGERPRINT_HEADER = ''.join(['x-amz-meta-',
+     FINGERPRINT_METADATA_KEY])
 
 class KeynameTagMessageMapper(object):
     def __init__(self, bucket_prefix, tag_separator,
@@ -66,8 +71,12 @@ class S3CommitStorage(object):
             self.tag_separator, keyname, tag, message)
 
     def __getitem__(self, tag):
-        keyname = self._get_keyname_mapper(self._get_keyname_for_tag(tag))
-        return BBCommit(self, keyname.tag, keyname.message)
+        keyname = self._get_keyname_for_tag(tag)
+        keyname_mapper = self._get_keyname_mapper(keyname)
+        key = self.bucket.get_key(keyname)
+        return BBCommit(self, keyname_mapper.tag,
+            keyname_mapper.message, key.get_metadata(
+                FINGERPRINT_METADATA_KEY))
 
     def __contains__(self, tag):
         return 0 < len(self._get_keys_that_start_with_tag(tag))
@@ -122,6 +131,8 @@ class S3CommitStorage(object):
                 headers={
                 'Content-Type': 'application/octet-stream',
                 'Content-Encoding': 'gzip',
+                CUSTOM_HTTP_FINGERPRINT_HEADER: self.get_fingerprint_for_file(
+                    fp)
                 })
         finally:
             os.remove(tmp_gzip_filename)
@@ -149,3 +160,10 @@ class S3CommitStorage(object):
     def get_message_for_tag(self, tag):
         keyname = self._get_keyname_for_tag(tag)
         return self._get_keyname_mapper(keyname).message
+
+    def get_fingerprint_for_file(self, file):
+        file.seek(0)
+        m = md5()
+        for l in file:
+            m.update(l)
+        return m.hexdigest()
