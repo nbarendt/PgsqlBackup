@@ -1,4 +1,4 @@
-from sys import stdout
+from sys import stdout, exit
 from bbpgsql.option_parser import archivepgsql_parse_args
 from bbpgsql.option_parser import archivepgsql_validate_options_and_args
 from bbpgsql.configuration import get_config_from_filename
