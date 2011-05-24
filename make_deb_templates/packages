@@ -17,22 +17,9 @@ Copyright: GPL
 Major-Changes:
  Introduced many bugs by not editing debian/packages appropriately.
 Build: sh
- CC=${CC:-gcc}
- CFLAGS=${CFLAGS:--Wall -g}
- CXXFLAGS=${CXXFLAGS:--Wall -g}
- LDFLAGS=${LDFLAGS:-}
- if [ "${DEB_BUILD_OPTIONS#*noopt}" != "$DEB_BUILD_OPTIONS" ]; then
-     CFLAGS="$CFLAGS -O0"
-     CXXFLAGS="$CXXFLAGS -O0"
- else
-     CFLAGS="$CFLAGS -O2"
-     CXXFLAGS="$CXXFLAGS -O2"
- fi
- CC="$CC" CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" \
-     ./configure --prefix=/usr --infodir=/usr/share/info --mandir=/usr/share/man
- make
+ .
 Clean: sh
- make distclean || make clean || true
+ .
 
 Package: bbpgsql
 Architecture: any
@@ -42,4 +29,7 @@ Description: Some binary package
  built properly; the packager should have replaced this with something
  appropriate.
 Install: sh
- make install DESTDIR=$ROOT
+ yada install -bin bbpgsql
+ yada symlink -bin -as archivepgsql bbpgsql
+ yada symlink -bin -as archivewal bbpgsql
+
