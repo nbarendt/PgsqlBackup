@@ -1,23 +1,42 @@
 #!/bin/sh
 
-#####
-# Run this script in the directory containing the lone binary file after
-# creating the debian subdirectory with 'yada yada' and editing the
-# debian/packages file.  Make sure that the directory has a different name
-# than the binary contained within.  Also make sure that the directory name
-# fits the convention some-package-name-0.0.0.
-# Procedure:
-# 1.  create sandbox directory.
-# 2.  within the sandbox directory create a subdirectory to hold the files
-#     in the binary distribution.  Give this folder a name like
-#     packagename-1.2.3 where 1.2.3 is the proper version number.
-# 3.  in the package directory, place the files of the binary distribution
-# 4.  cd into the package directory under the sandbox directory
-# 5.  Make sure the environment variable DEB_BUILD_OPTIONS is set to nostrip
-# 6.  run "yada yada" to create the debian directory and the changelog and packages
-#     files within it.  Edit those files appropriately.  See the
-#     packages.example file in this directory for guidance.
-# 7.  execute the following commands:
-#     'yada rebuild' and 'dpkg_buildpackage -b'
-#####
-echo 'This process is not automated.  Follow the instructions inside this file'
+if test ${#} != 1
+then
+    echo "Usage make_dep VERSION_NUMBER"
+    exit 1
+fi
+if test ! -f pyinstaller/dist/bbpgsql
+then
+    echo "Cannot find built package in './pyintsaller/dist'  Aborting."
+    exit 1
+fi
+
+export DEB_BUILD_OPTIONS=nostrip
+
+thisdir=`pwd`
+if test -d sandbox
+then
+    echo 'Old sandbox found, removing'
+    rm -rf sandbox
+fi
+
+pkgdir="sandbox/bbpgsql-${1}"
+echo 'Creating sandbox'
+mkdir sandbox
+echo 'Creating package directory'
+mkdir ${pkgdir}
+echo 'Copying package file'
+cp pyinstaller/dist/bbpgsql ${pkgdir}
+echo 'Creating changlog file'
+cd ${pkgdir}
+yada yada
+cd ${thisdir}
+echo "Copying template yada files"
+debdir=${pkgdir}/debian
+cp make_deb_templates/packages ${debdir}
+cd ${pkgdir}
+yada rebuild
+dpkg-buildpackage -b
+echo "If the build was successful, the package is now in the sandbox directory"
+cd ${thisdir}
+ls -l sandbox
