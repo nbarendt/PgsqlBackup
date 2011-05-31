@@ -40,3 +40,10 @@ class MemoryCommitStorage(object):
         for l in file:
             m.update(l)
         return m.hexdigest()
+
+    def get_storage_size(self):
+        tags = self.get_tags()
+        storage_size = 0
+        for tag in tags:
+           storage_size += len(self.data[tag]['data'])
+        return storage_size

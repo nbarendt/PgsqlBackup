@@ -25,7 +25,7 @@ class Skeleton_Repository_Operations_With_S3CommitStorage(
         self.teardown_tempdir()
 
     def get_lone_key(self):
-        keys = [k for k in self.bucket.list()]
+        keys = [k for k in self.bucket.list(prefix=self.bucket_prefix)]
         self.assertEqual(1, len(keys))
         return self.bucket.get_key(keys[0])
 
@@ -36,12 +36,16 @@ class Skeleton_Repository_Operations_With_S3CommitStorage(
         self.assertEqual(key.content_encoding, 'gzip')
         self.assertEqual(key.content_type, 'application/octet-stream')
 
+    def get_expected_size_from_contents(self, file_contents):
+        return sum(k.size for k in self.bucket.list(prefix=self.bucket_prefix))
+
 
 class Test_Repository_Operations_with_S3CommitStorage(
     Skeleton_Repository_Operations_With_S3CommitStorage):
     __test__ = True
 
     def create_storage(self):
+        self.bucket_prefix = ''
         return S3CommitStorage(self.bucket)
 
 
@@ -50,4 +54,6 @@ class Test_Repository_Operations_with_S3CommitStorage_with_Bucket_Prefix(
     __test__ = True
 
     def create_storage(self):
-        return S3CommitStorage(self.bucket, 'some_test_prefix/')
+        self.bucket_prefix = 'some_test_prefix/'
+        self.bucket.new_key('some_random_key').set_contents_from_string('some_random_string')
+        return S3CommitStorage(self.bucket, self.bucket_prefix)

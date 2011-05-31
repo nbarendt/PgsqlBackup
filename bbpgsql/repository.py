@@ -61,3 +61,6 @@ class BBRepository(object):
         if N_minus_1 < 0:
             raise ValueError()
         return self[tags[N_minus_1]]
+
+    def get_repository_size(self):
+        return self.store.get_storage_size()

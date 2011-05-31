@@ -71,3 +71,9 @@ class FilesystemCommitStorage(object):
         for l in file:
             m.update(l)
         return m.hexdigest()
+
+    def get_storage_size(self):
+        storage_size = 0
+        for commit_filename in self._get_list_of_commit_files():
+            storage_size += os.stat(os.path.join(self.path_to_storage, commit_filename)).st_size
+        return storage_size

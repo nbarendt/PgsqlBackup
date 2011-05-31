@@ -167,3 +167,6 @@ class S3CommitStorage(object):
         for l in file:
             m.update(l)
         return m.hexdigest()
+
+    def get_storage_size(self):
+        return sum(k.size for k in self.bucket.list(prefix=self.bucket_prefix))
