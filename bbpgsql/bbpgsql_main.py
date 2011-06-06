@@ -2,7 +2,7 @@ from os.path import basename
 from sys import stdout, exit
 from bbpgsql.archive_wal import archivewal_main
 from bbpgsql.archive_pgsql import archivepgsql_main
-from bbpgsql.report_storage_stats import storagestats_main
+from bbpgsql.storage_stats import storagestats_main
 
 #PYINSTALLER KLUDGES
 from email.mime.multipart import MIMEMultipart
