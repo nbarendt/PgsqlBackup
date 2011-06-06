@@ -2,7 +2,7 @@ from os.path import basename
 from sys import stdout, exit
 from bbpgsql.archive_wal import archivewal_main
 from bbpgsql.archive_pgsql import archivepgsql_main
-from bbpgsql.report_store_stats import reportstorestats_main
+from bbpgsql.report_storage_stats import storagestats_main
 
 #PYINSTALLER KLUDGES
 from email.mime.multipart import MIMEMultipart
@@ -25,7 +25,7 @@ def get_dispatch_map():
     CMD_DISPATCH_MAP = {
         'archivewal': archivewal_main,
         'archivepgsql': archivepgsql_main,
-        'reportstorestats': reportstorestats_main,
+        'storagestats': storagestats_main,
         'bbpgsql': bbpgsql_error,
     }
     return CMD_DISPATCH_MAP
