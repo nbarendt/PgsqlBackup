@@ -13,9 +13,38 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
     def setUp(self):
         self.setup_environment()
         self.cmd = [self.exe_script]
-        self.expected_output = '''
-                 Repository         # of items      Repository size 
-'''
+        self.topbottom_dashes = '{:-^76}'.format('')
+        self.middle_dashes = '|{:-^74}|'.format('')
+        self.total = '|{:<24} {:^24}|{:>24}|'.format(
+            'Total Size',
+            '',
+            '3000 MB'
+        )
+        self.column_headers = '|{:^24}|{:^24}|{:^24}|'.format(
+            'Repository Name',
+            'Number of Items',
+            'Repository Size'
+        )
+        self.snapshots = '|{:^24}|{:^24}|{:^24}|'.format(
+            'Snapshots',
+            '100',
+            '2000 MB'
+        )
+        self.walfiles = '|{:^24}|{:^24}|{:^24}|'.format(
+            'WAL Files',
+            '1000',
+            '1000 MB'
+        )
+        self.expected_output = ''.join([
+            self.topbottom_dashes,
+            self.column_headers,
+            self.middle_dashes,
+            self.snapshots,
+            self.walfiles,
+            self.middle_dashes,
+            self.total,
+            self.topbottom_dashes,
+        ])
 
     def setup_environment(self):
         self.env = deepcopy(os.environ)
