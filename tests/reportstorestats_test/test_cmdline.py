@@ -1,8 +1,10 @@
 from unittest import TestCase
 #from testfixtures import TempDirectory
 import os
+from sys import stdout
 from copy import deepcopy
 import subprocess
+from bbpgsql.storage_stats import Report_storage_stats
 
 
 class Test_reportstorestats_BasicCommandLineOperation(TestCase):
@@ -13,27 +15,32 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
     def setUp(self):
         self.setup_environment()
         self.cmd = [self.exe_script]
+        self.num_snapshots = 100
+        self.size_snapshots = 2000
+        self.num_walfiles = 1000
+        self.size_walfiles = 1000
         self.topbottom_dashes = '{:-^76}\n'.format('')
         self.middle_dashes = '|{:-^74}|\n'.format('')
-        self.total = '|{:^24} {:^24}|{:>24}|\n'.format(
-            'Total Size',
-            '',
-            '3000 MB '
-        )
         self.column_headers = '|{:^24}|{:^24}|{:^24}|\n'.format(
             'Repository Name',
             'Number of Items',
             'Repository Size'
         )
-        self.snapshots = '|{:^24}|{:>24}|{:>24}|\n'.format(
+        self.item = '|{:^24}|{:>17} items |{:>20} MB |\n'
+        self.snapshots = self.item.format(
             'Snapshots',
-            '100 items ',
-            '2000 MB '
+            '%s' % self.num_snapshots,
+            '%s' % self.size_snapshots
         )
-        self.walfiles = '|{:^24}|{:>24}|{:>24}|\n'.format(
+        self.walfiles = self.item.format(
             'WAL Files',
-            '1000 items ',
-            '1000 MB '
+            '%s' % self.num_walfiles,
+            '%s' % self.size_walfiles
+        )
+        self.total = '|{:^24} {:^24}|{:>20} MB |\n'.format(
+            'Total Size',
+            '',
+            '3000'
         )
         self.expected_output = ''.join([
             self.topbottom_dashes,
@@ -61,4 +68,18 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
             [self.exe_script],
             env=self.env,
             stderr=subprocess.STDOUT)
+        stdout.write(self.expected_output)
+        stdout.write(output)
         self.assertEqual(self.expected_output, output)
+
+    def test_get_repository_size_returns_snapshot_data(self):
+        rss = Report_storage_stats()
+        (items, size) = rss._get_repository_size('Snapshots')
+        self.assertEqual(items, self.num_snapshots)
+        self.assertEqual(size, self.size_snapshots)
+
+    def test_get_repository_size_returns_walfile_data(self):
+        rss = Report_storage_stats()
+        (items, size) = rss._get_repository_size('WAL Files')
+        self.assertEqual(items, self.num_walfiles)
+        self.assertEqual(size, self.size_walfiles)
