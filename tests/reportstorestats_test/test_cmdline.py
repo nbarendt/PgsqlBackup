@@ -1,7 +1,8 @@
 from unittest import TestCase
-from testfixtures import TempDirectory
+#from testfixtures import TempDirectory
 import os
-from subprocess import check_call
+from copy import deepcopy
+import subprocess
 
 
 class Test_reportstorestats_BasicCommandLineOperation(TestCase):
@@ -10,10 +11,25 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
     exe_script = 'reportstorestats'
 
     def setUp(self):
+        self.setup_environment()
         self.cmd = [self.exe_script]
+        self.expected_output = '''
+                 Repository         # of items      Repository size 
+'''
+
+    def setup_environment(self):
+        self.env = deepcopy(os.environ)
+        self.env['PATH'] = ''.join([
+            self.env['PATH'],
+            ':',
+            self.ARCHIVEPGSQL_PATH])
 
     def tearDown(self):
         pass
 
-    def test_reportstorestats_returns_error_if_given_an_argument(self):
-        proc = check_call(self.cmd)
+    def test_reportstorestats_returns_proper_report(self):
+        output = subprocess.check_output(
+            [self.exe_script],
+            env=self.env,
+            stderr=subprocess.STDOUT)
+        self.assertEqual(self.expected_output, output)
