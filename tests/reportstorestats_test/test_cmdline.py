@@ -8,32 +8,32 @@ import subprocess
 class Test_reportstorestats_BasicCommandLineOperation(TestCase):
     ARCHIVEPGSQL_PATH = os.path.join('bbpgsql', 'cmdline_scripts')
     CONFIG_FILE = 'config.ini'
-    exe_script = 'reportstorestats'
+    exe_script = 'storagestats'
 
     def setUp(self):
         self.setup_environment()
         self.cmd = [self.exe_script]
-        self.topbottom_dashes = '{:-^76}'.format('')
-        self.middle_dashes = '|{:-^74}|'.format('')
-        self.total = '|{:<24} {:^24}|{:>24}|'.format(
+        self.topbottom_dashes = '{:-^76}\n'.format('')
+        self.middle_dashes = '|{:-^74}|\n'.format('')
+        self.total = '|{:^24} {:^24}|{:>24}|\n'.format(
             'Total Size',
             '',
-            '3000 MB'
+            '3000 MB '
         )
-        self.column_headers = '|{:^24}|{:^24}|{:^24}|'.format(
+        self.column_headers = '|{:^24}|{:^24}|{:^24}|\n'.format(
             'Repository Name',
             'Number of Items',
             'Repository Size'
         )
-        self.snapshots = '|{:^24}|{:^24}|{:^24}|'.format(
+        self.snapshots = '|{:^24}|{:>24}|{:>24}|\n'.format(
             'Snapshots',
-            '100',
-            '2000 MB'
+            '100 items ',
+            '2000 MB '
         )
-        self.walfiles = '|{:^24}|{:^24}|{:^24}|'.format(
+        self.walfiles = '|{:^24}|{:>24}|{:>24}|\n'.format(
             'WAL Files',
-            '1000',
-            '1000 MB'
+            '1000 items ',
+            '1000 MB '
         )
         self.expected_output = ''.join([
             self.topbottom_dashes,
