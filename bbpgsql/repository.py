@@ -64,3 +64,6 @@ class BBRepository(object):
 
     def get_repository_size(self):
         return self.store.get_storage_size()
+
+    def get_number_of_items(self):
+        return len(self.store.get_tags())

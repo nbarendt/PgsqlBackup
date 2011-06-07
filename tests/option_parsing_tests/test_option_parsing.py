@@ -5,6 +5,8 @@ from bbpgsql.option_parser import common_validate_options_and_args
 from bbpgsql.configuration import write_config_to_filename
 from bbpgsql.option_parser import archivepgsql_parse_args
 from bbpgsql.option_parser import archivepgsql_validate_options_and_args
+from bbpgsql.option_parser import storagestats_parse_args
+from bbpgsql.option_parser import storagestats_validate_options_and_args
 from bbpgsql.option_parser import UsedArchivepgsqlAsArchiveWAL
 from bbpgsql.option_parser import TooManyArgumentsException
 from testfixtures import TempDirectory
@@ -120,3 +122,21 @@ class Test_archivepgsql_rejects_arguments(TestCase):
                 '--config', self.config_path, 'pg_xlog/some_arg'])
             archivepgsql_validate_options_and_args(options, args)
         self.assertRaises(UsedArchivepgsqlAsArchiveWAL, validate)
+
+class Test_storagestats_rejets_arguments(TestCase):
+    def setUp(self):
+        self.tempdir = TempDirectory()
+        self.config_dict = {
+        }
+        self.config_path = os.path.join(self.tempdir.path, 'config.ini')
+        write_config_to_filename(self.config_dict, self.config_path)
+
+    def tearDown(self):
+        self.tempdir.cleanup()
+
+    def test_storagestats_rejects_any_arguments(self):
+        def validate():
+            parser, options, args = storagestats_parse_args(args=[
+                '--config', self.config_path, 'some_argument'])
+            storagestats_validate_options_and_args(options, args)
+        self.assertRaises(TooManyArgumentsException, validate)

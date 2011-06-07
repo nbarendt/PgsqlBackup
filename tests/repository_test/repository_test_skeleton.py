@@ -167,3 +167,41 @@ class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
         self.assertEqual(expected_size,
             self.repo.get_repository_size())
 
+    def test_empty_repo_has_zero_items(self):
+        self.assertEqual(0, self.repo.get_number_of_items())
+
+    def test_can_get_number_items_one_commit(self):
+        file_contents = []
+        self.commit_filename1('a', 'A')
+        file_contents.append(self.file1_contents)
+        items = len(file_contents)
+        self.assertEqual(items, self.repo.get_number_of_items())
+
+    def test_can_get_number_of_items_many_different_commits(self):
+        file_contents = []
+        self.commit_filename1('a', 'A')
+        file_contents.append(self.file1_contents)
+        self.commit_filename2('b', 'B')
+        file_contents.append(self.file2_contents)
+        self.commit_filename1('c', 'C')
+        file_contents.append(self.file1_contents)
+        self.commit_filename2('d', 'D')
+        file_contents.append(self.file2_contents)
+        expected_size = len(file_contents)
+        self.assertEqual(expected_size,
+            self.repo.get_number_of_items())
+
+    def test_can_get_number_of_items_after_delete(self):
+        file_contents = []
+        self.commit_filename1('a', 'A')
+        file_contents.append(self.file1_contents)
+        self.commit_filename2('b', 'B')
+        file_contents.append(self.file2_contents)
+        self.commit_filename1('c', 'C')
+        file_contents.append(self.file1_contents)
+        self.commit_filename2('d', 'D')
+        file_contents.append(self.file2_contents)
+        self.repo.delete_commits_before(self.repo['d'])
+        file_contents = file_contents[3:]
+        expected_size = len(file_contents)
+        self.assertEqual(expected_size, self.repo.get_number_of_items())

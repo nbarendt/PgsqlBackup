@@ -125,3 +125,18 @@ def archivepgsql_validate_options_and_args(options=None, args=None):
                         ' with any arguments.  Are you using it as the' \
                         ' archive_command instead of archivewal?')
     return True
+
+def storagestats_parse_args(args=None):
+    storagestats_usage = ' '.join([
+        os.path.basename(sys.argv[0]),
+        '[options]'])
+    parser = create_common_parser(usage=storagestats_usage)
+    options, args = parser.parse_args(args)
+    return parser, options, args
+
+def storagestats_validate_options_and_args(options=None, args=None):
+    if not common_validate_options_and_args(options, args):
+        return False
+    if args:
+        raise TooManyArgumentsException('storagestats takes no arguments')
+    return True

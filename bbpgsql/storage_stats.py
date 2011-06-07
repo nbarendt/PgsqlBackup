@@ -1,4 +1,10 @@
 from sys import stdout, exit
+from bbpgsql.option_parser import storagestats_parse_args
+from bbpgsql.option_parser import storagestats_validate_options_and_args
+from bbpgsql.configuration import get_config_from_filename
+#from bbpgsql.configuration.repository import get_Snapshot_repository
+#from bbpgsql.configuration.repository import get_WAL_repository
+
 
 class Report_storage_stats(object):
     def __init__(self):
@@ -10,6 +16,8 @@ class Report_storage_stats(object):
             'Number of Items',
             'Repository Size'
         )
+#        self.WAL_repository = get_WAL_repository(conf)
+#        self.snapshot_repo = get_Snapshot_repository(conf)
         self.filldata()
 
     def filldata(self):
@@ -42,7 +50,7 @@ class Report_storage_stats(object):
         if repo_name == 'WAL Files':
             return(1000, 1000)
 
-    def _write_report(self):
+    def write_report(self):
         stdout.write(self.topbottom_dashes)
         stdout.write(self.column_headers)
         stdout.write(self.middle_dashes)
@@ -52,10 +60,29 @@ class Report_storage_stats(object):
         stdout.write(self.total)
         stdout.write(self.topbottom_dashes)
 
+
+def storagestats_handle_args():
+    parser, options, args = storagestats_parse_args()
+
+    try:
+        storagestats_validate_options_and_args(options, args)
+    except Exception, e:
+        stdout.write(str(e) + '\n')
+        parser.print_help()
+        exit(1)
+    return options, args
+    
 def storagestats_main():
     rss = Report_storage_stats()
-    rss._write_report()
+    rss.write_report()
     exit(0)
 
 if __name__ == '__main__':
     storagestats_main()
+
+def dummy():
+    options, args = storagestats_handle_args()
+    conf = get_config_from_filename(options.config_file)
+    reporter = Report_storage_stats(conf)
+    reporter.write_report()
+
