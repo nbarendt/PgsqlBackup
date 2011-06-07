@@ -8,6 +8,8 @@ from bbpgsql.configuration import get_config_from_filename
 
 class Report_storage_stats(object):
     def __init__(self):
+#        self.options, self.args = self.storagestats_handle_args()
+#        selfconf = get_config_from_filename(self.options.config_file)
         self.topbottom_dashes = '{:-^76}\n'.format('')
         self.middle_dashes = '|{:-^74}|\n'.format('')
         self.item = '|{:^24}|{:>17} items |{:>20} MB |\n'
@@ -16,11 +18,22 @@ class Report_storage_stats(object):
             'Number of Items',
             'Repository Size'
         )
-#        self.WAL_repository = get_WAL_repository(conf)
-#        self.snapshot_repo = get_Snapshot_repository(conf)
-        self.filldata()
+#        self.WAL_repository = get_WAL_repository(self.conf)
+#        self.snapshot_repo = get_Snapshot_repository(self.conf)
+        self._filldata()
 
-    def filldata(self):
+    def storagestats_handle_args(self):
+        parser, options, args = storagestats_parse_args()
+
+        try:
+            storagestats_validate_options_and_args(options, args)
+        except Exception, e:
+            stdout.write(str(e) + '\n')
+            parser.print_help()
+            exit(1)
+        return options, args
+
+    def _filldata(self):
         total = 0
         repo_name = 'Snapshots'
         (items, size) = self._get_repository_size(repo_name)
@@ -61,28 +74,17 @@ class Report_storage_stats(object):
         stdout.write(self.topbottom_dashes)
 
 
-def storagestats_handle_args():
-    parser, options, args = storagestats_parse_args()
-
-    try:
-        storagestats_validate_options_and_args(options, args)
-    except Exception, e:
-        stdout.write(str(e) + '\n')
-        parser.print_help()
-        exit(1)
-    return options, args
-    
 def storagestats_main():
-    rss = Report_storage_stats()
-    rss.write_report()
+    reporter = Report_storage_stats()
+    reporter.write_report()
     exit(0)
 
 if __name__ == '__main__':
     storagestats_main()
 
-def dummy():
-    options, args = storagestats_handle_args()
-    conf = get_config_from_filename(options.config_file)
-    reporter = Report_storage_stats(conf)
-    reporter.write_report()
+#def dummy():
+#    options, args = storagestats_handle_args()
+#    conf = get_config_from_filename(options.config_file)
+#    reporter = Report_storage_stats(conf)
+#    reporter.write_report()
 
