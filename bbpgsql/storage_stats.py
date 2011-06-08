@@ -7,6 +7,9 @@ from bbpgsql.configuration.repository import get_WAL_repository
 
 
 class Storage_stats_reporter(object):
+    ONE_MEBIBYTE = 1024 * 1024
+
+
     def __init__(self, repo_names, repositories):
         self.repo_names = repo_names
         self.repositories = repositories
@@ -40,13 +43,7 @@ class Storage_stats_reporter(object):
     def _get_repository_size(self, repo_name, repo):
         items = repo.get_number_of_items()
         size = repo.get_repository_size()
-        return items, size
-        if repo_name == 'Snapshots':
-            return (100, 2000)
-        if repo_name == 'WAL Files':
-            return(1000, 1000)
-        else:
-            print("Hey!  UnKnown repo name!!!!")
+        return items, size / self.ONE_MEBIBYTE
 
     def write_report(self, stream):
         stream.write(self.topbottom_dashes)
