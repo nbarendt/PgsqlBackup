@@ -1,10 +1,14 @@
 from unittest import TestCase
-#from testfixtures import TempDirectory
+from testfixtures import TempDirectory
 import os
 from sys import stdout
 from copy import deepcopy
 import subprocess
-from bbpgsql.storage_stats import Report_storage_stats
+from bbpgsql.storage_stats import Storage_stats_reporter
+from bbpgsql.configuration import get_config_from_filename
+from bbpgsql.configuration import write_config_to_filename
+from bbpgsql.configuration.repository import get_Snapshot_repository
+from bbpgsql.configuration.repository import get_WAL_repository
 
 
 class Test_reportstorestats_BasicCommandLineOperation(TestCase):
@@ -14,6 +18,8 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
 
     def setUp(self):
         self.setup_environment()
+        self.setup_config()
+        self.setup_repositories()
         self.cmd = [self.exe_script]
         self.num_snapshots = 100
         self.size_snapshots = 2000
@@ -59,6 +65,28 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
             self.env['PATH'],
             ':',
             self.ARCHIVEPGSQL_PATH])
+        self.tempdir = TempDirectory()
+
+    def setup_config(self):
+        self.config_path = os.path.join(self.tempdir.path, self.CONFIG_FILE)
+        self.config_dict = {
+            'General': {
+            },
+            'Snapshot': {
+                'driver': 'memory',
+            },
+            'WAL': {
+                'driver': 'memory',
+            }
+        }
+        write_config_to_filename(self.config_dict, self.config_path)
+        self.config = get_config_from_filename(self.config_path)
+
+    def setup_repositories(self):
+        self.repositories = {
+        'Snapshots': get_Snapshot_repository(self.config),
+        'WAL Files': get_WAL_repository(self.config),
+        }
 
     def tearDown(self):
         pass
@@ -73,13 +101,13 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
         self.assertEqual(self.expected_output, output)
 
     def test_get_repository_size_returns_snapshot_data(self):
-        rss = Report_storage_stats()
+        rss = Storage_stats_reporter(self.repositories)
         (items, size) = rss._get_repository_size('Snapshots')
         self.assertEqual(items, self.num_snapshots)
         self.assertEqual(size, self.size_snapshots)
 
     def test_get_repository_size_returns_walfile_data(self):
-        rss = Report_storage_stats()
+        rss = Storage_stats_reporter(self.repositories)
         (items, size) = rss._get_repository_size('WAL Files')
         self.assertEqual(items, self.num_walfiles)
         self.assertEqual(size, self.size_walfiles)

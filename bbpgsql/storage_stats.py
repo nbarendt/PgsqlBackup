@@ -6,8 +6,9 @@ from bbpgsql.configuration import get_config_from_filename
 #from bbpgsql.configuration.repository import get_WAL_repository
 
 
-class Report_storage_stats(object):
-    def __init__(self):
+class Storage_stats_reporter(object):
+    def __init__(self, repositories):
+        self.repositories = repositories
 #        self.options, self.args = self.storagestats_handle_args()
 #        selfconf = get_config_from_filename(self.options.config_file)
         self.topbottom_dashes = '{:-^76}\n'.format('')
@@ -75,7 +76,7 @@ class Report_storage_stats(object):
 
 
 def storagestats_main():
-    reporter = Report_storage_stats()
+    reporter = Storage_stats_reporter({})
     reporter.write_report()
     exit(0)
 
@@ -85,6 +86,6 @@ if __name__ == '__main__':
 #def dummy():
 #    options, args = storagestats_handle_args()
 #    conf = get_config_from_filename(options.config_file)
-#    reporter = Report_storage_stats(conf)
+#    reporter = Storage_stats_reporter(conf)
 #    reporter.write_report()
 
