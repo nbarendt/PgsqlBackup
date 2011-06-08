@@ -1,9 +1,12 @@
 from unittest import TestCase
+#from unittest import skip
 from testfixtures import TempDirectory
+from mock import Mock
 import os
 from sys import stdout
 from copy import deepcopy
-import subprocess
+#import subprocess
+import StringIO
 from bbpgsql.storage_stats import Storage_stats_reporter
 from bbpgsql.configuration import get_config_from_filename
 from bbpgsql.configuration import write_config_to_filename
@@ -20,7 +23,7 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
         self.setup_environment()
         self.setup_config()
         self.setup_repositories()
-        self.cmd = [self.exe_script]
+        self.cmd = [self.exe_script, '--config', self.config_path]
         self.num_snapshots = 100
         self.size_snapshots = 2000
         self.num_walfiles = 1000
@@ -28,18 +31,18 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
         self.topbottom_dashes = '{:-^76}\n'.format('')
         self.middle_dashes = '|{:-^74}|\n'.format('')
         self.column_headers = '|{:^24}|{:^24}|{:^24}|\n'.format(
-            'Repository Name',
+            'Item Category',
             'Number of Items',
-            'Repository Size'
+            'Size of All Items'
         )
         self.item = '|{:^24}|{:>17} items |{:>20} MB |\n'
         self.snapshots = self.item.format(
-            'Snapshots',
+            self.repo_names[0],
             '%s' % self.num_snapshots,
             '%s' % self.size_snapshots
         )
         self.walfiles = self.item.format(
-            'WAL Files',
+            self.repo_names[1],
             '%s' % self.num_walfiles,
             '%s' % self.size_walfiles
         )
@@ -83,31 +86,53 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
         self.config = get_config_from_filename(self.config_path)
 
     def setup_repositories(self):
+        self.repo_names = [ 'Snapshots', 'WAL Files' ]
+        repo1 = Mock()
+        repo2 = Mock()
+        repo1.get_number_of_items.return_value = 100
+        repo1.get_repository_size.return_value = 2000
+        repo2.get_number_of_items.return_value = 1000
+        repo2.get_repository_size.return_value = 1000
         self.repositories = {
-        'Snapshots': get_Snapshot_repository(self.config),
-        'WAL Files': get_WAL_repository(self.config),
+            self.repo_names[0]: repo1,
+            self.repo_names[1]: repo2,
+        }
+
+    def setup_real_repositories(self):
+        self.repo_names = [ 'Snapshots', 'WAL Files' ]
+        self.repositories = {
+            self.repo_names[0]: get_Snapshot_repository(self.config),
+            self.repo_names[1]: get_WAL_repository(self.config),
         }
 
     def tearDown(self):
         pass
 
-    def test_reportstorestats_returns_proper_report(self):
-        output = subprocess.check_output(
-            [self.exe_script],
-            env=self.env,
-            stderr=subprocess.STDOUT)
-        stdout.write(self.expected_output)
-        stdout.write(output)
-        self.assertEqual(self.expected_output, output)
-
     def test_get_repository_size_returns_snapshot_data(self):
-        rss = Storage_stats_reporter(self.repositories)
-        (items, size) = rss._get_repository_size('Snapshots')
+        rss = Storage_stats_reporter(self.repo_names, self.repositories)
+        (items, size) = rss._get_repository_size(
+            self.repo_names[0],
+            self.repositories[self.repo_names[0]]
+        )
         self.assertEqual(items, self.num_snapshots)
         self.assertEqual(size, self.size_snapshots)
 
     def test_get_repository_size_returns_walfile_data(self):
-        rss = Storage_stats_reporter(self.repositories)
-        (items, size) = rss._get_repository_size('WAL Files')
+        rss = Storage_stats_reporter(self.repo_names, self.repositories)
+        (items, size) = rss._get_repository_size(
+            self.repo_names[1],
+            self.repositories[self.repo_names[1]]
+        )
         self.assertEqual(items, self.num_walfiles)
         self.assertEqual(size, self.size_walfiles)
+
+    def test_reportstorestats_returns_proper_report(self):
+        rss = Storage_stats_reporter(self.repo_names, self.repositories)
+        myout = StringIO.StringIO()
+        rss.write_report(myout)
+        output = myout.getvalue()
+        print(output)
+        myout.close()
+        stdout.write(self.expected_output)
+        stdout.write(output)
+        self.assertEqual(self.expected_output, output)

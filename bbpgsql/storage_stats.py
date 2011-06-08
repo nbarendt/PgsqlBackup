@@ -2,83 +2,85 @@ from sys import stdout, exit
 from bbpgsql.option_parser import storagestats_parse_args
 from bbpgsql.option_parser import storagestats_validate_options_and_args
 from bbpgsql.configuration import get_config_from_filename
-#from bbpgsql.configuration.repository import get_Snapshot_repository
-#from bbpgsql.configuration.repository import get_WAL_repository
+from bbpgsql.configuration.repository import get_Snapshot_repository
+from bbpgsql.configuration.repository import get_WAL_repository
 
 
 class Storage_stats_reporter(object):
-    def __init__(self, repositories):
+    def __init__(self, repo_names, repositories):
+        self.repo_names = repo_names
         self.repositories = repositories
-#        self.options, self.args = self.storagestats_handle_args()
-#        selfconf = get_config_from_filename(self.options.config_file)
+        self.repo_sizes = {}
         self.topbottom_dashes = '{:-^76}\n'.format('')
         self.middle_dashes = '|{:-^74}|\n'.format('')
         self.item = '|{:^24}|{:>17} items |{:>20} MB |\n'
         self.column_headers = '|{:^24}|{:^24}|{:^24}|\n'.format(
-            'Repository Name',
+            'Item Category',
             'Number of Items',
-            'Repository Size'
+            'Size of All Items'
         )
-#        self.WAL_repository = get_WAL_repository(self.conf)
-#        self.snapshot_repo = get_Snapshot_repository(self.conf)
         self._filldata()
-
-    def storagestats_handle_args(self):
-        parser, options, args = storagestats_parse_args()
-
-        try:
-            storagestats_validate_options_and_args(options, args)
-        except Exception, e:
-            stdout.write(str(e) + '\n')
-            parser.print_help()
-            exit(1)
-        return options, args
 
     def _filldata(self):
         total = 0
-        repo_name = 'Snapshots'
-        (items, size) = self._get_repository_size(repo_name)
-        total += size
-        self.snapshots = self.item.format(
-            repo_name,
-            '%s' % items,
-            '%s' % size
-        ) 
-        repo_name = 'WAL Files'
-        (items, size) = self._get_repository_size(repo_name)
-        total += size
-        self.walfiles = self.item.format(
-            repo_name,
-            '%s' % items,
-            '%s' % size
-        )
+        for repo_name, repo in self.repositories.iteritems():
+            items, size = self._get_repository_size(repo_name, repo)
+            total += size
+            self.repo_sizes[repo_name] = self.item.format(
+                repo_name,
+                '%s' % items,
+                '%s' % size
+            )
         self.total = '|{:^24} {:^24}|{:>20} MB |\n'.format(
             'Total Size',
             '',
             '%s' % total
         )
 
-    def _get_repository_size(self, repo_name):
+    def _get_repository_size(self, repo_name, repo):
+        items = repo.get_number_of_items()
+        size = repo.get_repository_size()
+        return items, size
         if repo_name == 'Snapshots':
             return (100, 2000)
         if repo_name == 'WAL Files':
             return(1000, 1000)
+        else:
+            print("Hey!  UnKnown repo name!!!!")
 
-    def write_report(self):
-        stdout.write(self.topbottom_dashes)
-        stdout.write(self.column_headers)
-        stdout.write(self.middle_dashes)
-        stdout.write(self.snapshots)
-        stdout.write(self.walfiles)
-        stdout.write(self.middle_dashes)
-        stdout.write(self.total)
-        stdout.write(self.topbottom_dashes)
+    def write_report(self, stream):
+        stream.write(self.topbottom_dashes)
+        stream.write(self.column_headers)
+        stream.write(self.middle_dashes)
+        for name in self.repo_names:
+            stream.write(self.repo_sizes[name])
+        stream.write(self.middle_dashes)
+        stream.write(self.total)
+        stream.write(self.topbottom_dashes)
 
 
 def storagestats_main():
-    reporter = Storage_stats_reporter({})
-    reporter.write_report()
+    options, args = storagestats_handle_args()
+    conf = get_config_from_filename(options.config_file)
+    repo_names = [ 'Snapshots', 'WAL Files' ]
+    repositories = {
+        repo_names[0]: get_Snapshot_repository(conf),
+        repo_names[1]: get_WAL_repository(conf),
+    }
+    reporter = Storage_stats_reporter(repo_names, repositories)
+    reporter.write_report(stdout)
     exit(0)
+
+def storagestats_handle_args():
+    parser, options, args = storagestats_parse_args()
+
+    try:
+        storagestats_validate_options_and_args(options, args)
+    except Exception, e:
+        stdout.write(str(e) + '\n')
+        parser.print_help()
+        exit(1)
+    return options, args
 
 if __name__ == '__main__':
     storagestats_main()
