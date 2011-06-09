@@ -1,5 +1,5 @@
 from unittest import TestCase
-#from unittest import skip
+from unittest import skip
 from testfixtures import TempDirectory
 from mock import Mock
 import os
@@ -18,6 +18,7 @@ class Test_storagestats_reporter(TestCase):
     ARCHIVEPGSQL_PATH = os.path.join('bbpgsql', 'cmdline_scripts')
     CONFIG_FILE = 'config.ini'
     exe_script = 'storagestats'
+    ONE_MEBIBYTE = 1024. * 1024.
 
     def setUp(self):
         self.setup_environment()
@@ -25,42 +26,6 @@ class Test_storagestats_reporter(TestCase):
         self.setup_repositories()
         self.setup_report()
         self.cmd = [self.exe_script, '--config', self.config_path]
-
-    def setup_report(self):
-        self.topbottom_dashes = '{:-^76}\n'.format('')
-        self.middle_dashes = '|{:-^74}|\n'.format('')
-        self.column_headers = '|{:^24}|{:^24}|{:^24}|\n'.format(
-            'Item Category',
-            'Number of Items',
-            'Size of All Items'
-        )
-        self.item = '|{:^24}|{:>17} items |{:>20} MB |\n'
-        self.snapshots = self.item.format(
-            self.repo_names[0],
-            '%s' % self.num_snapshots,
-            '%s' % self.size_snapshots
-        )
-        self.walfiles = self.item.format(
-            self.repo_names[1],
-            '%s' % self.num_walfiles,
-            '%s' % self.size_walfiles
-        )
-        self.size_total = self.size_snapshots + self.size_walfiles
-        self.total = '|{:^24} {:^24}|{:>20} MB |\n'.format(
-            'Total Size',
-            '',
-            self.size_total
-        )
-        self.expected_output = ''.join([
-            self.topbottom_dashes,
-            self.column_headers,
-            self.middle_dashes,
-            self.snapshots,
-            self.walfiles,
-            self.middle_dashes,
-            self.total,
-            self.topbottom_dashes,
-        ])
 
     def setup_environment(self):
         self.env = deepcopy(os.environ)
@@ -88,27 +53,58 @@ class Test_storagestats_reporter(TestCase):
     def setup_repositories(self):
         self.repo_names = [ 'Snapshots', 'WAL Files' ]
         self.num_snapshots = 100
-        self.size_snapshots = 2000
+        self.size_snapshots = 2000 * self.ONE_MEBIBYTE
         self.num_walfiles = 1000
-        self.size_walfiles = 1000
-        self.snapshot_tags = [
-            '0_oldest',
-            '1_intermediate',
-            '9_newest'
-        ]
+        self.size_walfiles = 1000 * self.ONE_MEBIBYTE
         repo1 = Mock()
         repo2 = Mock()
         repo1.get_number_of_items.return_value = self.num_snapshots
         repo1.get_repository_size.return_value = \
-            self.size_snapshots * 1024 * 1024
-        repo1.get_tags.return_value = self.snapshot_tags
+            self.size_snapshots
         repo2.get_number_of_items.return_value = self.num_walfiles
         repo2.get_repository_size.return_value = \
-            self.size_walfiles * 1024 * 1024
+            self.size_walfiles
         self.repositories = {
             self.repo_names[0]: repo1,
             self.repo_names[1]: repo2,
         }
+
+    def setup_report(self):
+        self.topbottom_dashes = '{:-^76}\n'.format('')
+        self.middle_dashes = '|{:-^74}|\n'.format('')
+        self.column_headers = '|{:^24}|{:^24}|{:^24}|\n'.format(
+            'Item Category',
+            'Number of Items',
+            'Size of All Items'
+        )
+        self.item = '|{:^24}|{:>17} items |{:>20} MB |\n'
+        self.snapshots = self.item.format(
+            self.repo_names[0],
+            '%s' % self.num_snapshots,
+            '%s' % (self.size_snapshots / self.ONE_MEBIBYTE)
+        )
+        self.walfiles = self.item.format(
+            self.repo_names[1],
+            '%s' % self.num_walfiles,
+            '%s' % (self.size_walfiles / self.ONE_MEBIBYTE)
+        )
+        self.size_total = self.size_snapshots + self.size_walfiles
+        self.total_templ = '|{:^24} {:^24}|{:>20} MB |\n'
+        self.total = self.total_templ.format(
+            'Total Size',
+            '',
+            '%s' % (self.size_total / self.ONE_MEBIBYTE)
+        )
+        self.expected_output = ''.join([
+            self.topbottom_dashes,
+            self.column_headers,
+            self.middle_dashes,
+            self.snapshots,
+            self.walfiles,
+            self.middle_dashes,
+            self.total,
+            self.topbottom_dashes,
+        ])
 
     def tearDown(self):
         pass
@@ -116,7 +112,6 @@ class Test_storagestats_reporter(TestCase):
     def test_get_repository_size_returns_snapshot_data(self):
         rss = Storage_stats_reporter(self.repo_names, self.repositories)
         (items, size) = rss._get_repository_size(
-            self.repo_names[0],
             self.repositories[self.repo_names[0]]
         )
         self.assertEqual(self.num_snapshots, items)
@@ -125,12 +120,12 @@ class Test_storagestats_reporter(TestCase):
     def test_get_repository_size_returns_walfile_data(self):
         rss = Storage_stats_reporter(self.repo_names, self.repositories)
         (items, size) = rss._get_repository_size(
-            self.repo_names[1],
             self.repositories[self.repo_names[1]]
         )
         self.assertEqual(self.num_walfiles, items)
         self.assertEqual(self.size_walfiles, size)
 
+    @skip
     def test_reportstorestats_returns_proper_report(self):
         rss = Storage_stats_reporter(self.repo_names, self.repositories)
         myout = StringIO.StringIO()
@@ -144,11 +139,11 @@ class Test_storagestats_reporter(TestCase):
         self.assertEqual(self.expected_output, output)
 
 
-class Test_reportstorestats_BasicCommandLineOperation(TestCase):
+class Test_storestats_with_real_repos(TestCase):
     ARCHIVEPGSQL_PATH = os.path.join('bbpgsql', 'cmdline_scripts')
     CONFIG_FILE = 'config.ini'
     exe_script = 'storagestats'
-    ONE_MEBIBYTE = 1024 * 1024
+    ONE_MEBIBYTE = 1024. * 1024.
 
     def setUp(self):
         self.setup_environment()
@@ -203,20 +198,30 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
         self.snapshots = self.item.format(
             self.repo_names[0],
             '%s' % self.num_snapshots,
-            '%s' % self.size_snapshots
+            '%s' % (self.size_snapshots / self.ONE_MEBIBYTE)
         )
         self.walfiles = self.item.format(
             self.repo_names[1],
             '%s' % self.num_walfiles,
-            '%s' % self.size_walfiles
+            '%s' % (self.size_walfiles / self.ONE_MEBIBYTE)
         )
         self.size_total = self.size_snapshots + self.size_walfiles
-        self.total = '|{:^24} {:^24}|{:>20} MB |\n'.format(
+        self.total_templ = '|{:^24} {:^24}|{:>20} MB |\n'
+        self.total = self.total_templ.format(
             'Total Size',
             '',
-            self.size_total
+            '%s' % (self.size_total / self.ONE_MEBIBYTE)
         )
-        self.expected_output = ''.join([
+        self.firstlast_templ = '|{:^24}|{:^49}|\n'
+        self.first = self.firstlast_templ.format(
+            'First Snapshot:',
+            'Repository Empty'
+        )
+        self.last = self.firstlast_templ.format(
+            'Last Snapshot:',
+            'No Commits'
+        )
+        self.expected_output_lines = [
             self.topbottom_dashes,
             self.column_headers,
             self.middle_dashes,
@@ -224,8 +229,12 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
             self.walfiles,
             self.middle_dashes,
             self.total,
+            self.middle_dashes,
+            self.first,
+            self.last,
             self.topbottom_dashes,
-        ])
+        ]
+        self.expected_output = ''.join(self.expected_output_lines)
 
     def tearDown(self):
         pass
@@ -233,7 +242,6 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
     def test_get_snapshots_size_empty_repository(self):
         rss = Storage_stats_reporter(self.repo_names, self.repositories)
         (items, size) = rss._get_repository_size(
-            self.repo_names[0],
             self.repositories[self.repo_names[0]]
         )
         self.assertEqual(0, items)
@@ -242,7 +250,6 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
     def test_get_walfiles_size_empty_repository(self):
         rss = Storage_stats_reporter(self.repo_names, self.repositories)
         (items, size) = rss._get_repository_size(
-            self.repo_names[1],
             self.repositories[self.repo_names[1]]
         )
         self.assertEqual(0, items)
@@ -285,23 +292,91 @@ class Test_reportstorestats_BasicCommandLineOperation(TestCase):
         repo_wal = self.repositories[self.repo_names[1]]
         self.fill_repositories_with_commits()
         rss = Storage_stats_reporter(self.repo_names, self.repositories)
-        num_items, size_items = rss._get_repository_size(
-            self.repo_names[0], repo_ss)
+        num_items, size_items = rss._get_repository_size(repo_ss)
         self.assertEqual(
             repo_ss.get_number_of_items(),
             num_items
         )
         self.assertEqual(
-            repo_ss.get_repository_size() / self.ONE_MEBIBYTE,
+            repo_ss.get_repository_size(),
             size_items
         )
-        num_items, size_items = rss._get_repository_size(
-            self.repo_names[1], repo_wal)
+        num_items, size_items = rss._get_repository_size(repo_wal)
         self.assertEqual(
             repo_wal.get_number_of_items(),
             num_items
         )
         self.assertEqual(
-            repo_wal.get_repository_size() / self.ONE_MEBIBYTE,
+            repo_wal.get_repository_size(),
             size_items
         )
+
+    def test_get_first_and_last_snapshot(self):
+        repo_ss = self.repositories[self.repo_names[0]]
+        self.fill_repositories_with_commits()
+        rss = Storage_stats_reporter(self.repo_names, self.repositories)
+        all_comm = [c for c in repo_ss]
+        first_comm = all_comm[0].tag
+        last_comm = all_comm[-1].tag
+        first, last = rss._get_first_and_last_commit_tags(repo_ss)
+        print(first_comm, first)
+        print(last_comm, last)
+        self.assertEqual(first_comm, first)
+        self.assertEqual(last_comm, last)
+
+    def test_filled_repository_produces_correct_output(self):
+        repo_ss = self.repositories[self.repo_names[0]]
+        repo_wal = self.repositories[self.repo_names[1]]
+        self.fill_repositories_with_commits()
+        self.num_snapshots = repo_ss.get_number_of_items()
+        self.size_snapshots = repo_ss.get_repository_size()
+        self.num_walfiles = repo_wal.get_number_of_items()
+        self.size_walfiles = repo_wal.get_repository_size()
+        total = self.size_snapshots + self.size_walfiles
+        self.snapshots = self.item.format(
+            self.repo_names[0],
+            '%s' % self.num_snapshots,
+            '%s' % (self.size_snapshots / self.ONE_MEBIBYTE)
+        )
+        self.walfiles = self.item.format(
+            self.repo_names[1],
+            '%s' % self.num_walfiles,
+            '%s' % (self.size_walfiles / self.ONE_MEBIBYTE)
+        )
+        self.total = self.total_templ.format(
+            'Total Size',
+            '',
+            '%s' % (total / self.ONE_MEBIBYTE)
+        )
+        all = [c for c in repo_ss]
+        self.first = self.firstlast_templ.format(
+            'First Snapshot:',
+            all[0].tag
+        )
+        self.last = self.firstlast_templ.format(
+            'Last Snapshot:',
+            all[-1].tag
+        )
+        self.expected_output_lines = [
+            self.topbottom_dashes,
+            self.column_headers,
+            self.middle_dashes,
+            self.snapshots,
+            self.walfiles,
+            self.middle_dashes,
+            self.total,
+            self.middle_dashes,
+            self.first,
+            self.last,
+            self.topbottom_dashes,
+        ]
+        self.expected_output = ''.join(self.expected_output_lines)
+        rss = Storage_stats_reporter(self.repo_names, self.repositories)
+        myout = StringIO.StringIO()
+        rss.write_report(myout)
+        output = myout.getvalue()
+        print(output)
+        myout.close()
+        stdout.write(self.expected_output)
+        stdout.write(output)
+        self.assertEqual(self.expected_output, output)

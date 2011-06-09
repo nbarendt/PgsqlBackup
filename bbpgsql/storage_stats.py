@@ -7,7 +7,7 @@ from bbpgsql.configuration.repository import get_WAL_repository
 
 
 class Storage_stats_reporter(object):
-    ONE_MEBIBYTE = 1024 * 1024
+    ONE_MEBIBYTE = 1024. * 1024.
 
 
     def __init__(self, repo_names, repositories):
@@ -22,30 +22,50 @@ class Storage_stats_reporter(object):
             'Number of Items',
             'Size of All Items'
         )
-        self._filldata()
+        self.total_templ = '|{:^24} {:^24}|{:>20} MB |\n'
+        self.firstlast_templ = '|{:^24}|{:^49}|\n'
 
     def _filldata(self):
         total = 0
         for repo_name, repo in self.repositories.iteritems():
-            items, size = self._get_repository_size(repo_name, repo)
+            items, size = self._get_repository_size(repo)
             total += size
             self.repo_sizes[repo_name] = self.item.format(
                 repo_name,
                 '%s' % items,
-                '%s' % size
+                '%s' % (size / self.ONE_MEBIBYTE)
             )
-        self.total = '|{:^24} {:^24}|{:>20} MB |\n'.format(
+        self.total = self.total_templ.format(
             'Total Size',
             '',
-            '%s' % total
+            '%s' % (total / self.ONE_MEBIBYTE)
+        )
+        self.first_ss, self.last_ss = self._get_first_and_last_commit_tags(
+            self.repositories[self.repo_names[0]]
+        )
+        self.first = self.firstlast_templ.format(
+            'First Snapshot:',
+            self.first_ss
+        )
+        self.last = self.firstlast_templ.format(
+            'Last Snapshot:',
+            self.last_ss
         )
 
-    def _get_repository_size(self, repo_name, repo):
+    def _get_repository_size(self, repo):
         items = repo.get_number_of_items()
         size = repo.get_repository_size()
-        return items, size / self.ONE_MEBIBYTE
+        return items, size
+
+    def _get_first_and_last_commit_tags(self, repo):
+        all = [c for c in repo]
+        if len(all):
+            return all[0].tag, all[-1].tag
+        else:
+            return 'Repository Empty', 'No Commits'
 
     def write_report(self, stream):
+        self._filldata()
         stream.write(self.topbottom_dashes)
         stream.write(self.column_headers)
         stream.write(self.middle_dashes)
@@ -53,6 +73,9 @@ class Storage_stats_reporter(object):
             stream.write(self.repo_sizes[name])
         stream.write(self.middle_dashes)
         stream.write(self.total)
+        stream.write(self.middle_dashes)
+        stream.write(self.first)
+        stream.write(self.last)
         stream.write(self.topbottom_dashes)
 
 
