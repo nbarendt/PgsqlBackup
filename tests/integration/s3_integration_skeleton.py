@@ -21,7 +21,6 @@ class S3_Integration_Test_Skeleton(TestCase):
 
     def setUp_s3_common(self):
         self.setup_environment()
-        self.setup_s3()
         self.setup_config()
         self.cmd = [self.exe_script, '--config', self.config_path]
 
@@ -39,13 +38,12 @@ class S3_Integration_Test_Skeleton(TestCase):
         self.temps3 = setup_s3_and_bucket(self.bucket_name)
 
     def setup_config(self):
+        self.setup_s3()
         self.config_path = self.tempdir.getpath(self.CONFIG_FILE)
         config_dict = {
             'General': {
                 'pgsql_data_directory': self.tempdir.path,
                 'bucket': self.bucket_name,
-            },
-            'WAL': {
             },
             'Credentials': {
                 'aws_access_key_id': self.temps3.access_key,
