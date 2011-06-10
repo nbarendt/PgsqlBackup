@@ -1,57 +1,19 @@
-from unittest import TestCase
 from subprocess import Popen, PIPE, STDOUT
-import os
-from uuid import uuid4
-from copy import deepcopy
-from testfixtures import TempDirectory
-from tests.integration.s3_helpers import setup_s3_and_bucket
-from bbpgsql.configuration import write_config_to_filename
+from tests.integration.s3_integration_skeleton import (
+    S3_Integration_Test_Skeleton
+)
 from gzip import GzipFile
 from StringIO import StringIO
 
-class Test_archivewal_commits_to_S3(TestCase):
-    ARCHIVEPGSQL_PATH = os.path.join('bbpgsql', 'cmdline_scripts')
-    CONFIG_FILE = 'config.ini'
+class Test_archivewal_commits_to_S3(S3_Integration_Test_Skeleton):
+    __test__ = True # to make nose run this class
     exe_script = 'archivewal'
 
     def setUp(self):
-        self.setup_environment()
-        self.setup_s3()
-        self.setup_config()
-        self.cmd = [self.exe_script, '--config', self.config_path]
-
-    def setup_environment(self):
-        self.env = deepcopy(os.environ)
-        self.env['PATH'] = ''.join([
-            self.env['PATH'],
-            ':',
-            self.ARCHIVEPGSQL_PATH])
-        self.tempdir = TempDirectory()
-
-    def setup_s3(self):
-        self.bucket_name = '.'.join(['test', uuid4().hex])
-        self.prefix = 'wals/'
-        self.temps3 = setup_s3_and_bucket(self.bucket_name)
-
-    def setup_config(self):
-        self.config_path = self.tempdir.getpath(self.CONFIG_FILE)
-        config_dict = {
-            'General': {
-                'pgsql_data_directory': self.tempdir.path,
-                'bucket': self.bucket_name,
-            },
-            'WAL': {
-            },
-            'Credentials': {
-                'aws_access_key_id': self.temps3.access_key,
-                'aws_secret_key_id': self.temps3.secret_key,
-            },
-        }
-        write_config_to_filename(config_dict, self.config_path)
+        self.setUp_s3_common()
 
     def tearDown(self):
-        self.temps3.cleanup()
-        self.tempdir.cleanup()
+        self.tearDown_s3_common()
 
     def test_will_archive_WAL_file_to_S3(self):
         WAL_CONTENTS = 'some data'

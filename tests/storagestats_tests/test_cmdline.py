@@ -1,7 +1,7 @@
 from unittest import TestCase
-from unittest import skip
+#from unittest import skip
 from testfixtures import TempDirectory
-from mock import Mock
+#from mock import Mock
 import os
 from sys import stdout
 from copy import deepcopy
