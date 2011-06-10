@@ -1,60 +1,37 @@
-from unittest import TestCase
-#from unittest import skip
-from testfixtures import TempDirectory
-#from mock import Mock
 import os
 from sys import stdout
-from copy import deepcopy
 #import subprocess
 import StringIO
 from bbpgsql.storage_stats import Storage_stats_reporter
-from bbpgsql.configuration import get_config_from_filename
-from bbpgsql.configuration import write_config_to_filename
 from bbpgsql.configuration.repository import get_Snapshot_repository
 from bbpgsql.configuration.repository import get_WAL_repository
+from tests.cmdline_test_skeleton import Cmdline_test_skeleton
 
 
-class Test_storagestats_skeleton(TestCase):
-    __test__ = False # to prevent nose from running this skeleton
+class Test_storestats_with_real_repos(Cmdline_test_skeleton):
+    __test__ = True # to make nose run these tests
+    config_dict = {
+        'General': {
+        },
+        'Snapshot': {
+            'driver': 'memory',
+        },
+        'WAL': {
+            'driver': 'memory',
+        }
+    }
 
     ARCHIVEPGSQL_PATH = os.path.join('bbpgsql', 'cmdline_scripts')
     CONFIG_FILE = 'config.ini'
     exe_script = 'storagestats'
     ONE_MEBIBYTE = 1024. * 1024.
 
-    def setUp(self):
-        self.setup_environment()
-        self.setup_config()
+    def setup_config(self):
+        return self.config_dict
+
+    def setup_customize(self):
         self.setup_repositories()
         self.setup_report()
-        self.cmd = [self.exe_script, '--config', self.config_path]
-
-    def setup_environment(self):
-        self.env = deepcopy(os.environ)
-        self.env['PATH'] = ''.join([
-            self.env['PATH'],
-            ':',
-            self.ARCHIVEPGSQL_PATH])
-        self.tempdir = TempDirectory()
-
-    def setup_config(self):
-        self.config_path = os.path.join(self.tempdir.path, self.CONFIG_FILE)
-        self.config_dict = {
-            'General': {
-            },
-            'Snapshot': {
-                'driver': 'memory',
-            },
-            'WAL': {
-                'driver': 'memory',
-            }
-        }
-        write_config_to_filename(self.config_dict, self.config_path)
-        self.config = get_config_from_filename(self.config_path)
-
-
-class Test_storestats_with_real_repos(Test_storagestats_skeleton):
-    __test__ = True # to make nose run these tests
 
     def setup_repositories(self):
         self.repo_names = [ 'Snapshots', 'WAL Files' ]
