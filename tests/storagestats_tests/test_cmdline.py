@@ -14,7 +14,9 @@ from bbpgsql.configuration.repository import get_Snapshot_repository
 from bbpgsql.configuration.repository import get_WAL_repository
 
 
-class Test_storagestats_reporter(TestCase):
+class Test_storagestats_skeleton(TestCase):
+    __test__ = False # to prevent nose from running this skeleton
+
     ARCHIVEPGSQL_PATH = os.path.join('bbpgsql', 'cmdline_scripts')
     CONFIG_FILE = 'config.ini'
     exe_script = 'storagestats'
@@ -50,130 +52,9 @@ class Test_storagestats_reporter(TestCase):
         write_config_to_filename(self.config_dict, self.config_path)
         self.config = get_config_from_filename(self.config_path)
 
-    def setup_repositories(self):
-        self.repo_names = [ 'Snapshots', 'WAL Files' ]
-        self.num_snapshots = 100
-        self.size_snapshots = 2000 * self.ONE_MEBIBYTE
-        self.num_walfiles = 1000
-        self.size_walfiles = 1000 * self.ONE_MEBIBYTE
-        repo1 = Mock()
-        repo2 = Mock()
-        repo1.get_number_of_items.return_value = self.num_snapshots
-        repo1.get_repository_size.return_value = \
-            self.size_snapshots
-        repo2.get_number_of_items.return_value = self.num_walfiles
-        repo2.get_repository_size.return_value = \
-            self.size_walfiles
-        self.repositories = {
-            self.repo_names[0]: repo1,
-            self.repo_names[1]: repo2,
-        }
 
-    def setup_report(self):
-        self.topbottom_dashes = '{:-^76}\n'.format('')
-        self.middle_dashes = '|{:-^74}|\n'.format('')
-        self.column_headers = '|{:^24}|{:^24}|{:^24}|\n'.format(
-            'Item Category',
-            'Number of Items',
-            'Size of All Items'
-        )
-        self.item = '|{:^24}|{:>17} items |{:>20} MB |\n'
-        self.snapshots = self.item.format(
-            self.repo_names[0],
-            '%s' % self.num_snapshots,
-            '%s' % (self.size_snapshots / self.ONE_MEBIBYTE)
-        )
-        self.walfiles = self.item.format(
-            self.repo_names[1],
-            '%s' % self.num_walfiles,
-            '%s' % (self.size_walfiles / self.ONE_MEBIBYTE)
-        )
-        self.size_total = self.size_snapshots + self.size_walfiles
-        self.total_templ = '|{:^24} {:^24}|{:>20} MB |\n'
-        self.total = self.total_templ.format(
-            'Total Size',
-            '',
-            '%s' % (self.size_total / self.ONE_MEBIBYTE)
-        )
-        self.expected_output = ''.join([
-            self.topbottom_dashes,
-            self.column_headers,
-            self.middle_dashes,
-            self.snapshots,
-            self.walfiles,
-            self.middle_dashes,
-            self.total,
-            self.topbottom_dashes,
-        ])
-
-    def tearDown(self):
-        pass
-
-    def test_get_repository_size_returns_snapshot_data(self):
-        rss = Storage_stats_reporter(self.repo_names, self.repositories)
-        (items, size) = rss._get_repository_size(
-            self.repositories[self.repo_names[0]]
-        )
-        self.assertEqual(self.num_snapshots, items)
-        self.assertEqual(self.size_snapshots, size)
-
-    def test_get_repository_size_returns_walfile_data(self):
-        rss = Storage_stats_reporter(self.repo_names, self.repositories)
-        (items, size) = rss._get_repository_size(
-            self.repositories[self.repo_names[1]]
-        )
-        self.assertEqual(self.num_walfiles, items)
-        self.assertEqual(self.size_walfiles, size)
-
-    @skip
-    def test_reportstorestats_returns_proper_report(self):
-        rss = Storage_stats_reporter(self.repo_names, self.repositories)
-        myout = StringIO.StringIO()
-        rss.write_report(myout)
-        output = myout.getvalue()
-        print(output)
-        #assert False
-        myout.close()
-        stdout.write(self.expected_output)
-        stdout.write(output)
-        self.assertEqual(self.expected_output, output)
-
-
-class Test_storestats_with_real_repos(TestCase):
-    ARCHIVEPGSQL_PATH = os.path.join('bbpgsql', 'cmdline_scripts')
-    CONFIG_FILE = 'config.ini'
-    exe_script = 'storagestats'
-    ONE_MEBIBYTE = 1024. * 1024.
-
-    def setUp(self):
-        self.setup_environment()
-        self.setup_config()
-        self.setup_repositories()
-        self.setup_report()
-        self.cmd = [self.exe_script, '--config', self.config_path]
-
-    def setup_environment(self):
-        self.env = deepcopy(os.environ)
-        self.env['PATH'] = ''.join([
-            self.env['PATH'],
-            ':',
-            self.ARCHIVEPGSQL_PATH])
-        self.tempdir = TempDirectory()
-
-    def setup_config(self):
-        self.config_path = os.path.join(self.tempdir.path, self.CONFIG_FILE)
-        self.config_dict = {
-            'General': {
-            },
-            'Snapshot': {
-                'driver': 'memory',
-            },
-            'WAL': {
-                'driver': 'memory',
-            }
-        }
-        write_config_to_filename(self.config_dict, self.config_path)
-        self.config = get_config_from_filename(self.config_path)
+class Test_storestats_with_real_repos(Test_storagestats_skeleton):
+    __test__ = True # to make nose run these tests
 
     def setup_repositories(self):
         self.repo_names = [ 'Snapshots', 'WAL Files' ]
