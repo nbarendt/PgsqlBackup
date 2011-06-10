@@ -1,6 +1,4 @@
-import os
 from sys import stdout
-#import subprocess
 import StringIO
 from bbpgsql.storage_stats import Storage_stats_reporter
 from bbpgsql.configuration.repository import get_Snapshot_repository
@@ -21,10 +19,7 @@ class Test_storestats_with_real_repos(Cmdline_test_skeleton):
         }
     }
 
-    ARCHIVEPGSQL_PATH = os.path.join('bbpgsql', 'cmdline_scripts')
-    CONFIG_FILE = 'config.ini'
     exe_script = 'storagestats'
-    ONE_MEBIBYTE = 1024. * 1024.
 
     def setup_config(self):
         return self.config_dict

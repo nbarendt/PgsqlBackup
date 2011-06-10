@@ -9,12 +9,6 @@ class Test_archivewal_commits_to_S3(S3_Integration_Test_Skeleton):
     __test__ = True # to make nose run this class
     exe_script = 'archivewal'
 
-    def setUp(self):
-        self.setUp_s3_common()
-
-    def tearDown(self):
-        self.tearDown_s3_common()
-
     def test_will_archive_WAL_file_to_S3(self):
         WAL_CONTENTS = 'some data'
         WAL_FILENAME = 'walfile'
