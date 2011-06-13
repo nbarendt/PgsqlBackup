@@ -40,6 +40,7 @@ def setup_s3_and_bucket(bucket_name):
     access_key, secret_key = get_test_aws_credentials()
     return S3TestFixture(access_key, secret_key, bucket_name)
 
+
 def generate_s3_config(access_key, secret_key, bucket_name, tempdir):
     config_dict = {
         'General': {
@@ -52,4 +53,3 @@ def generate_s3_config(access_key, secret_key, bucket_name, tempdir):
         },
     }
     return config_dict
-

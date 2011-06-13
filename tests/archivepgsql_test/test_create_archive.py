@@ -76,11 +76,11 @@ class Test_archive_create(TestCase):
         fill_directory_tree(self.srcDir)
         self.excludeList = ['./dir2']
         create_archive(self.srcPath, self.archivePath, self.excludeList)
-        tf=tarfile.open(self.archivePath, mode='r')
+        tf = tarfile.open(self.archivePath, mode='r')
 
         def getExcludedMember(name):
-            tarinfo=tf.getmember(name)
-            if(tarinfo):
+            tarinfo = tf.getmember(name)
+            if tarinfo:
                 pass
 
         self.assertRaises(KeyError, getExcludedMember, './dir2')
@@ -89,17 +89,17 @@ class Test_archive_create(TestCase):
         fill_directory_tree(self.srcDir)
         self.excludeList = ['./dir2', './dir0']
         create_archive(self.srcPath, self.archivePath, self.excludeList)
-        tf=tarfile.open(self.archivePath, mode='r')
+        tf = tarfile.open(self.archivePath, mode='r')
 
         def getExcludedMember(name):
-            tarinfo=tf.getmember(name)
-            if(tarinfo):
+            tarinfo = tf.getmember(name)
+            if tarinfo:
                 pass
 
         for root, dirs, files in os.walk(self.srcPath):
             relativeRoot = os.path.relpath(root, self.srcPath)
             if relativeRoot != '.':
-                relativeRoot = ''.join(['./',relativeRoot])
+                relativeRoot = ''.join(['./', relativeRoot])
             for file in files:
                 relfile = os.path.join(relativeRoot, file)
                 if relfile in self.excludeList:
@@ -116,7 +116,7 @@ class Test_archive_create(TestCase):
                     print('Checking dir is excluded:', root, dir, reldir)
                     self.assertRaises(KeyError,
                         getExcludedMember, reldir)
-                    subTreePath = os.path.join(root,dir)
+                    subTreePath = os.path.join(root, dir)
                     print('checking subtree', subTreePath)
                     for root2, dirs2, files2 in os.walk(subTreePath):
                         print('element subtree', root2, dirs2, files2)
@@ -125,12 +125,14 @@ class Test_archive_create(TestCase):
                             relativeRoot2 = ''.join(['./', relativeRoot2])
                         for file2 in files2:
                             relfile2 = os.path.join(relativeRoot2, file2)
-                            print('Checking file is excluded:', root2, file2, relfile2)
+                            print('Checking file is excluded:',
+                                root2, file2, relfile2)
                             self.assertRaises(KeyError,
                                 getExcludedMember, relfile2)
                         for dir2 in dirs2:
                             reldir2 = os.path.join(relativeRoot2, dir2)
-                            print('Checking dir is excluded:', root2, dir2, reldir2)
+                            print('Checking dir is excluded:',
+                                root2, dir2, reldir2)
                             self.assertRaises(KeyError,
                                 getExcludedMember, reldir2)
                     dirs.remove(dir)
@@ -144,10 +146,10 @@ class Test_generate_exclude(TestCase):
     def setUp(self):
         self.excludeList = ['exclude_this', 'exclude_this_too']
         self.keepList = ['keep_this', 'keep_this_too']
-        self.excluded = tarfile.TarInfo(name = self.excludeList[0])
-        self.excluded_too = tarfile.TarInfo(name = self.excludeList[1])
-        self.kept = tarfile.TarInfo(name = self.keepList[0])
-        self.kept_too = tarfile.TarInfo(name = self.keepList[1])
+        self.excluded = tarfile.TarInfo(name=self.excludeList[0])
+        self.excluded_too = tarfile.TarInfo(name=self.excludeList[1])
+        self.kept = tarfile.TarInfo(name=self.keepList[0])
+        self.kept_too = tarfile.TarInfo(name=self.keepList[1])
         self.function = generate_exclude(self.excludeList)
 
     def tearDown(self):

@@ -47,7 +47,7 @@ class FilesystemCommitStorage(object):
 
     def add_commit(self, tag, fp, message):
         contents = fp.read()
-        fingerprint = md5(contents).hexdigest() 
+        fingerprint = md5(contents).hexdigest()
         commit_filename = self.tag_separator.join([tag, message, fingerprint])
         commit_path = self._commit_filename_to_absolute_path(commit_filename)
         open(commit_path, 'wb').write(contents)
@@ -75,5 +75,6 @@ class FilesystemCommitStorage(object):
     def get_storage_size(self):
         storage_size = 0
         for commit_filename in self._get_list_of_commit_files():
-            storage_size += os.stat(os.path.join(self.path_to_storage, commit_filename)).st_size
+            storage_size += os.stat(
+                os.path.join(self.path_to_storage, commit_filename)).st_size
         return storage_size

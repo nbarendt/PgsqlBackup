@@ -2,6 +2,7 @@ from unittest import TestCase
 from mock import patch
 from bbpgsql.bbpgsql_main import bbpgsql_main
 
+
 @patch('bbpgsql.bbpgsql_main.bbpgsql_error')
 @patch('bbpgsql.bbpgsql_main.archivewal_main')
 @patch('bbpgsql.bbpgsql_main.archivepgsql_main')
@@ -15,7 +16,6 @@ class Test_command_dispatch(TestCase):
 
     def tearDown(self):
         pass
-
 
     def test_dispatch_calls_archivepgsql_main(self,
         mock_archivepgsql_main, mock_archivewal_main, mock_bbpgsql_error):

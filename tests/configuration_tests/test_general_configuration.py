@@ -5,6 +5,7 @@ from bbpgsql.configuration.general import (
     MissingDataDirError,
     )
 
+
 class Test_General_data_dir(TestCase):
     def setUp(self):
         self.config = config()

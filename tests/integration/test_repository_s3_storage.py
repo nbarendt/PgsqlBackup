@@ -55,5 +55,6 @@ class Test_Repository_Operations_with_S3CommitStorage_with_Bucket_Prefix(
 
     def create_storage(self):
         self.bucket_prefix = 'some_test_prefix/'
-        self.bucket.new_key('some_random_key').set_contents_from_string('some_random_string')
+        self.bucket.new_key('some_random_key').set_contents_from_string(
+            'some_random_string')
         return S3CommitStorage(self.bucket, self.bucket_prefix)

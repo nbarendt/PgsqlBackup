@@ -5,8 +5,9 @@ from tests.integration.s3_integration_skeleton import (
 from gzip import GzipFile
 from StringIO import StringIO
 
+
 class Test_archivewal_commits_to_S3(S3_Integration_Test_Skeleton):
-    __test__ = True # to make nose run this class
+    __test__ = True  # to make nose run this class
     exe_script = 'archivewal'
     prefix = 'wals/'
 

@@ -62,6 +62,7 @@ def create_subdirs(topDir, depth):
     return [''.join(['dir', str(i)]) for i in xrange(0, depth+1)]
 """
 
+
 def create_valid_source_and_destination_paths(test_case_obj):
     test_case_obj.srcDir = TempDirectory()
     test_case_obj.destDir = TempDirectory()

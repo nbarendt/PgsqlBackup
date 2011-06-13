@@ -12,6 +12,7 @@ FINGERPRINT_METADATA_KEY = 'fingerprint'
 CUSTOM_HTTP_FINGERPRINT_HEADER = ''.join(['x-amz-meta-',
      FINGERPRINT_METADATA_KEY])
 
+
 class KeynameTagMessageMapper(object):
     def __init__(self, bucket_prefix, tag_separator,
             keyname=None,
@@ -123,7 +124,7 @@ class S3CommitStorage(object):
     def _gzip_file_to_key(self, key, fp):
         tmp_gzip_fp, tmp_gzip_filename = mkstemp()
         try:
-            gzip_fp = GzipFile(mode='wb', fileobj=os.fdopen(tmp_gzip_fp,'wb'))
+            gzip_fp = GzipFile(mode='wb', fileobj=os.fdopen(tmp_gzip_fp, 'wb'))
             copyfileobj(fp, gzip_fp)
             gzip_fp.close()
             key.set_contents_from_file(
@@ -145,7 +146,7 @@ class S3CommitStorage(object):
             gzip_fp = GzipFile(tmp_gunzip_filename)
             copyfileobj(gzip_fp, open(filename, 'wb'))
         finally:
-            os.remove(tmp_gunzip_filename) 
+            os.remove(tmp_gunzip_filename)
 
     def get_commit_contents_to_filename(self, tag, filename):
         if os.path.exists(filename):

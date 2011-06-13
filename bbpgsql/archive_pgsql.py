@@ -25,6 +25,7 @@ def archivepgsql_handle_args():
         exit(1)
     return options, args
 
+
 # borrowing from Python 3
 class TemporaryDirectory:
     """Create and return a temporary directory.  This has the same
@@ -51,6 +52,7 @@ class TemporaryDirectory:
     def __exit__(self, exc, value, tb):
         self.cleanup()
 
+
 def archivepgsql_main():
     options, args = archivepgsql_handle_args()
     conf = get_config_from_filename(options.config_file)
@@ -66,33 +68,40 @@ def archivepgsql_main():
         else:
             perform_backup(data_dir, archive_dst_path, tag, repo)
 
+
 def perform_backup(src_dir, archivefile, tag, repo):
     first_WAL = pg_start_backup(tag)
     create_archive(src_dir, archivefile)
     second_WAL = pg_stop_backup()
-    commit_snapshot_to_repository(repo, archivefile, tag, first_WAL, second_WAL)
+    commit_snapshot_to_repository(
+        repo, archivefile, tag, first_WAL, second_WAL)
+
 
 def generate_tag():
-   return datetime.utcnow().isoformat() 
+    return datetime.utcnow().isoformat()
+
 
 def commit_snapshot_to_repository(repo, snapshot_filename, tag, first_WAL,
     last_WAL):
     repo.create_commit_from_filename(tag, snapshot_filename,
         _generate_message_from_WAL_filenames(first_WAL, last_WAL))
 
+
 def _generate_message_from_WAL_filenames(first_WAL, last_WAL):
     return 'firstWAL:{0}-lastWAL:{1}'.format(first_WAL, last_WAL)
+
 
 def _get_WAL_filenames_from_message(message):
     print message
     m = match(r"firstWAL:([^\-]+)-lastWAL:([^\-]+)", message)
     return m.group(1), m.group(2)
 
+
 def get_first_WAL(repo, tag):
-    message = repo[tag].message 
+    message = repo[tag].message
     return _get_WAL_filenames_from_message(message)[0]
 
+
 def get_last_WAL(repo, tag):
-    message = repo[tag].message 
+    message = repo[tag].message
     return _get_WAL_filenames_from_message(message)[1]
-   

@@ -68,7 +68,7 @@ class Test_archivewal_requires_WAL_file(TestCase):
 
     def test_path_to_WAL_file_must_be_relative(self):
         abs_wal_path = self.tempdir.write('WAL_file', '')
-        
+
         def raises_exception():
             archivewal_validate_options_and_args(self.options, [abs_wal_path])
         self.assertRaises(Exception, raises_exception)

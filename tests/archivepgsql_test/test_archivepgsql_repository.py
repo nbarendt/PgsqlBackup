@@ -5,9 +5,10 @@ from testfixtures import TempDirectory
 from bbpgsql.archive_pgsql import generate_tag, commit_snapshot_to_repository
 from bbpgsql.archive_pgsql import get_first_WAL, get_last_WAL
 
+
 class Test_Snapshot_Tag(TestCase):
-   def test_can_get_a_tag(self):
-    self.assertTrue(generate_tag()) 
+    def test_can_get_a_tag(self):
+        self.assertTrue(generate_tag())
 
 
 class Test_SnapshotArchive_Repository(TestCase):
@@ -21,12 +22,12 @@ class Test_SnapshotArchive_Repository(TestCase):
         archive_name = 'somearchive.tgz'
         self.archive_contents = '123'
         self.archive_path = self.tempdir.write(archive_name,
-            self.archive_contents) 
+            self.archive_contents)
         self.tag = generate_tag()
         self.first_WAL = '01234'
         self.last_WAL = '45678'
         commit_snapshot_to_repository(self.repo, self.archive_path, self.tag,
-            self.first_WAL, self.last_WAL) 
+            self.first_WAL, self.last_WAL)
 
     def tearDown(self):
         self.tempdir.cleanup()
@@ -35,7 +36,8 @@ class Test_SnapshotArchive_Repository(TestCase):
         commit = [i for i in self.repo][-1]
         restore_path = self.tempdir.getpath('restorearchive.tgz')
         commit.get_contents_to_filename(restore_path)
-        self.assertEqual(self.archive_contents, open(restore_path, 'rb').read())
+        self.assertEqual(self.archive_contents,
+            open(restore_path, 'rb').read())
 
     def test_get_first_WAL_file_for_archived_snapshot_with_tag(self):
         self.assertEqual(self.first_WAL, get_first_WAL(self.repo, self.tag))

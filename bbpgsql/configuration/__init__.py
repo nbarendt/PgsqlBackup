@@ -45,9 +45,10 @@ def write_config_to_filename(config_dictionary, config_filename):
             config.set(section, v, variables[v])
     mode = stat.S_IRUSR | stat.S_IWUSR
     flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
-    print('opening file {0} with flags {1} and mode {2}'.format(config_filename, flags, mode))
+    print('opening file {0} with flags {1} and mode {2}'.format(
+        config_filename, flags, mode))
     fd = os.open(config_filename, flags, mode)
     print('file descriptor is: {0}'.format(fd))
-    f = os.fdopen(fd,'wb')
+    f = os.fdopen(fd, 'wb')
     config.write(f)
     f.close()

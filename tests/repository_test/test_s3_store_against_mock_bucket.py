@@ -69,7 +69,8 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         self.store.add_commit('tag1', fp1, 'some_message')
         new_key_mock = self.mock_bucket.new_key.return_value
         new_key_mock.set_contents_from_file.assert_called_once()
-        mock_last_called_kwargs = new_key_mock.set_contents_from_file.call_args[1]
+        mock_last_called_kwargs = new_key_mock.\
+            set_contents_from_file.call_args[1]
         mock_actual_headers = mock_last_called_kwargs['headers']
         lower_headers = {}
         for k in mock_actual_headers:
@@ -130,7 +131,7 @@ class Skeleton_S3CommitStorage_Against_Mock(TestCase):
         self.assertEqual('tag1', commit.tag)
         self.assertEqual('msg1', commit.message)
 
-    def test_dictionary_interface_uses_customer_header_to_get_fingerprint(self):
+    def test_dictionary_interface_uses_custom_header_to_get_fingerprint(self):
         self.set_bucket_list(['tag1_msg1'])
         self.mock_bucket.get_key.return_value.get_metadata.return_value = '123'
         commit = self.store['tag1']

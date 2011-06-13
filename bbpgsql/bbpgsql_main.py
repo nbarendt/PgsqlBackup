@@ -12,6 +12,7 @@ MIMEMultipart
 MIMEBase
 MIMEText
 
+
 def bbpgsql_error():
     msg = '''You have invoked this script as bbpgsql.
 This script is supposed to be invoked through the commands archivepgsql
@@ -21,6 +22,7 @@ commands were installed correctly.
     stdout.write(msg)
     exit(1)
 
+
 def get_dispatch_map():
     CMD_DISPATCH_MAP = {
         'archivewal': archivewal_main,
@@ -29,6 +31,7 @@ def get_dispatch_map():
         'bbpgsql': bbpgsql_error,
     }
     return CMD_DISPATCH_MAP
+
 
 def bbpgsql_main(argv):
     cmd_name = basename(argv[0])

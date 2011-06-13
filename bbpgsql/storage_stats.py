@@ -9,7 +9,6 @@ from bbpgsql.configuration.repository import get_WAL_repository
 class Storage_stats_reporter(object):
     ONE_MEBIBYTE = 1024. * 1024.
 
-
     def __init__(self, repo_names, repositories):
         self.repo_names = repo_names
         self.repositories = repositories
@@ -82,7 +81,7 @@ class Storage_stats_reporter(object):
 def storagestats_main():
     options, args = storagestats_handle_args()
     conf = get_config_from_filename(options.config_file)
-    repo_names = [ 'Snapshots', 'WAL Files' ]
+    repo_names = ['Snapshots', 'WAL Files']
     repositories = {
         repo_names[0]: get_Snapshot_repository(conf),
         repo_names[1]: get_WAL_repository(conf),
@@ -90,6 +89,7 @@ def storagestats_main():
     reporter = Storage_stats_reporter(repo_names, repositories)
     reporter.write_report(stdout)
     exit(0)
+
 
 def storagestats_handle_args():
     parser, options, args = storagestats_parse_args()
@@ -102,12 +102,6 @@ def storagestats_handle_args():
         exit(1)
     return options, args
 
+
 if __name__ == '__main__':
     storagestats_main()
-
-#def dummy():
-#    options, args = storagestats_handle_args()
-#    conf = get_config_from_filename(options.config_file)
-#    reporter = Storage_stats_reporter(conf)
-#    reporter.write_report()
-

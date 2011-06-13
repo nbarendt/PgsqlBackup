@@ -1,6 +1,7 @@
 from bbpgsql.repository_commit import BBCommit
 from hashlib import md5
 
+
 class MemoryCommitStorage(object):
     def __init__(self):
         self.data = {}
@@ -45,5 +46,5 @@ class MemoryCommitStorage(object):
         tags = self.get_tags()
         storage_size = 0
         for tag in tags:
-           storage_size += len(self.data[tag]['data'])
+            storage_size += len(self.data[tag]['data'])
         return storage_size

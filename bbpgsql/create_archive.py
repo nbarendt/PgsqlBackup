@@ -9,6 +9,7 @@ def create_archive(srcPath, archivePath, excludeDirs=None):
     fhandle.add(srcPath, arcname='.', filter=my_exclude)
     fhandle.close()
 
+
 def generate_exclude(excludeObjs):
     def my_exclude(tarinfo):
         for excluded_name in excludeObjs:

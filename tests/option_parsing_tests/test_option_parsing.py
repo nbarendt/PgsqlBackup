@@ -77,6 +77,7 @@ class Test_OptionParsing_and_Validation(TestCase):
             self.config_path = d.write('parent_dir/config.ini', '')
             self.open_perm = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
             os.chmod(self.config_path, self.open_perm)
+
             def validate(config_path):
                 parser, options, args = common_parse_args(args=[
                     '--config', config_path])
@@ -122,6 +123,7 @@ class Test_archivepgsql_rejects_arguments(TestCase):
                 '--config', self.config_path, 'pg_xlog/some_arg'])
             archivepgsql_validate_options_and_args(options, args)
         self.assertRaises(UsedArchivepgsqlAsArchiveWAL, validate)
+
 
 class Test_storagestats_rejets_arguments(TestCase):
     def setUp(self):

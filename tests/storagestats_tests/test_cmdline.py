@@ -7,7 +7,7 @@ from tests.cmdline_test_skeleton import Cmdline_test_skeleton
 
 
 class Test_storestats_with_real_repos(Cmdline_test_skeleton):
-    __test__ = True # to make nose run these tests
+    __test__ = True  # to make nose run these tests
     config_dict = {
         'General': {
         },
@@ -29,7 +29,7 @@ class Test_storestats_with_real_repos(Cmdline_test_skeleton):
         self.setup_report()
 
     def setup_repositories(self):
-        self.repo_names = [ 'Snapshots', 'WAL Files' ]
+        self.repo_names = ['Snapshots', 'WAL Files']
         self.repositories = {
             self.repo_names[0]: get_Snapshot_repository(self.config),
             self.repo_names[1]: get_WAL_repository(self.config),
@@ -127,18 +127,18 @@ class Test_storestats_with_real_repos(Cmdline_test_skeleton):
     def fill_repositories_with_commits(self):
         repo_ss = self.repositories[self.repo_names[0]]
         repo_wal = self.repositories[self.repo_names[1]]
-        self.commit_a_file(repo_ss, 'file1', 'contents1', 'TAG001', 'Message1')
-        self.commit_a_file(repo_ss, 'file2', 'contents2', 'TAG002', 'Message2')
-        self.commit_a_file(repo_ss, 'file3', 'contents3', 'TAG003', 'Message3')
-        self.commit_a_file(repo_ss, 'file4', 'contents4', 'TAG004', 'Message4')
-        self.commit_a_file(repo_wal, 'file1', 'contents1', 'TAG001', 'Message1')
-        self.commit_a_file(repo_wal, 'file2', 'contents2', 'TAG002', 'Message2')
-        self.commit_a_file(repo_wal, 'file3', 'contents3', 'TAG003', 'Message3')
-        self.commit_a_file(repo_wal, 'file4', 'contents4', 'TAG004', 'Message4')
-        self.commit_a_file(repo_wal, 'file5', 'contents5', 'TAG005', 'Message5')
-        self.commit_a_file(repo_wal, 'file6', 'contents6', 'TAG006', 'Message6')
-        self.commit_a_file(repo_wal, 'file7', 'contents7', 'TAG007', 'Message7')
-        self.commit_a_file(repo_wal, 'file8', 'contents8', 'TAG008', 'Message8')
+        self.commit_a_file(repo_ss, 'file1', 'contents1', 'T001', 'Message1')
+        self.commit_a_file(repo_ss, 'file2', 'contents2', 'T002', 'Message2')
+        self.commit_a_file(repo_ss, 'file3', 'contents3', 'T003', 'Message3')
+        self.commit_a_file(repo_ss, 'file4', 'contents4', 'T004', 'Message4')
+        self.commit_a_file(repo_wal, 'file1', 'contents1', 'T001', 'Message1')
+        self.commit_a_file(repo_wal, 'file2', 'contents2', 'T002', 'Message2')
+        self.commit_a_file(repo_wal, 'file3', 'contents3', 'T003', 'Message3')
+        self.commit_a_file(repo_wal, 'file4', 'contents4', 'T004', 'Message4')
+        self.commit_a_file(repo_wal, 'file5', 'contents5', 'T005', 'Message5')
+        self.commit_a_file(repo_wal, 'file6', 'contents6', 'T006', 'Message6')
+        self.commit_a_file(repo_wal, 'file7', 'contents7', 'T007', 'Message7')
+        self.commit_a_file(repo_wal, 'file8', 'contents8', 'T008', 'Message8')
 
     def test_get_repository_size_with_items(self):
         repo_ss = self.repositories[self.repo_names[0]]

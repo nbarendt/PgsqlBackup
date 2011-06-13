@@ -6,6 +6,7 @@ from bbpgsql.configuration.general import get_data_dir
 from subprocess import check_output
 import sys
 
+
 class BadArgumentException(Exception):
     def __init__(self, msg):
         self.msg = msg
@@ -34,7 +35,8 @@ def get_version():
     # override "version" with a constant string for release
     version = check_output(['git', 'describe']).strip()
     return ' '.join(['%prog', version])
-    
+
+
 def create_common_parser(**kwargs):
     kwargs['version'] = get_version()
     parser = OptionParser(**kwargs)
@@ -82,12 +84,15 @@ def archivewal_parse_args(args=None):
 def is_relative_path(wal_path):
     return not os.path.isabs(wal_path)
 
+
 def wal_file_exists(config, wal_path):
     return os.path.isfile(get_wal_filename(config, wal_path))
+
 
 def get_wal_filename(config, wal_path):
     data_dir = get_data_dir(config)
     return os.path.join(data_dir, wal_path)
+
 
 def is_valid_file(config, wal_path):
     return is_relative_path(wal_path) and wal_file_exists(config, wal_path)
@@ -103,6 +108,7 @@ def archivewal_validate_options_and_args(options=None, args=None):
                         ' must be provided!')
     return True
 
+
 def archivepgsql_parse_args(args=None):
     archivepgsql_usage = ' '.join([
         os.path.basename(sys.argv[0]),
@@ -110,6 +116,7 @@ def archivepgsql_parse_args(args=None):
     parser = create_common_parser(usage=archivepgsql_usage)
     options, args = parser.parse_args(args)
     return parser, options, args
+
 
 def archivepgsql_validate_options_and_args(options=None, args=None):
     if not common_validate_options_and_args(options, args):
@@ -126,6 +133,7 @@ def archivepgsql_validate_options_and_args(options=None, args=None):
                         ' archive_command instead of archivewal?')
     return True
 
+
 def storagestats_parse_args(args=None):
     storagestats_usage = ' '.join([
         os.path.basename(sys.argv[0]),
@@ -133,6 +141,7 @@ def storagestats_parse_args(args=None):
     parser = create_common_parser(usage=storagestats_usage)
     options, args = parser.parse_args(args)
     return parser, options, args
+
 
 def storagestats_validate_options_and_args(options=None, args=None):
     if not common_validate_options_and_args(options, args):

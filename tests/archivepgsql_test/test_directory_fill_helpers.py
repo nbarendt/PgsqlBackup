@@ -8,6 +8,7 @@ from directory_fill_helpers import create_files
 from directory_fill_helpers import generate_dirnames
 from directory_fill_helpers import create_directories
 
+
 class Test_directory_fill_helpers(TestCase):
     def setUp(self):
         self.testDir = TempDirectory()
@@ -45,7 +46,7 @@ class Test_directory_fill_helpers(TestCase):
         files = zip(fileNames, fileContents)
         write_files(self.testDir, files)
         self.testDir.check(*fileNames)
-        
+
     def test_write_test_files_ten_files(self):
         fileNames = generate_filenames(10)
         fileContents = generate_file_contents(10)

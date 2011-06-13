@@ -7,6 +7,7 @@ from bbpgsql.pg_backup_control import UnsupportedPostgresVersionError
 from bbpgsql.pg_backup_control import pg_stop_backup
 from bbpgsql.pg_backup_control import wal_name_cleanup
 
+
 SAMPLE_8_2_7_VERSION_OUTPUT = """
 psql (PostgreSQL) 8.2.7
 contains support for command-line editing
@@ -37,26 +38,27 @@ SAMPLE_UNSUPPORTED_VERSION = """
 psql (PostgreSQL) 7.4.25
 """
 
+
 @patch('bbpgsql.pg_backup_control.get_pg_version_output')
 class Test_pg_get_version(TestCase):
     def test_parses_version_for_8_2_7_properly(self, mock_query_version):
         mock_query_version.return_value = SAMPLE_8_2_7_VERSION_OUTPUT
         self.assertEqual('8.2', pg_get_version())
 
-    def test_parses_version_for_8_3_12_properly(self, mock_query_version): 
-        mock_query_version.return_value = SAMPLE_8_3_12_VERSION_OUTPUT 
+    def test_parses_version_for_8_3_12_properly(self, mock_query_version):
+        mock_query_version.return_value = SAMPLE_8_3_12_VERSION_OUTPUT
         self.assertEqual('8.3', pg_get_version())
 
-    def test_parses_version_for_8_3_7_properly(self, mock_query_version): 
-        mock_query_version.return_value = SAMPLE_8_3_7_VERSION_OUTPUT 
+    def test_parses_version_for_8_3_7_properly(self, mock_query_version):
+        mock_query_version.return_value = SAMPLE_8_3_7_VERSION_OUTPUT
         self.assertEqual('8.3', pg_get_version())
 
-    def test_parses_version_for_8_4_7_properly(self, mock_query_version): 
-        mock_query_version.return_value = SAMPLE_8_4_7_VERSION_OUTPUT 
+    def test_parses_version_for_8_4_7_properly(self, mock_query_version):
+        mock_query_version.return_value = SAMPLE_8_4_7_VERSION_OUTPUT
         self.assertEqual('8.4', pg_get_version())
 
     def test_raises_exception_on_unparsable_version(self, mock_query_version):
-        mock_query_version.return_value = SAMPLE_UNPARSABLE_VERSION_OUTPUT 
+        mock_query_version.return_value = SAMPLE_UNPARSABLE_VERSION_OUTPUT
 
         def raises_Exception():
             pg_get_version()
@@ -64,20 +66,20 @@ class Test_pg_get_version(TestCase):
         self.assertRaises(Exception, raises_Exception)
 
     def test_raises_UnsupportedPostgresVersionError(self, mock_query_version):
-        mock_query_version.return_value = SAMPLE_UNSUPPORTED_VERSION 
+        mock_query_version.return_value = SAMPLE_UNSUPPORTED_VERSION
 
         def raises_Exception():
             pg_get_version()
-        self.assertRaises(UnsupportedPostgresVersionError, raises_Exception) 
+        self.assertRaises(UnsupportedPostgresVersionError, raises_Exception)
 
     def test_UnsupportedPostgresVersionError_has_expected_msg(self,
         mock_query_version):
-        mock_query_version.return_value = SAMPLE_UNSUPPORTED_VERSION 
+        mock_query_version.return_value = SAMPLE_UNSUPPORTED_VERSION
         try:
             pg_get_version()
         except UnsupportedPostgresVersionError, e:
-            self.assertIn('Unsupported', str(e)) 
-            self.assertIn('7.4', str(e)) 
+            self.assertIn('Unsupported', str(e))
+            self.assertIn('7.4', str(e))
 
 
 @patch('bbpgsql.pg_backup_control.check_output')
