@@ -89,7 +89,7 @@ class Test_storestats_with_real_repos(Cmdline_test_skeleton):
         ]
         self.expected_output = ''.join(self.expected_output_lines)
 
-    def tearDown(self):
+    def teardown_customize(self):
         pass
 
     def test_get_snapshots_size_empty_repository(self):
