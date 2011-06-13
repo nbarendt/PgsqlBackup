@@ -39,3 +39,17 @@ class S3TestFixture(object):
 def setup_s3_and_bucket(bucket_name):
     access_key, secret_key = get_test_aws_credentials()
     return S3TestFixture(access_key, secret_key, bucket_name)
+
+def generate_s3_config(access_key, secret_key, bucket_name, tempdir):
+    config_dict = {
+        'General': {
+            'pgsql_data_directory': tempdir,
+            'bucket': bucket_name,
+        },
+        'Credentials': {
+            'aws_access_key_id': access_key,
+            'aws_secret_key_id': secret_key,
+        },
+    }
+    return config_dict
+
