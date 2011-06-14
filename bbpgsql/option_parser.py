@@ -6,6 +6,7 @@ from bbpgsql.configuration.general import get_data_dir
 from subprocess import check_output
 import sys
 
+VERSION = ''
 
 class BadArgumentException(Exception):
     def __init__(self, msg):
