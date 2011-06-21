@@ -34,7 +34,7 @@ class UsedArchivepgsqlAsArchiveWAL(Exception):
 
 def get_version():
     # override "version" with a constant string for release
-    version = check_output(['git', 'describe']).strip()
+    version = VERSION or check_output(['git', 'describe']).strip()
     return ' '.join(['%prog', version])
 
 
