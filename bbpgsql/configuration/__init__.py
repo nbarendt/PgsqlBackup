@@ -1,6 +1,7 @@
 from ConfigParser import SafeConfigParser
 import os
 import stat
+import logging
 
 default_configuration = {
     'General': {
@@ -12,6 +13,12 @@ default_configuration = {
         'driver': 's3',
     },
     'Credentials': {
+    },
+    'Logging': {
+        'log_dir': '/var/log',
+        'syslog': 'host:port',
+        'level': 'warn',
+        'history': '7',
     },
 }
 
@@ -52,3 +59,11 @@ def write_config_to_filename(config_dictionary, config_filename):
     f = os.fdopen(fd, 'wb')
     config.write(f)
     f.close()
+
+
+def set_up_logging():
+    return logging.getLogger()
+
+
+def set_up_logger_file_handler(filename):
+    return logging.handlers.TimedRotatingFileHandler(filename)
