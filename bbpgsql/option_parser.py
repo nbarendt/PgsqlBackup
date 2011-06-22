@@ -8,6 +8,7 @@ import sys
 
 VERSION = ''
 
+
 class BadArgumentException(Exception):
     def __init__(self, msg):
         self.msg = msg
