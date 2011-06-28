@@ -1,7 +1,15 @@
 from ConfigParser import SafeConfigParser
 import os
 import stat
-import logging
+import logging.config
+from logging import (
+#    DEBUG,
+#    INFO,
+    WARNING,
+#    ERROR,
+#    CRITICAL,
+)
+
 
 default_configuration = {
     'General': {
@@ -13,12 +21,6 @@ default_configuration = {
         'driver': 's3',
     },
     'Credentials': {
-    },
-    'Logging': {
-        'log_dir': '/var/log',
-        'syslog': 'host:port',
-        'level': 'warn',
-        'history': '7',
     },
 }
 
@@ -61,8 +63,32 @@ def write_config_to_filename(config_dictionary, config_filename):
     f.close()
 
 
-def set_up_logging():
-    return logging.getLogger()
+default_log_config = {
+    'version': 1,
+    'handlers': {
+        'null': {
+            'class': 'logging.NullHandler',
+        },
+    },
+    'root': {
+        'level': WARNING,
+        'handlers': ['null'],
+    },
+}
+
+
+def get_log_level_from_string(level):
+        return getattr(logging, level)
+
+
+def set_up_logging(config):
+    logging.config.dictConfig(default_log_config)
+    logger = logging.getLogger()
+    if config.has_section('Logging'):
+        if config.has_option('Logging', 'level'):
+            level = config.get('Logging', 'level')
+            print(level)
+            logger.setLevel(get_log_level_from_string(level))
 
 
 def set_up_logger_file_handler(filename):
