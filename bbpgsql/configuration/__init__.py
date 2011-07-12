@@ -78,7 +78,8 @@ default_log_config = {
 
 
 def get_log_level_from_string(level):
-        return getattr(logging, level)
+    #return getattr(logging, level)
+    return logging.getLevelName(level.upper())
 
 
 def set_up_logging(config):
@@ -87,9 +88,27 @@ def set_up_logging(config):
     if config.has_section('Logging'):
         if config.has_option('Logging', 'level'):
             level = config.get('Logging', 'level')
-            print(level)
+            lvl = logging.getLevelName(level.upper())
+            if type(lvl) is not type(1):
+                raise(Exception('Invalid Logging Level'))
             logger.setLevel(get_log_level_from_string(level))
 
 
-def set_up_logger_file_handler(filename):
-    return logging.handlers.TimedRotatingFileHandler(filename)
+def set_up_logger_file_handler(config):
+#    return logging.handlers.TimedRotatingFileHandler(filename)
+    if config.has_section('Logging'):
+        if config.has_option('Logging', 'logfile'):
+            logfile = config.get('Logging', 'logfile')
+        if config.has_option('Logging', 'loghistory'):
+            loghistory = int(config.get('Logging', 'loghistory'))
+        else:
+            loghistory = 7
+        l = logging.getLogger()
+        l.addHandler(
+            logging.handlers.TimedRotatingFileHandler(
+                logfile,
+                when='d',
+                interval=1,
+                backupCount=loghistory
+            )
+        )

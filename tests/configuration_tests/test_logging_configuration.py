@@ -5,6 +5,7 @@ from testfixtures import TempDirectory
 from bbpgsql.configuration import (
     config,
     set_up_logging,
+    set_up_logger_file_handler,
 )
 #import logging
 #import logging.config
@@ -36,11 +37,19 @@ default_log_config = {
 config_text = '''
 [Logging]
 level=DEBUG
+logfile=/var/log/bbpgsql
+loghistory=14
+loghost=localhost
+logport=514
 '''
 
-config_bad_level = '''
+config_bad_values = '''
 [Logging]
 level=DORK
+logfile=/nonexistent/path
+loghistory=not_a_number
+loghost=nohost
+logport=not_a_number
 '''
 
 
@@ -50,7 +59,7 @@ class Test_Logging_setup(TestCase):
         self.td = TempDirectory()
         self.config_path = self.td.write('bbpgsql', config_text)
         self.full_config = config([self.config_path])
-        self.config_path = self.td.write('bad_level', config_bad_level)
+        self.config_path = self.td.write('bad_level', config_bad_values)
         self.bad_config = config([self.config_path])
 
     def tearDown(self):
@@ -77,9 +86,21 @@ class Test_Logging_setup(TestCase):
 
     @patch('logging.Logger.setLevel')
     def test_logger_rejects_bad_level_name(self, mock_setLevel):
-        raise(SkipTest)
-        set_up_logging(self.bad_config)
+        self.assertRaises(Exception, set_up_logging, (self.bad_config))
         self.assertEqual(1, mock_setLevel.call_count)
+
+    @patch('logging.Logger.addHandler')
+    @patch('logging.handlers.TimedRotatingFileHandler')
+    def test_logger_gets_filename_from_config(
+        self,
+        mock_TRFH,
+        mock_logger_addHandler
+    ):
+        set_up_logger_file_handler(self.full_config)
+        self.assertEqual(1, mock_logger_addHandler.call_count)
+        self.assertEqual(1, mock_TRFH.call_count)
+        expected = (('/var/log/bbpgsql', ), {'backupCount': 14, 'interval': 1, 'when': 'd'})
+        self.assertEqual(expected, mock_TRFH.call_args)
 
 #  Logging Psuedo code outline
 #
