@@ -6,11 +6,12 @@ from bbpgsql.configuration import (
     config,
     set_up_logging,
     set_up_logger_file_handler,
+    set_up_logger_syslog_handler,
 )
 #import logging
 #import logging.config
 #import logging.handlers
-#import os.path
+import os.path
 from logging import (
     DEBUG,
 #    INFO,
@@ -37,7 +38,7 @@ default_log_config = {
 config_text = '''
 [Logging]
 level=DEBUG
-logfile=/var/log/bbpgsql
+logfile=/needs/setting/in/setUp/bbpgsql
 loghistory=14
 loghost=localhost
 logport=514
@@ -57,8 +58,11 @@ class Test_Logging_setup(TestCase):
     def setUp(self):
         self.default_config = config()
         self.td = TempDirectory()
+        self.logdir = self.td.makedir('log')
+        self.logfilepath = os.path.join(self.logdir, 'bbpgsql')
         self.config_path = self.td.write('bbpgsql', config_text)
         self.full_config = config([self.config_path])
+        self.full_config.set('Logging', 'logfile', self.logfilepath)
         self.config_path = self.td.write('bad_level', config_bad_values)
         self.bad_config = config([self.config_path])
 
@@ -99,25 +103,65 @@ class Test_Logging_setup(TestCase):
         set_up_logger_file_handler(self.full_config)
         self.assertEqual(1, mock_logger_addHandler.call_count)
         self.assertEqual(1, mock_TRFH.call_count)
-        expected = (('/var/log/bbpgsql', ), {'backupCount': 14, 'interval': 1, 'when': 'd'})
+        expected = (
+            (self.logfilepath, ),
+            {'backupCount': 14, 'interval': 1, 'when': 'd'}
+        )
         self.assertEqual(expected, mock_TRFH.call_args)
 
-#  Logging Psuedo code outline
-#
-#  Create a default configuration dictionary in the module
-#
-#  set up logging
-#    get default dict
-#    modify default dict with values from main config file
-#    instantiate logger from dict
-#
-#  Questions:
-#  Must default have all the keys already?
-#  Can config file add new keys to dict?
-#  Must default dict values be valid?
-#  Required values in main config are:
-#    syslog host  Default?
-#    syslog port  Default?
-#    log directory  Default = /var/log
-#    number of days of history to keep around  Default = 7 days
-#    log level  Default = warn
+    @patch('logging.Logger.addHandler')
+    @patch('logging.handlers.TimedRotatingFileHandler')
+    def test_logger_does_nothing_if_logfile_not_defined(
+        self,
+        mock_TRFH,
+        mock_logger_addHandler,
+    ):
+        set_up_logger_file_handler(self.default_config)
+        self.assertFalse(mock_logger_addHandler.called)
+        self.assertFalse(mock_TRFH.called)
+
+    @patch('logging.Logger.addHandler')
+    @patch('logging.handlers.SysLogHandler')
+    def test_logger_gets_hostname_port_from_config(
+        self,
+        mock_SLH,
+        mock_logger_addHandler,
+    ):
+        set_up_logger_syslog_handler(self.full_config)
+        self.assertEqual(1, mock_logger_addHandler.call_count)
+        self.assertEqual(1, mock_SLH.call_count)
+        expected = ((), {'address': ('localhost', 514)})
+        self.assertEqual(expected, mock_SLH.call_args)
+
+    @patch('logging.Logger.addHandler')
+    @patch('logging.handlers.SysLogHandler')
+    def test_logger_does_nothing_if_syslog_host_not_defined(
+        self,
+        mock_SLH,
+        mock_logger_addHandler,
+    ):
+        set_up_logger_syslog_handler(self.default_config)
+        self.assertEqual(0, mock_logger_addHandler.call_count)
+        self.assertEqual(0, mock_SLH.call_count)
+
+    @patch('bbpgsql.configuration.set_up_logger_file_handler')
+    @patch('bbpgsql.configuration.set_up_logger_syslog_handler')
+    def test_set_up_logging_calls_handler_setups(
+        self,
+        mock_set_up_logger_syslog_handler,
+        mock_set_up_logger_file_handler,
+    ):
+        set_up_logging(self.full_config)
+        self.assertEqual(1, mock_set_up_logger_file_handler.call_count)
+        self.assertEqual(1, mock_set_up_logger_syslog_handler.call_count)
+
+    @patch('bbpgsql.configuration.set_up_logger_file_handler')
+    @patch('bbpgsql.configuration.set_up_logger_syslog_handler')
+    def test_set_up_logging_does_not_setup_handlers_if_no_logging_section(
+        self,
+        mock_set_up_logger_syslog_handler,
+        mock_set_up_logger_file_handler,
+    ):
+        set_up_logging(self.default_config)
+        self.assertEqual(0, mock_set_up_logger_file_handler.call_count)
+        self.assertEqual(0, mock_set_up_logger_syslog_handler.call_count)

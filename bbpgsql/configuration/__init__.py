@@ -41,8 +41,15 @@ def config(filenames=None):
     return config_parser
 
 
+#def get_config_from_filename(filename):
+#    return config([filename])
+#
+#
+#def get_config_from_filename_and_set_up_logging(filename):
 def get_config_from_filename(filename):
-    return config([filename])
+    conf = config([filename])
+    set_up_logging(conf)
+    return conf
 
 
 def write_config_to_filename(config_dictionary, config_filename):
@@ -78,7 +85,6 @@ default_log_config = {
 
 
 def get_log_level_from_string(level):
-    #return getattr(logging, level)
     return logging.getLevelName(level.upper())
 
 
@@ -92,10 +98,11 @@ def set_up_logging(config):
             if type(lvl) is not type(1):
                 raise(Exception('Invalid Logging Level'))
             logger.setLevel(get_log_level_from_string(level))
+        set_up_logger_file_handler(config)
+        set_up_logger_syslog_handler(config)
 
 
 def set_up_logger_file_handler(config):
-#    return logging.handlers.TimedRotatingFileHandler(filename)
     if config.has_section('Logging'):
         if config.has_option('Logging', 'logfile'):
             logfile = config.get('Logging', 'logfile')
@@ -112,3 +119,18 @@ def set_up_logger_file_handler(config):
                 backupCount=loghistory
             )
         )
+
+
+def set_up_logger_syslog_handler(config):
+    if config.has_section('Logging'):
+        if config.has_option('Logging', 'loghost') and \
+            config.has_option('Logging', 'logport'):
+            log_host = config.get('Logging', 'loghost')
+            log_port = int(config.get('Logging', 'logport'))
+            log_address = (log_host, log_port)
+            l = logging.getLogger()
+            l.addHandler(
+                logging.handlers.SysLogHandler(
+                    address=log_address
+                )
+            )
