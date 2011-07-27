@@ -6,7 +6,7 @@ import os
 from copy import deepcopy
 from testfixtures import TempDirectory
 from mock import patch
-from bbpgsql.configuration import get_config_from_filename
+from bbpgsql.configuration import get_config_from_filename_and_set_up_logging
 from bbpgsql.configuration import write_config_to_filename
 from bbpgsql.configuration.repository import get_Snapshot_repository
 import bbpgsql.archive_pgsql
@@ -42,7 +42,7 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
             },
         }
         write_config_to_filename(self.config_dict, self.config_path)
-        self.config = get_config_from_filename(self.config_path)
+        self.config = get_config_from_filename_and_set_up_logging(self.config_path)
 
     def tearDown(self):
         self.tempdir.cleanup()
@@ -87,7 +87,7 @@ class Test_archivepgsql_backup_invocation(TestCase):
             },
         }
         write_config_to_filename(self.config_dict, self.config_path)
-        self.config = get_config_from_filename(self.config_path)
+        self.config = get_config_from_filename_and_set_up_logging(self.config_path)
 
     def tearDown(self):
         self.tempdir.cleanup()

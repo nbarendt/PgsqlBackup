@@ -41,12 +41,7 @@ def config(filenames=None):
     return config_parser
 
 
-#def get_config_from_filename(filename):
-#    return config([filename])
-#
-#
-#def get_config_from_filename_and_set_up_logging(filename):
-def get_config_from_filename(filename):
+def get_config_from_filename_and_set_up_logging(filename):
     conf = config([filename])
     set_up_logging(conf)
     return conf

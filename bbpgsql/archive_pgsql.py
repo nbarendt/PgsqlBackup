@@ -1,7 +1,7 @@
 from sys import stdout, exit
 from bbpgsql.option_parser import archivepgsql_parse_args
 from bbpgsql.option_parser import archivepgsql_validate_options_and_args
-from bbpgsql.configuration import get_config_from_filename
+from bbpgsql.configuration import get_config_from_filename_and_set_up_logging
 from bbpgsql.configuration.general import get_data_dir
 from bbpgsql.configuration.repository import get_Snapshot_repository
 from bbpgsql.pg_backup_control import pg_start_backup
@@ -55,7 +55,7 @@ class TemporaryDirectory:
 
 def archivepgsql_main():
     options, args = archivepgsql_handle_args()
-    conf = get_config_from_filename(options.config_file)
+    conf = get_config_from_filename_and_set_up_logging(options.config_file)
     data_dir = get_data_dir(conf)
 
     with TemporaryDirectory(suffix='archivepgsql') as tempdir:

@@ -1,7 +1,7 @@
 from sys import stdout, exit
 from bbpgsql.option_parser import storagestats_parse_args
 from bbpgsql.option_parser import storagestats_validate_options_and_args
-from bbpgsql.configuration import get_config_from_filename
+from bbpgsql.configuration import get_config_from_filename_and_set_up_logging
 from bbpgsql.configuration.repository import get_Snapshot_repository
 from bbpgsql.configuration.repository import get_WAL_repository
 
@@ -80,7 +80,7 @@ class Storage_stats_reporter(object):
 
 def storagestats_main():
     options, args = storagestats_handle_args()
-    conf = get_config_from_filename(options.config_file)
+    conf = get_config_from_filename_and_set_up_logging(options.config_file)
     repo_names = ['Snapshots', 'WAL Files']
     repositories = {
         repo_names[0]: get_Snapshot_repository(conf),

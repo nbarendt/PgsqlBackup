@@ -2,7 +2,7 @@ from unittest import TestCase
 from testfixtures import TempDirectory
 import os
 import stat
-from bbpgsql.configuration import get_config_from_filename
+from bbpgsql.configuration import get_config_from_filename_and_set_up_logging
 from bbpgsql.configuration import write_config_to_filename
 
 
@@ -21,7 +21,7 @@ class Test_write_config_to_filename(TestCase):
         with TempDirectory() as d:
             config_filename = os.path.join(d.path, 'config.ini')
             write_config_to_filename(self.test_configuration, config_filename)
-            config = get_config_from_filename(config_filename)
+            config = get_config_from_filename_and_set_up_logging(config_filename)
             self.assertEqual('Test_value',
                 config.get('Test Section', 'Test_key'))
 

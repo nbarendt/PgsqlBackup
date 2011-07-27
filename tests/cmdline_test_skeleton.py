@@ -2,7 +2,7 @@ from unittest import TestCase
 from testfixtures import TempDirectory
 import os
 from copy import deepcopy
-from bbpgsql.configuration import get_config_from_filename
+from bbpgsql.configuration import get_config_from_filename_and_set_up_logging
 from bbpgsql.configuration import write_config_to_filename
 
 
@@ -36,7 +36,7 @@ class Cmdline_test_skeleton(TestCase):
     def write_config_to_disk(self):
         self.config_path = os.path.join(self.tempdir.path, self.CONFIG_FILE)
         write_config_to_filename(self.setup_config(), self.config_path)
-        self.config = get_config_from_filename(self.config_path)
+        self.config = get_config_from_filename_and_set_up_logging(self.config_path)
 
     def tearDown(self):
         self.teardown_customize()
