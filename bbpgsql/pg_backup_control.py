@@ -6,6 +6,7 @@ PGSQL_START_BACKUP_SQL_COMMAND_STRING = {
     '8.2': "SELECT pg_xlogfile_name(pg_start_backup('{0}'));",
     '8.3': "SELECT pg_xlogfile_name(pg_start_backup('{0}'));",
     '8.4': "SELECT pg_xlogfile_name(pg_start_backup('{0}', true));",
+    '9.0': "SELECT pg_xlogfile_name(pg_start_backup('{0}', true));",
 }
 
 PGSQL_SUPPORTED_VERSIONS = PGSQL_START_BACKUP_SQL_COMMAND_STRING.keys()

@@ -92,7 +92,7 @@ def set_up_logging(config):
             lvl = logging.getLevelName(level.upper())
             if type(lvl) is not type(1):
                 raise(Exception('Invalid Logging Level'))
-            logger.setLevel(get_log_level_from_string(level))
+            logger.setLevel(lvl)
         set_up_logger_file_handler(config)
         set_up_logger_syslog_handler(config)
 

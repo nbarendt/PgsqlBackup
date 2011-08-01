@@ -12,6 +12,7 @@ from re import match
 from tempfile import mkdtemp, template
 from shutil import rmtree
 from os.path import exists, join
+import logging
 
 
 def archivepgsql_handle_args():
@@ -67,6 +68,7 @@ def archivepgsql_main():
             return
         else:
             perform_backup(data_dir, archive_dst_path, tag, repo)
+            logging.info('archive_pgsql executed successfully')
 
 
 def perform_backup(src_dir, archivefile, tag, repo):

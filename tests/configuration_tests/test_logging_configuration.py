@@ -81,10 +81,9 @@ class Test_Logging_setup(TestCase):
         self.assertEqual(expected, mock_dictConfig.call_args)
 
     @patch('logging.Logger.setLevel')
-    def test_logger_sets_warn_level_from_configfile(self, mock_setLevel):
+    def test_logger_sets_log_level_from_configfile(self, mock_setLevel):
         set_up_logging(self.full_config)
         self.assertEqual(2, mock_setLevel.call_count)
-        print(mock_setLevel.call_count, mock_setLevel.call_args)
         expected = ((DEBUG, ), {})
         self.assertEqual(expected, mock_setLevel.call_args)
 
