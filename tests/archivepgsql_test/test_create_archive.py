@@ -141,10 +141,10 @@ class Test_archive_create(TestCase):
                     print('Checking dir is included:', root, dir, reldir)
                     self.assertNotEqual(None,
                         tf.getmember(reldir))
-             
             for d in dirs_to_remove:
-              dirs.remove(d)
- 
+                dirs.remove(d)
+
+
 class Test_generate_exclude(TestCase):
     def setUp(self):
         self.excludeList = ['exclude_this', 'exclude_this_too']
