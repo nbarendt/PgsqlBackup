@@ -98,6 +98,7 @@ class Test_archive_create(TestCase):
 
         for root, dirs, files in os.walk(self.srcPath):
             relativeRoot = os.path.relpath(root, self.srcPath)
+            dirs_to_remove = []
             if relativeRoot != '.':
                 relativeRoot = ''.join(['./', relativeRoot])
             for file in files:
@@ -135,13 +136,15 @@ class Test_archive_create(TestCase):
                                 root2, dir2, reldir2)
                             self.assertRaises(KeyError,
                                 getExcludedMember, reldir2)
-                    dirs.remove(dir)
+                    dirs_to_remove.append(dir)
                 else:
                     print('Checking dir is included:', root, dir, reldir)
                     self.assertNotEqual(None,
                         tf.getmember(reldir))
-
-
+             
+            for d in dirs_to_remove:
+              dirs.remove(d)
+ 
 class Test_generate_exclude(TestCase):
     def setUp(self):
         self.excludeList = ['exclude_this', 'exclude_this_too']
