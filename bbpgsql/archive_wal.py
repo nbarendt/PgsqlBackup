@@ -8,7 +8,7 @@ from bbpgsql.configuration import get_config_from_filename_and_set_up_logging
 from bbpgsql.configuration.repository import (
     get_WAL_repository
 )
-
+from bbpgsql.events import Support
 
 def archivewal_handle_args():
     parser, options, args = archivewal_parse_args()
@@ -36,6 +36,8 @@ def archivewal_main():
 
 def commit_wal_to_repository(repository, wal_filename_to_archive):
     wal_basename = basename(wal_filename_to_archive)
+    Support().notify_wal_started(wal_basename)
     repository.create_commit_from_filename(wal_basename,
         wal_filename_to_archive,
         datetime.utcnow().isoformat())
+    Support().notify_wal_completed(wal_basename)
