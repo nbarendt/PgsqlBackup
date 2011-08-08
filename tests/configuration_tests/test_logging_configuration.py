@@ -1,5 +1,5 @@
 from unittest import TestCase
-from nose.plugins.skip import SkipTest
+#from nose.plugins.skip import SkipTest
 from mock import patch
 from testfixtures import TempDirectory
 from bbpgsql.configuration import (

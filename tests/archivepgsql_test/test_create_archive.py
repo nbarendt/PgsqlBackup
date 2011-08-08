@@ -188,8 +188,7 @@ class Test_log_events(TestCase):
     @patch('bbpgsql.archive_pgsql.backup_pgsql_and_return_needed_WAL_files')
     @patch('bbpgsql.archive_pgsql.commit_snapshot_to_repository')
     def test_complete_backup_emits_log_message(self, p1, p2):
-        p2.return_value = (1,2)
+        p2.return_value = (1, 2)
         with LogCapture() as l:
-            bbpgsql.archive_pgsql.perform_backup(1,2,3,4)
-            l.check( ('root', 'INFO', 'archive_pgsql executed successfully'))
-
+            bbpgsql.archive_pgsql.perform_backup(1, 2, 3, 4)
+            l.check(('root', 'INFO', 'archive_pgsql executed successfully'))
