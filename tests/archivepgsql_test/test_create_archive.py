@@ -1,16 +1,19 @@
 from unittest import TestCase
 from nose.plugins.skip import SkipTest
+from testfixtures import LogCapture
 import os
 import tarfile
 import filecmp
 from bbpgsql.create_archive import create_archive
 from bbpgsql.create_archive import generate_exclude
 from bbpgsql.extract_archive import extract_archive
+import bbpgsql.archive_pgsql
 from tar_archive_helpers import fill_directory_tree
 from tar_archive_helpers import create_valid_source_and_destination_paths
 from tar_archive_helpers import create_invalid_source_and_destination_paths
 from tar_archive_helpers import cleanup_temporary_directories
 from tar_archive_helpers import member_is_at_relative_path
+from mock import patch
 
 
 class Test_archive_create(TestCase):
@@ -179,3 +182,14 @@ class Test_generate_exclude(TestCase):
     def test_generated_function_returns_none_for_excluded_too_object(self):
         self.retval = self.function(self.excluded_too)
         self.assertEqual(self.retval, None)
+
+
+class Test_log_events(TestCase):
+    @patch('bbpgsql.archive_pgsql.backup_pgsql_and_return_needed_WAL_files')
+    @patch('bbpgsql.archive_pgsql.commit_snapshot_to_repository')
+    def test_complete_backup_emits_log_message(self, p1, p2):
+        p2.return_value = (1,2)
+        with LogCapture() as l:
+            bbpgsql.archive_pgsql.perform_backup(1,2,3,4)
+            l.check( ('root', 'INFO', 'archive_pgsql executed successfully'))
+

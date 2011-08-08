@@ -68,15 +68,21 @@ def archivepgsql_main():
             return
         else:
             perform_backup(data_dir, archive_dst_path, tag, repo)
-            logging.info('archive_pgsql executed successfully')
 
 
-def perform_backup(src_dir, archivefile, tag, repo):
+def backup_pgsql_and_return_needed_WAL_files(src_dir, archivefile, tag):
     first_WAL = pg_start_backup(tag)
     create_archive(src_dir, archivefile)
     second_WAL = pg_stop_backup()
+    return (first_WAL, second_WAL)
+
+
+def perform_backup(src_dir, archivefile, tag, repo):
+    first_WAL, second_WAL = backup_pgsql_and_return_needed_WAL_files(src_dir,
+        archivefile, tag)
     commit_snapshot_to_repository(
         repo, archivefile, tag, first_WAL, second_WAL)
+    logging.info('archive_pgsql executed successfully')
 
 
 def generate_tag():
