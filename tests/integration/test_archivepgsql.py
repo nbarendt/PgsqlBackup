@@ -50,6 +50,6 @@ class Test_archive_pgsql_logging(Cmdline_test_skeleton):
     def test_archive_pgsql_logs_success_at_INFO(self):
         check_call(self.cmd, env=self.env, stdout=PIPE)
         log = open(self.log_file)
-        expected = 'archive_pgsql executed successfully\n'
-        self.assertEqual(expected, log.read())
-        assert False
+        log_text = log.read()
+        assert 'Backup snapshot started' in log_text
+        assert 'Backup snapshot completed' in log_text
