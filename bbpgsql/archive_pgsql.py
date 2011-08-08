@@ -12,7 +12,7 @@ from re import match
 from tempfile import mkdtemp, template
 from shutil import rmtree
 from os.path import exists, join
-import logging
+from bbpgsql.events import Support
 
 
 def archivepgsql_handle_args():
@@ -72,6 +72,7 @@ def archivepgsql_main():
 
 def backup_pgsql_and_return_needed_WAL_files(src_dir, archivefile, tag):
     first_WAL = pg_start_backup(tag)
+    Support().notify_snapshot_started(tag, first_WAL)
     create_archive(src_dir, archivefile)
     second_WAL = pg_stop_backup()
     return (first_WAL, second_WAL)
@@ -82,7 +83,7 @@ def perform_backup(src_dir, archivefile, tag, repo):
         archivefile, tag)
     commit_snapshot_to_repository(
         repo, archivefile, tag, first_WAL, second_WAL)
-    logging.info('archive_pgsql executed successfully')
+    Support().notify_snapshot_completed(tag, first_WAL, second_WAL)
 
 
 def generate_tag():

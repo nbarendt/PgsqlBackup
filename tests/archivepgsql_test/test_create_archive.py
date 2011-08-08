@@ -185,10 +185,24 @@ class Test_generate_exclude(TestCase):
 
 
 class Test_log_events(TestCase):
+    @patch('bbpgsql.archive_pgsql.pg_start_backup')
+    @patch('bbpgsql.archive_pgsql.pg_stop_backup')
+    @patch('bbpgsql.archive_pgsql.create_archive')
+    def test_archive_starting_emits_log_message(self, mock_create_archive,
+        mock_pg_stop_backup, mock_pg_start_backup):
+        mock_pg_start_backup.return_value = '123'
+        tag = 'abc'
+        expected_msg = 'Backup snapshot started (abc) (123:)'
+        with LogCapture() as l:
+            bbpgsql.archive_pgsql.backup_pgsql_and_return_needed_WAL_files(
+                None, None, tag)
+            l.check(('root', 'INFO', expected_msg))
+        
+
     @patch('bbpgsql.archive_pgsql.backup_pgsql_and_return_needed_WAL_files')
     @patch('bbpgsql.archive_pgsql.commit_snapshot_to_repository')
     def test_complete_backup_emits_log_message(self, p1, p2):
         p2.return_value = (1, 2)
         with LogCapture() as l:
             bbpgsql.archive_pgsql.perform_backup(1, 2, 3, 4)
-            l.check(('root', 'INFO', 'archive_pgsql executed successfully'))
+            l.check(('root', 'INFO', 'Backup snapshot completed (3) (1:2)'))
