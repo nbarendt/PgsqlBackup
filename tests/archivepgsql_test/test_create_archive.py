@@ -197,7 +197,6 @@ class Test_log_events(TestCase):
             bbpgsql.archive_pgsql.backup_pgsql_and_return_needed_WAL_files(
                 None, None, tag)
             l.check(('root', 'INFO', expected_msg))
-        
 
     @patch('bbpgsql.archive_pgsql.backup_pgsql_and_return_needed_WAL_files')
     @patch('bbpgsql.archive_pgsql.commit_snapshot_to_repository')

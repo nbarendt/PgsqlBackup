@@ -10,6 +10,7 @@ from bbpgsql.configuration.repository import (
 )
 from bbpgsql.events import Support
 
+
 def archivewal_handle_args():
     parser, options, args = archivewal_parse_args()
 
