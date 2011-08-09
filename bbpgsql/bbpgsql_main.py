@@ -5,7 +5,8 @@ from bbpgsql.archive_pgsql import archivepgsql_main
 from bbpgsql.storage_stats import storagestats_main
 from bbpgsql.option_parser import (
     non_destructive_minimal_parse_and_validate_args)
-
+from bbpgsql.configuration import get_config_from_filename_and_set_up_logging
+import logging
 
 #PYINSTALLER KLUDGES
 from email.mime.multipart import MIMEMultipart
@@ -41,7 +42,13 @@ def bbpgsql_main(argv):
     dispatch_map = get_dispatch_map()
     if cmd_name in dispatch_map:
         options, args = non_destructive_minimal_parse_and_validate_args(argv)
-        dispatch_map[cmd_name]()
+        get_config_from_filename_and_set_up_logging(options.config_file)
+        try:
+            dispatch_map[cmd_name]()
+        except Exception, e:
+            logging.error(str(e))
+            logging.shutdown()
+            raise e 
     else:
         stdout.write('Unknown command: {0}\n'.format(cmd_name))
         exit(1)

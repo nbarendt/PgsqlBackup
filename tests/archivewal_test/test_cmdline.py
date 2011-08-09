@@ -27,6 +27,7 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
     def setup_config(self):
         self.storage_path = self.tempdir.makedir('repo')
         self.config_path = self.tempdir.getpath(self.CONFIG_FILE)
+        self.log_file = self.tempdir.getpath('bbpgsql.log')
         self.config_dict = {
             'WAL':  {
                 'driver': 'filesystem',
@@ -34,6 +35,9 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
             },
             'General': {
                 'pgsql_data_directory': self.tempdir.path,
+            },
+            'Logging': {
+                'logfile': self.log_file
             },
         }
         write_config_to_filename(self.config_dict, self.config_path)
@@ -55,6 +59,14 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
         proc.wait()
         print(proc.stdout.read())
         self.assertNotEqual(0, proc.returncode)
+
+    def test_archivewal_logs_error_with_if_less_than_one_argument(self):
+        proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
+        proc.wait()
+        log_output = open(self.log_file, 'rb').read()
+        print 'log_output:'
+        print log_output
+        assert 'ERROR' in log_output
 
     def test_archivewal_success_with_file(self):
         self.cmd.append(self.wal_filename)
