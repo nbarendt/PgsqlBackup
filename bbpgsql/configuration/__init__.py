@@ -106,14 +106,16 @@ def set_up_logger_file_handler(config):
         else:
             loghistory = 7
         l = logging.getLogger()
-        l.addHandler(
-            logging.handlers.TimedRotatingFileHandler(
+        h = logging.handlers.TimedRotatingFileHandler(
                 logfile,
                 when='d',
                 interval=1,
                 backupCount=loghistory
             )
-        )
+        formatter = logging.Formatter(
+            "%(asctime)s - %(levelname)s - %(message)s")
+        h.setFormatter(formatter)
+        l.addHandler(h)
 
 
 def set_up_logger_syslog_handler(config):
@@ -124,8 +126,12 @@ def set_up_logger_syslog_handler(config):
             log_port = int(config.get('Logging', 'logport'))
             log_address = (log_host, log_port)
             l = logging.getLogger()
-            l.addHandler(
-                logging.handlers.SysLogHandler(
+            h = logging.handlers.SysLogHandler(
                     address=log_address
                 )
+            formatter = logging.Formatter(
+                '%(asctime)s %(name)s: %(levelname)s %(message)s',
+                '%b %e %H:%M:%S'
             )
+            h.setFormatter(formatter)
+            l.addHandler(h)
