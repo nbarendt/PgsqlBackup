@@ -73,6 +73,13 @@ def common_validate_options_and_args(options=None, args=None):
     return True
 
 
+def non_destructive_minimal_parse_and_validate_args(args=None):
+    args = args or sys.argv[:]
+    parser, options, args = common_parse_args(args)
+    common_validate_options_and_args(options, args)
+    return options, args
+
+
 def archivewal_parse_args(args=None):
     archivewal_usage = ' '.join([
         os.path.basename(sys.argv[0]),

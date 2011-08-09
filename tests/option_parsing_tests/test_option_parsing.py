@@ -7,12 +7,15 @@ from bbpgsql.option_parser import archivepgsql_parse_args
 from bbpgsql.option_parser import archivepgsql_validate_options_and_args
 from bbpgsql.option_parser import storagestats_parse_args
 from bbpgsql.option_parser import storagestats_validate_options_and_args
+from bbpgsql.option_parser import (
+    non_destructive_minimal_parse_and_validate_args)
 from bbpgsql.option_parser import UsedArchivepgsqlAsArchiveWAL
 from bbpgsql.option_parser import TooManyArgumentsException
 from testfixtures import TempDirectory
 from re import match
 import os
 import stat
+import sys
 
 
 class Test_CommandLineOptionParsing_Defaults(TestCase):
@@ -62,6 +65,12 @@ class Test_OptionParsing_and_Validation(TestCase):
 
     def tearDown(self):
         self.tempdir.cleanup()
+
+    def test_non_destructive_with_sys_argv(self):
+        expected_sys_argv = ['', '-c', self.config_path]
+        sys.argv = expected_sys_argv[:]
+        non_destructive_minimal_parse_and_validate_args()
+        self.assertEqual(expected_sys_argv, sys.argv)
 
     def test_validation_raises_exception_if_config_file_does_not_exist(self):
         def validate():
