@@ -49,8 +49,6 @@ class Test_command_dispatch(TestCase):
         self.assertFalse(mock_archivewal_main.called)
 
 
-@patch('bbpgsql.bbpgsql_main.stdout.write')
-@patch('bbpgsql.bbpgsql_main.exit')
 class Test_incorrect_invocation(TestCase):
     mainMsg = '''You have invoked this script as bbpgsql.
 This script is supposed to be invoked through the commands archivepgsql
@@ -69,12 +67,14 @@ commands were installed correctly.
     def tearDown(self):
         self.tempdir.cleanup()
 
-    def test_invokation_using_main_script_fails(self,
-        mock_exit, mock_stdout_write):
+    @patch('bbpgsql.bbpgsql_main.exit')
+    def test_invocation_using_main_script_fails(self,
+        mock_exit):
         bbpgsql_main(['bbpgsql', '-c', self.config_path])
-        mock_stdout_write.assert_called_once_with(self.mainMsg)
-        mock_exit.assert_called_once_with(1)
+        mock_exit.assert_called_with(1)
 
+    @patch('bbpgsql.bbpgsql_main.stdout.write')
+    @patch('bbpgsql.bbpgsql_main.exit')
     def test_invocation_using_unknown_fails(self,
         mock_exit, mock_stdout_write):
         bbpgsql_main(['unknown'])

@@ -13,6 +13,6 @@ class Test_log_events(TestCase):
                 Mock(),
                 '/dev/null')
             l.check(
-                ('root', 'INFO', expected_started),
-                ('root', 'INFO', expected_completed)
+                ('bbpgsql', 'INFO', expected_started),
+                ('bbpgsql', 'INFO', expected_completed)
             )

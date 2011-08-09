@@ -37,7 +37,8 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
                 'pgsql_data_directory': self.tempdir.path,
             },
             'Logging': {
-                'logfile': self.log_file
+                'logfile': self.log_file,
+                'level': 'DEBUG',
             },
         }
         write_config_to_filename(self.config_dict, self.config_path)
@@ -63,6 +64,8 @@ class Test_archivepgsql_BasicCommandLineOperation(TestCase):
     def test_archivewal_logs_error_with_if_less_than_one_argument(self):
         proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
         proc.wait()
+        self.assertNotEqual(0, proc.returncode)
+        print proc.stdout.read()
         log_output = open(self.log_file, 'rb').read()
         print 'log_output:'
         print log_output
