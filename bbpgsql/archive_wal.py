@@ -1,4 +1,4 @@
-from sys import stdout, exit
+from sys import stdout
 from os.path import basename
 from datetime import datetime
 from bbpgsql.option_parser import archivewal_parse_args
@@ -19,7 +19,7 @@ def archivewal_handle_args():
     except Exception, e:
         stdout.write(str(e) + '\n')
         parser.print_help()
-        exit(1)
+        raise e
     return options, args
 
 

@@ -1,4 +1,4 @@
-from sys import stdout, exit
+from sys import stdout
 from bbpgsql.option_parser import archivepgsql_parse_args
 from bbpgsql.option_parser import archivepgsql_validate_options_and_args
 from bbpgsql.configuration import get_config_from_filename_and_set_up_logging
@@ -23,7 +23,7 @@ def archivepgsql_handle_args():
     except Exception, e:
         stdout.write(str(e) + '\n')
         parser.print_help()
-        exit(1)
+        raise e
     return options, args
 
 
