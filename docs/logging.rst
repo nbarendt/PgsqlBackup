@@ -10,13 +10,13 @@ Logging related configuration.
 +==============+===========+=============+=============================+
 | level        |   String  | ``WARNING`` | log warning msgs or higher  |
 +--------------+-----------+-------------+-----------------------------+
-| logfile      |   String  |    NONE     | full path to log file (mandatory) |
+| logfile      |   String  |    NONE     | log file path (mandatory)   |
 +--------------+-----------+-------------+-----------------------------+
-| loghistory   |   String  |``7``| Number of days of logfiles to keep |
+| loghistory   |   String  | ``7``       | log file history to keep    |
 +--------------+-----------+-------------+-----------------------------+
-| loghost       |   String  |  NONE  | hostname to log to using syslog (mandatory) |
+| loghost      |   String  |  NONE       | syslog hostname (mandatory) |
 +--------------+-----------+-------------+-----------------------------+
-| logport       |   String  | NONE | port number for syslog (mandatory)|
+| logport      |   String  | NONE        | syslog port (mandatory)     |
 +--------------+-----------+-------------+-----------------------------+
 
 In order to turn on file logging, a valid path to a logfile must
