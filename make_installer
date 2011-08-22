@@ -1,12 +1,14 @@
 #!/bin/bash
 set -e
 
+export PYINSTALL_PATH=pyinstaller-1.5.1
+
 . env/bin/activate
 export WORKINGDIR=`pwd`
 cd pyinstaller
 rm -rf dist build
-python pyinstaller-1.5-rc1/Configure.py
-python pyinstaller-1.5-rc1/Build.py bbpgsql.spec
+python ${PYINSTALL_PATH}/Configure.py
+python ${PYINSTALL_PATH}/Build.py bbpgsql.spec
 cd dist
 ln -s bbpgsql archivewal
 ln -s bbpgsql archivepgsql
