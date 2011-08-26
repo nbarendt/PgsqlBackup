@@ -88,7 +88,6 @@ def storagestats_main():
     }
     reporter = Storage_stats_reporter(repo_names, repositories)
     reporter.write_report(stdout)
-    exit(0)
 
 
 def storagestats_handle_args():
