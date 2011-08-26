@@ -12,7 +12,11 @@ config = {
 	'version': '0.1',
 	'install_requires': [''],
 	'packages': ['bbpgsql'],
-	'scripts': ['bbpgsql/cmdline_scripts/archivewal'],
+	'scripts': [
+        'bbpgsql/cmdline_scripts/archivewal',
+        'bbpgsql/cmdline_scripts/archivepgsql',
+        'bbpgsql/cmdline_scripts/storagestats',
+    ],
 	'name': 'bbpgsql'
 }
 
