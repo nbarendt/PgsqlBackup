@@ -128,21 +128,21 @@ def set_up_logger_file_handler(config):
         # create formatter
         if config.has_option('Logging', 'logfile'):
             logfile = config.get('Logging', 'logfile')
-        if config.has_option('Logging', 'loghistory'):
-            loghistory = int(config.get('Logging', 'loghistory'))
-        else:
-            loghistory = 7
-        formatters['file_formatter'] = {
-            'format': "%(asctime)s - %(levelname)s - %(message)s",
-        }
-        handlers['file'] = {
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'formatter': 'file_formatter',
-            'filename': logfile,
-            'when': 'd',
-            'interval': 1,
-            'backupCount': loghistory,
-        }
+            if config.has_option('Logging', 'loghistory'):
+                loghistory = int(config.get('Logging', 'loghistory'))
+            else:
+                loghistory = 7
+            formatters['file_formatter'] = {
+                'format': "%(asctime)s - %(levelname)s - %(message)s",
+            }
+            handlers['file'] = {
+                'class': 'logging.handlers.TimedRotatingFileHandler',
+                'formatter': 'file_formatter',
+                'filename': logfile,
+                'when': 'd',
+                'interval': 1,
+                'backupCount': loghistory,
+            }
     return handlers, formatters
 
 

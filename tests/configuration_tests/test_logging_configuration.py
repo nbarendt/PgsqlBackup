@@ -3,6 +3,7 @@ from mock import patch
 from testfixtures import TempDirectory
 import bbpgsql.configuration
 import os.path
+from ConfigParser import SafeConfigParser
 from logging import (
     DEBUG,
 #    INFO,
@@ -32,6 +33,9 @@ default_log_config = {
     },
 }
 
+config_only_section = '''
+[Logging]
+'''
 
 config_text = '''
 [Logging]
@@ -63,12 +67,19 @@ class Test_Logging_setup(TestCase):
         self.full_config.set('Logging', 'logfile', self.logfilepath)
         self.config_path = self.td.write('bad_level', config_bad_values)
         self.bad_config = bbpgsql.configuration.config([self.config_path])
+        self.config_path = self.td.write('section_only', config_only_section)
+        self.section_only = bbpgsql.configuration.config([self.config_path])
 
     def tearDown(self):
         self.td.cleanup()
 
     def test_default_config_lacks_logging(self):
         self.assertFalse(self.default_config.has_section('Logger'))
+
+    def test_section_only_does_no_logging(self):
+        log_config = bbpgsql.configuration.set_up_logging(self.section_only)
+        # assert only null handler
+        self.assertEqual(1, len(log_config['handlers']))
 
     @patch('logging.config.dictConfig')
     def test_logger_sets_up_default_config(self, mock_dictConfig):
@@ -109,7 +120,7 @@ class Test_Logging_setup(TestCase):
             }
         )
 
-    def test_logger_does_nothing_if_logfile_not_defined(self):
+    def test_logger_does_nothing_if_section_is_missing(self):
         handlers, formatters = \
             bbpgsql.configuration.set_up_logger_file_handler(
                 self.default_config)
@@ -124,9 +135,20 @@ class Test_Logging_setup(TestCase):
             ('localhost', 514))
 
     def test_logger_does_nothing_if_syslog_host_not_defined(self):
+        conf = SafeConfigParser()
+        conf.add_section('Logging')
+        conf.set('Logging', 'logport', '514')
         handlers, formatters = \
-            bbpgsql.configuration.set_up_logger_syslog_handler(
-                self.default_config)
+            bbpgsql.configuration.set_up_logger_syslog_handler(conf)
+        self.assertEqual({}, handlers)
+        self.assertEqual({}, formatters)
+
+    def test_logger_does_nothing_if_syslog_port_not_defined(self):
+        conf = SafeConfigParser()
+        conf.add_section('Logging')
+        conf.set('Logging', 'loghost', 'localhost')
+        handlers, formatters = \
+            bbpgsql.configuration.set_up_logger_syslog_handler(conf)
         self.assertEqual({}, handlers)
         self.assertEqual({}, formatters)
 
