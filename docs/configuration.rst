@@ -200,8 +200,9 @@ Logging related configuration.
 In order to turn on file logging, a valid path to a logfile must
 be specified in the configuration file.  If this key is absent
 from the configuration file, no logging will be done to log files.
+The file must be writable by the postgres user.
 
-In order to turn on syslog logging, a valid hostname and port number
+In order to turn on syslog logging (UDP), a valid hostname and port number
 must be specified in the configuration file.  If either key is
 absent from the configuration file, no logging to syslog will be
 performed.
