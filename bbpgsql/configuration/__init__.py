@@ -10,6 +10,8 @@ from logging import (
 #    ERROR,
 #    CRITICAL,
 )
+import socket
+import logging
 
 BBPGSQL_LOGGER_NAME = 'bbpgsql'
 
@@ -159,9 +161,25 @@ def set_up_logger_syslog_handler(config):
                 'format': '%(asctime)s %(name)s: %(levelname)s %(message)s',
                 'datefmt': '%b %e %H:%M:%S',
             }
+            socktype = socket.SOCK_DGRAM
+            if config.has_option('Logging', 'logtcp'):
+                if config.getboolean('Logging', 'logtcp'):
+                    socktype = socket.SOCK_STREAM
+                else:
+                    socktype = socket.SOCK_DGRAM
+            facility = logging.handlers.SysLogHandler.LOG_USER
+            if config.has_option('Logging', 'logfacility'):
+                try:
+                    facility = logging.handlers.SysLogHandler.facility_names[
+                        config.get('Logging', 'logfacility')]
+                except KeyError:
+                    raise Exception('Invalid "logfacility" value of "%s"' %
+                        config.get('Logging', 'logfacility'))
             handlers['syslog'] = {
                 'class': 'logging.handlers.SysLogHandler',
                 'formatter': 'syslog_formatter',
                 'address': log_address,
+                'facility': facility,
+                'socktype': socktype,
             }
     return handlers, formatters

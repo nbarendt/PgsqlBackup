@@ -11,6 +11,8 @@ from logging import (
 #    ERROR,
 #    CRITICAL,
 )
+import socket
+import logging
 
 
 default_log_config = {
@@ -151,6 +153,82 @@ class Test_Logging_setup(TestCase):
             bbpgsql.configuration.set_up_logger_syslog_handler(conf)
         self.assertEqual({}, handlers)
         self.assertEqual({}, formatters)
+
+    def test_logger_uses_UDP_by_default(self):
+        conf = SafeConfigParser()
+        conf.add_section('Logging')
+        conf.set('Logging', 'loghost', 'localhost')
+        conf.set('Logging', 'logport', '514')
+        handlers, formatters = \
+            bbpgsql.configuration.set_up_logger_syslog_handler(conf)
+        syslog_handler = handlers[handlers.keys()[0]]
+        self.assertEqual(socket.SOCK_DGRAM, syslog_handler['socktype'])
+
+    def test_logger_uses_TCP_when_tcpon_is_false(self):
+        conf = SafeConfigParser()
+        conf.add_section('Logging')
+        conf.set('Logging', 'loghost', 'localhost')
+        conf.set('Logging', 'logport', '514')
+        conf.set('Logging', 'logtcp', 'off')
+        handlers, formatters = \
+            bbpgsql.configuration.set_up_logger_syslog_handler(conf)
+        syslog_handler = handlers[handlers.keys()[0]]
+        self.assertEqual(socket.SOCK_DGRAM, syslog_handler['socktype'])
+
+    def test_logger_uses_TCP_when_tcpon_is_true(self):
+        conf = SafeConfigParser()
+        conf.add_section('Logging')
+        conf.set('Logging', 'loghost', 'localhost')
+        conf.set('Logging', 'logport', '514')
+        conf.set('Logging', 'logtcp', 'on')
+        handlers, formatters = \
+            bbpgsql.configuration.set_up_logger_syslog_handler(conf)
+        syslog_handler = handlers[handlers.keys()[0]]
+        self.assertEqual(socket.SOCK_STREAM, syslog_handler['socktype'])
+
+    def test_logger_uses_facility_user_by_default(self):
+        conf = SafeConfigParser()
+        conf.add_section('Logging')
+        conf.set('Logging', 'loghost', 'localhost')
+        conf.set('Logging', 'logport', '514')
+        handlers, formatters = \
+            bbpgsql.configuration.set_up_logger_syslog_handler(conf)
+        syslog_handler = handlers[handlers.keys()[0]]
+        self.assertEqual(logging.handlers.SysLogHandler.LOG_USER,
+            syslog_handler['facility'])
+
+    def test_logger_uses_facility_user_when_specified(self):
+        conf = SafeConfigParser()
+        conf.add_section('Logging')
+        conf.set('Logging', 'loghost', 'localhost')
+        conf.set('Logging', 'logport', '514')
+        conf.set('Logging', 'logfacility', 'user')
+        handlers, formatters = \
+            bbpgsql.configuration.set_up_logger_syslog_handler(conf)
+        syslog_handler = handlers[handlers.keys()[0]]
+        self.assertEqual(logging.handlers.SysLogHandler.LOG_USER,
+            syslog_handler['facility'])
+
+    def test_logger_uses_facility_local0_when_specified(self):
+        conf = SafeConfigParser()
+        conf.add_section('Logging')
+        conf.set('Logging', 'loghost', 'localhost')
+        conf.set('Logging', 'logport', '514')
+        conf.set('Logging', 'logfacility', 'local0')
+        handlers, formatters = \
+            bbpgsql.configuration.set_up_logger_syslog_handler(conf)
+        syslog_handler = handlers[handlers.keys()[0]]
+        self.assertEqual(logging.handlers.SysLogHandler.LOG_LOCAL0,
+            syslog_handler['facility'])
+
+    def test_logger_raises_exception_on_invalid_facility(self):
+        conf = SafeConfigParser()
+        conf.add_section('Logging')
+        conf.set('Logging', 'loghost', 'localhost')
+        conf.set('Logging', 'logport', '514')
+        conf.set('Logging', 'logfacility', 'quidgybo')
+        self.assertRaises(Exception,
+            bbpgsql.configuration.set_up_logger_syslog_handler, conf)
 
     @patch('bbpgsql.configuration.set_up_logger_file_handler')
     @patch('bbpgsql.configuration.set_up_logger_syslog_handler')

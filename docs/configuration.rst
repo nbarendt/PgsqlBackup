@@ -196,6 +196,12 @@ Logging related configuration.
 +--------------+-----------+-------------+-----------------------------+
 | logport      |   String  | NONE        | syslog port (mandatory)     |
 +--------------+-----------+-------------+-----------------------------+
+| logtcp       |   Boolean | ``off``     | syslog UDP by default       |
+|              |           |             | change to ``on`` to use TCP |
++--------------+-----------+-------------+-----------------------------+
+| logfacility  |   String  | ``user``    | syslog facility (e.g., user |
+|              |           |             |  local0, local1, etc.)      |
++--------------+-----------+-------------+-----------------------------+
 
 In order to turn on file logging, a valid path to a logfile must
 be specified in the configuration file.  If this key is absent
