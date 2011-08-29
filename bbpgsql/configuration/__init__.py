@@ -94,8 +94,8 @@ def build_logging_configuration_dict(config):
     new_handlers = []
     bbpgsql_log_config = log_config['loggers'][BBPGSQL_LOGGER_NAME]
     if config.has_section('Logging'):
-        if config.has_option('Logging', 'level'):
-            level = config.get('Logging', 'level')
+        if config.has_option('Logging', 'loglevel'):
+            level = config.get('Logging', 'loglevel')
             lvl = logging.getLevelName(level.upper())
             if type(lvl) is not type(1):
                 raise(Exception('Invalid Logging Level'))

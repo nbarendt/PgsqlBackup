@@ -186,7 +186,7 @@ Logging related configuration.
 +--------------+-----------+-------------+-----------------------------+
 | Key Name     |   Type    |   Default   |  Description                |
 +==============+===========+=============+=============================+
-| level        |   String  | ``WARNING`` | log warning msgs or higher  |
+| loglevel     |   String  | ``WARNING`` | log warning msgs or higher  |
 +--------------+-----------+-------------+-----------------------------+
 | logfile      |   String  |    NONE     | log file path (mandatory)   |
 +--------------+-----------+-------------+-----------------------------+

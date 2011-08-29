@@ -39,7 +39,7 @@ config_only_section = '''
 
 config_text = '''
 [Logging]
-level=DEBUG
+loglevel=DEBUG
 logfile=/needs/setting/in/setUp/bbpgsql
 loghistory=14
 loghost=localhost
@@ -48,7 +48,7 @@ logport=514
 
 config_bad_values = '''
 [Logging]
-level=DORK
+loglevel=DORK
 logfile=/nonexistent/path
 loghistory=not_a_number
 loghost=nohost
