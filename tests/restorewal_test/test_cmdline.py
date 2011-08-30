@@ -76,3 +76,14 @@ class Test_restorewal(Cmdline_test_skeleton):
             'tag1',
             self.destfilepath
         )
+
+'''
+    Roadmap:
+
+    going to need functionality that mirros archive_wal.  Two basic functions.
+    1. restorewal_handle_args()
+    2. restorewal_main()
+
+    underneath need new function in option_parser to
+    restorewal_validate_options_and_args()
+'''
