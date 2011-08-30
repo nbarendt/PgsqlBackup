@@ -143,8 +143,6 @@ def archivepgsql_validate_options_and_args(options=None, args=None):
     return True
 
 def restorewal_parse_args(args=None):
-    parser = create_common_parser()
-'''
     restorewal_usage = ' '.join([
         os.path.basename(sys.argv[0]),
         '[options]',
@@ -152,7 +150,7 @@ def restorewal_parse_args(args=None):
         '<path_to_write_restored_file>',
         ])
     parser = create_common_parser(usage=restorewal_usage)
-
+'''
 
 def restorewal_validate_options_and_args(options=None, args=None):
     pass

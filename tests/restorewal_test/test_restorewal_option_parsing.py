@@ -15,7 +15,6 @@ class Test_restorewal_parse_args_Uses_Common_Functions(TestCase):
         restorewal_parse_args(args=[])
         self.assertTrue(mock_func.called)
 
-'''
     @patch('bbpgsql.option_parser.create_common_parser', spec=True)
     def test_create_common_parser_passed_usage_string(self, mock_func):
         mock_parser = Mock()
@@ -23,10 +22,15 @@ class Test_restorewal_parse_args_Uses_Common_Functions(TestCase):
         mock_func.return_value = mock_parser
         restorewal_parse_args(args=[])
         kwargs = mock_func.call_args_list[0][1]
-        expected_usage_suffix = '[options] <path_to_wal_file_to_restore>'
+        expected_usage_suffix = ' '.join([
+            '[options]',
+            '<name_of_wal_file_to_restore>',
+            '<path_to_write_restored_file>',
+            ])
         self.assertTrue(kwargs['usage'].endswith(expected_usage_suffix))
 
 
+'''
 class Test_restorewal_validate_options_Uses_Common_Functions(TestCase):
     @patch('bbpgsql.option_parser.common_validate_options_and_args', spec=True)
     def test_will_call_common_validate_options_and_args(self, mock_func):
