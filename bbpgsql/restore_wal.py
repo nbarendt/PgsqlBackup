@@ -6,4 +6,5 @@ class Restore_WAL(object):
         self.repository = repository
 
     def restore(self, basename, destination):
-        pass
+        commit = self.repository[basename]
+        commit.get_contents_to_filename(destination)

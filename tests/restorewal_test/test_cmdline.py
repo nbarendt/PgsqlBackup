@@ -5,6 +5,7 @@ from testfixtures import TempDirectory
 from bbpgsql.archive_wal import commit_wal_to_repository
 import os.path
 import filecmp
+from bbpgsql.repository_exceptions import UnknownTagError
 
 
 class Test_restorewal(Cmdline_test_skeleton):
@@ -62,4 +63,16 @@ class Test_restorewal(Cmdline_test_skeleton):
 
     def test_restorewal_restores_a_wal_file(self):
         self.restorer.restore(self.basename, self.destfilepath)
-        self.assertTrue(filecmp.cmp(self.srcfilepath, self.destfilepath))
+        self.assertTrue(filecmp.cmp(
+            self.srcfilepath,
+            self.destfilepath,
+            shallow=False
+            ))
+
+    def test_restorewal_raises_unknown_tag_error(self):
+        self.assertRaises(
+            UnknownTagError,
+            self.restorer.restore,
+            'tag1',
+            self.destfilepath
+        )
