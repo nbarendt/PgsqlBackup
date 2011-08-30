@@ -38,5 +38,14 @@ class Test_restorewal(Cmdline_test_skeleton):
     def null_test(self):
         pass
 
-    def test_restorewal_instantiates(self):
+    def test_restorewal_sets_repository_attr(self):
         restorer = Restore_WAL(self.repository)
+        self.assertEqual(self.repository, restorer.repository)
+
+    def test_restorewal_has_method_restore(self):
+        restorer = Restore_WAL(self.repository)
+        self.assertEqual(type(restorer.restore), type(self.setUp))
+
+    def test_restorewal_takes_two_arguments(self):
+        restorer = Restore_WAL(self.repository)
+        restorer.restore('one', 'two')
