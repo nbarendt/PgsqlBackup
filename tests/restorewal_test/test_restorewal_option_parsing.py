@@ -1,12 +1,11 @@
 from unittest import TestCase
-#from bbpgsql.option_parser import restorewal_parse_args
+from bbpgsql.option_parser import restorewal_parse_args
 #from bbpgsql.option_parser import restorewal_validate_options_and_args
 from bbpgsql.configuration import write_config_to_filename
 from mock import patch, Mock
 from testfixtures import TempDirectory
 import os
 
-'''
 class Test_restorewal_parse_args_Uses_Common_Functions(TestCase):
     @patch('bbpgsql.option_parser.create_common_parser', spec=True)
     def test_create_common_parser_used(self, mock_func):
@@ -16,6 +15,7 @@ class Test_restorewal_parse_args_Uses_Common_Functions(TestCase):
         restorewal_parse_args(args=[])
         self.assertTrue(mock_func.called)
 
+'''
     @patch('bbpgsql.option_parser.create_common_parser', spec=True)
     def test_create_common_parser_passed_usage_string(self, mock_func):
         mock_parser = Mock()
