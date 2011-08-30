@@ -142,6 +142,20 @@ def archivepgsql_validate_options_and_args(options=None, args=None):
                         ' archive_command instead of archivewal?')
     return True
 
+'''
+def restorewal_parse_args(args=None):
+    restorewal_usage = ' '.join([
+        os.path.basename(sys.argv[0]),
+        '[options]',
+        '<name_of_wal_file_to_restore>',
+        '<path_to_write_restored_file>',
+        ])
+    parser = create_common_parser(usage=restorewal_usage)
+
+
+def restorewal_validate_options_and_args(options=None, args=None):
+    pass
+'''
 
 def storagestats_parse_args(args=None):
     storagestats_usage = ' '.join([
