@@ -1,6 +1,6 @@
 from unittest import TestCase
 from bbpgsql.option_parser import restorewal_parse_args
-#from bbpgsql.option_parser import restorewal_validate_options_and_args
+from bbpgsql.option_parser import restorewal_validate_options_and_args
 from bbpgsql.configuration import write_config_to_filename
 from mock import patch, Mock
 from testfixtures import TempDirectory
@@ -30,7 +30,6 @@ class Test_restorewal_parse_args_Uses_Common_Functions(TestCase):
         self.assertTrue(kwargs['usage'].endswith(expected_usage_suffix))
 
 
-'''
 class Test_restorewal_validate_options_Uses_Common_Functions(TestCase):
     @patch('bbpgsql.option_parser.common_validate_options_and_args', spec=True)
     def test_will_call_common_validate_options_and_args(self, mock_func):
@@ -39,6 +38,7 @@ class Test_restorewal_validate_options_Uses_Common_Functions(TestCase):
         self.assertTrue(mock_func.called)
 
 
+'''
 class Test_restorewal_requires_WAL_file(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
