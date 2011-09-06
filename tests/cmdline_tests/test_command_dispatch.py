@@ -9,6 +9,7 @@ from bbpgsql.configuration import write_config_to_filename
 @patch('bbpgsql.bbpgsql_main.bbpgsql_error')
 @patch('bbpgsql.bbpgsql_main.archivewal_main')
 @patch('bbpgsql.bbpgsql_main.archivepgsql_main')
+@patch('bbpgsql.bbpgsql_main.restorewal_main')
 class Test_command_dispatch(TestCase):
     archivepgsql_exe = 'archivepgsql'
     archivewal_exe = 'archivewal'
@@ -28,25 +29,31 @@ class Test_command_dispatch(TestCase):
         return [cmd, '-c', self.config_path]
 
     def test_dispatch_calls_archivepgsql_main(self,
+        mock_restorewal_main,
         mock_archivepgsql_main, mock_archivewal_main, mock_bbpgsql_error):
         bbpgsql_main(self.get_argv_for_cmd(self.archivepgsql_exe))
         mock_archivepgsql_main.assert_called_once_with()
         self.assertFalse(mock_archivewal_main.called)
+        self.assertFalse(mock_restorewal_main.called)
         self.assertFalse(mock_bbpgsql_error.called)
 
     def test_dispatch_calls_only_archivewal_main(self,
+        mock_restorewal_main,
         mock_archivepgsql_main, mock_archivewal_main, mock_bbpgsql_error):
         bbpgsql_main(self.get_argv_for_cmd(self.archivewal_exe))
         mock_archivewal_main.assert_called_once_with()
         self.assertFalse(mock_archivepgsql_main.called)
+        self.assertFalse(mock_restorewal_main.called)
         self.assertFalse(mock_bbpgsql_error.called)
 
     def test_dispatch_calls_only_bbpgsql_error(self,
+        mock_restorewal_main,
         mock_archivepgsql_main, mock_archivewal_main, mock_bbpgsql_error):
         bbpgsql_main(self.get_argv_for_cmd(self.bbpgsql_exe))
         mock_bbpgsql_error.assert_called_once_with()
         self.assertFalse(mock_archivepgsql_main.called)
         self.assertFalse(mock_archivewal_main.called)
+        self.assertFalse(mock_restorewal_main.called)
 
 
 class Test_incorrect_invocation(TestCase):
