@@ -65,8 +65,9 @@ class Test_archivewal_validate_options_Uses_Common_Functions(TestCase):
     @patch('bbpgsql.option_parser.common_validate_options_and_args', spec=True)
     def test_will_call_common_validate_options_and_args(self, mock_func):
         mock_func.return_value = False
-        archivewal_validate_options_and_args()
+        retval = archivewal_validate_options_and_args()
         self.assertTrue(mock_func.called)
+        self.assertFalse(retval)
 
 
 class Test_archivewal_requires_WAL_file(TestCase):
