@@ -156,7 +156,8 @@ def restorewal_parse_args(args=None):
 
 
 def restorewal_validate_options_and_args(options=None, args=None):
-    common_validate_options_and_args(options, args)
+    if not common_validate_options_and_args(options, args):
+        return False
 
 
 def storagestats_parse_args(args=None):
