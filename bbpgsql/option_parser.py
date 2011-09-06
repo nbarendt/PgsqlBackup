@@ -151,6 +151,8 @@ def restorewal_parse_args(args=None):
         '<path_to_write_restored_file>',
         ])
     parser = create_common_parser(usage=restorewal_usage)
+    options, args = parser.parse_args(args)
+    return parser, options, args
 
 
 def restorewal_validate_options_and_args(options=None, args=None):
