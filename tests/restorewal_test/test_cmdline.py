@@ -21,7 +21,8 @@ class Test_restorewal(Cmdline_test_skeleton):
                 'driver': 'memory',
             },
             'WAL': {
-                'driver': 'memory',
+                'driver': 'filesystem',
+                'path': self.archivepath,
             }
         }
         return self.config_dict
@@ -42,6 +43,7 @@ class Test_restorewal(Cmdline_test_skeleton):
             'Some Data goes here',
         )
         self.destdirpath = self.tempdir.makedir('destination')
+        self.archivepath = self.tempdir.makedir('walarchive')
 
     def teardown_customize(self):
         self.teardown_tempdirs()
@@ -91,12 +93,15 @@ class Test_restorewal(Cmdline_test_skeleton):
             in proc.stdout.read())
 
     def test_restorewal_success_restoring_file(self):
-        #self.cmd.append(self.basename)
-        #self.cmd.append(self.destfilepath)
+        self.cmd.append(self.basename)
+        self.cmd.append(self.destfilepath)
         proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
         proc.wait()
-        print(self.cmd)
-        print(proc.stdout.read())
+        self.assertTrue(filecmp.cmp(
+            self.srcfilepath,
+            self.destfilepath,
+            shallow=False
+            ))
 '''
     Roadmap:
 
