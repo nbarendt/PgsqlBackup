@@ -1,7 +1,6 @@
 from tests.cmdline_test_skeleton import Cmdline_test_skeleton
 from bbpgsql.configuration.repository import get_WAL_repository
 from bbpgsql.restore_wal import Restore_WAL
-from testfixtures import TempDirectory
 from bbpgsql.archive_wal import commit_wal_to_repository
 import os.path
 import filecmp
@@ -10,24 +9,24 @@ from bbpgsql.repository_exceptions import UnknownTagError
 
 class Test_restorewal(Cmdline_test_skeleton):
     __test__ = True  # to make nose run these tests
-    config_dict = {
-        'General': {
-        },
-        'Snapshot': {
-            'driver': 'memory',
-        },
-        'WAL': {
-            'driver': 'memory',
-        }
-    }
 
     def setup_config(self):
+        self.config_dict = {
+            'General': {
+                'pgsql_data_directory': self.destdirpath
+            },
+            'Snapshot': {
+                'driver': 'memory',
+            },
+            'WAL': {
+                'driver': 'memory',
+            }
+        }
         return self.config_dict
 
     def setup_customize(self):
         self.setup_repository()
         self.restorer = Restore_WAL(self.repository)
-        self.setup_tempdirs()
         commit_wal_to_repository(self.repository, self.srcfilepath)
         self.basename = os.path.basename(self.srcfilepath)
         self.destfilepath = os.path.join(self.destdirpath, self.basename)
@@ -35,8 +34,7 @@ class Test_restorewal(Cmdline_test_skeleton):
     def setup_repository(self):
         self.repository = get_WAL_repository(self.config)
 
-    def setup_tempdirs(self):
-        self.tempdir = TempDirectory()
+    def setup_environment_and_paths_customize(self):
         self.srcfilepath = self.tempdir.write(
             os.path.join('source', 'WALFileName0001'),
             'Some Data goes here',
