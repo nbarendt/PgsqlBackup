@@ -5,10 +5,12 @@ from bbpgsql.archive_wal import commit_wal_to_repository
 import os.path
 import filecmp
 from bbpgsql.repository_exceptions import UnknownTagError
+from subprocess import Popen, PIPE, STDOUT, check_call, CalledProcessError
 
 
 class Test_restorewal(Cmdline_test_skeleton):
     __test__ = True  # to make nose run these tests
+    exe_script = 'restorewal'
 
     def setup_config(self):
         self.config_dict = {
@@ -75,6 +77,26 @@ class Test_restorewal(Cmdline_test_skeleton):
             self.destfilepath
         )
 
+    def test_raises_exception_if_too_few_args(self):
+
+        def raises_exception():
+            check_call(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
+
+        self.assertRaises(CalledProcessError, raises_exception)
+
+    def test_too_few_arguments_produces_proper_message(self):
+        proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
+        proc.wait()
+        self.assertTrue('restorewal must be given the name of the WAL'
+            in proc.stdout.read())
+
+    def test_restorewal_success_restoring_file(self):
+        #self.cmd.append(self.basename)
+        #self.cmd.append(self.destfilepath)
+        proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
+        proc.wait()
+        print(self.cmd)
+        print(proc.stdout.read())
 '''
     Roadmap:
 
