@@ -25,6 +25,14 @@ class TooManyArgumentsException(Exception):
         return self.msg
 
 
+class NotEnoughArgumentsException(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
+
+
 class UsedArchivepgsqlAsArchiveWAL(Exception):
     def __init__(self, msg):
         self.msg = msg
@@ -156,8 +164,15 @@ def restorewal_parse_args(args=None):
 
 
 def restorewal_validate_options_and_args(options=None, args=None):
+    args = args or []
     if not common_validate_options_and_args(options, args):
         return False
+    nargs = len(args)
+    if nargs != 2:
+        raise Exception('restorewal must be given the name of the WAL' \
+                        ' file to retrieve and the destination path to' \
+                        ' restore to.')
+    return True
 
 
 def storagestats_parse_args(args=None):

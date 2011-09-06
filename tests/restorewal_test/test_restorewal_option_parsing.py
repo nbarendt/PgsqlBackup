@@ -74,9 +74,7 @@ class Test_restorewal_validate_options_Uses_Common_Functions(TestCase):
         self.assertFalse(retval)
 
 
-
-'''
-class Test_restorewal_requires_WAL_file(TestCase):
+class Test_restorewal_requires_WAL_file_and_destination(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
         self.config_dict = {
@@ -92,20 +90,45 @@ class Test_restorewal_requires_WAL_file(TestCase):
     def tearDown(self):
         self.tempdir.cleanup()
 
-    def test_will_raise_exception_with_no_WAL_file(self):
+    def test_will_raise_exception_if_not_exactly_two_args(self):
+        self.assertRaises(
+            Exception,
+            restorewal_validate_options_and_args,
+            self.options,
+            []
+            )
+        self.assertRaises(
+            Exception,
+            restorewal_validate_options_and_args,
+            self.options,
+            ['one']
+            )
+        self.assertRaises(
+            Exception,
+            restorewal_validate_options_and_args,
+            self.options,
+            ['one', 'two', 'three']
+            )
 
-        def will_raise_Exception():
-            restorewal_validate_options_and_args(self.options, [])
-        self.assertRaises(Exception, will_raise_Exception)
-
-    def test_exception_is_explicit_about_error(self):
+    def test_is_explicit_about_error(self):
         try:
-            restorewal_validate_options_and_args(self.options, [])
+            restorewal_validate_options_and_args(
+                self.options,
+                []
+                )
         except Exception, e:
             print 'Exception', e
-            self.assertTrue('path to a WAL file' in str(e))
+            self.assertTrue('name of the WAL file to retrieve' in str(e))
         else:
             self.assertTrue(False, 'should never get here')
+
+    def test_returns_true_with_valid_arguments(self):
+        retval = restorewal_validate_options_and_args(
+            self.options,
+            ['walfilename', 'destdirname']
+            )
+        self.assertTrue(retval)
+'''
 
     def test_path_to_WAL_file_must_be_relative(self):
         abs_wal_path = self.tempdir.write('WAL_file', '')
