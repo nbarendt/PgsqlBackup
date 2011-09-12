@@ -59,7 +59,7 @@ class Test_archive_create(TestCase):
             self.assertTrue(member_is_at_relative_path(member))
 
     def test_archive_file_contains_no_up_references_above_root(self):
-        raise(SkipTest)
+        raise(SkipTest)  # Test for no up-references in archive
         self.fail('Not implemented yet')
 
     def test_archive_represtantative_tree(self):
