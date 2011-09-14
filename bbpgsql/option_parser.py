@@ -25,6 +25,14 @@ class TooManyArgumentsException(Exception):
         return self.msg
 
 
+class NotEnoughArgumentsException(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
+
+
 class UsedArchivepgsqlAsArchiveWAL(Exception):
     def __init__(self, msg):
         self.msg = msg
@@ -140,6 +148,30 @@ def archivepgsql_validate_options_and_args(options=None, args=None):
         raise TooManyArgumentsException('archivepgsql should not be called' \
                         ' with any arguments.  Are you using it as the' \
                         ' archive_command instead of archivewal?')
+    return True
+
+
+def restorewal_parse_args(args=None):
+    restorewal_usage = ' '.join([
+        os.path.basename(sys.argv[0]),
+        '[options]',
+        '<name_of_wal_file_to_restore>',
+        '<path_to_write_restored_file>',
+        ])
+    parser = create_common_parser(usage=restorewal_usage)
+    options, args = parser.parse_args(args)
+    return parser, options, args
+
+
+def restorewal_validate_options_and_args(options=None, args=None):
+    args = args or []
+    if not common_validate_options_and_args(options, args):
+        return False
+    nargs = len(args)
+    if nargs != 2:
+        raise Exception('restorewal must be given the name of the WAL' \
+                        ' file to retrieve and the destination path to' \
+                        ' restore to.')
     return True
 
 

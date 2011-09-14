@@ -3,6 +3,7 @@ from sys import stdout, exit
 from bbpgsql.archive_wal import archivewal_main
 from bbpgsql.archive_pgsql import archivepgsql_main
 from bbpgsql.storage_stats import storagestats_main
+from bbpgsql.restore_wal import restorewal_main
 from bbpgsql.option_parser import (
     non_destructive_minimal_parse_and_validate_args)
 from bbpgsql.configuration import get_config_from_filename_and_set_up_logging
@@ -31,6 +32,7 @@ def get_dispatch_map():
         'archivewal': archivewal_main,
         'archivepgsql': archivepgsql_main,
         'storagestats': storagestats_main,
+        'restorewal': restorewal_main,
         'bbpgsql': bbpgsql_error,
     }
     return CMD_DISPATCH_MAP

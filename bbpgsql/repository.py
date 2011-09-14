@@ -1,5 +1,6 @@
 from re import match
 from bbpgsql.repository_exceptions import DuplicateTagError
+from bbpgsql.repository_exceptions import UnknownTagError
 
 CHARACTER_REGEX = r'^[a-zA-Z0-9\-\:\.]*$'
 
@@ -11,7 +12,10 @@ class BBRepository(object):
         self.store = store
 
     def _get_commit_by_tag(self, tag):
-        return self.store[tag]
+        try:
+            return self.store[tag]
+        except KeyError:
+            raise UnknownTagError(tag)
 
     def __iter__(self):
         for tag in self._sorted_tags():
