@@ -175,6 +175,26 @@ def restorewal_validate_options_and_args(options=None, args=None):
     return True
 
 
+def restorepgsql_parse_args(args=None):
+    restorepgsql_usage = ' '.join([
+        os.path.basename(sys.argv[0]),
+        '[options]',
+        ])
+    parser = create_common_parser(usage=restorepgsql_usage)
+    options, args = parser.parse_args(args)
+    return parser, options, args
+
+
+def restorepgsql_validate_options_and_args(options=None, args=None):
+    args = args or []
+    if not common_validate_options_and_args(options, args):
+        return False
+    nargs = len(args)
+    if nargs > 0:
+        raise Exception('restorepgsql should be called with no arguments')
+    return True
+
+
 def storagestats_parse_args(args=None):
     storagestats_usage = ' '.join([
         os.path.basename(sys.argv[0]),
