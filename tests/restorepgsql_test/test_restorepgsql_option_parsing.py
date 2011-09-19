@@ -107,24 +107,22 @@ class Test_restorepgsql_requires_pgsql_file_and_destination(TestCase):
             self.options,
             ['one', 'two', 'three']
             )
-'''
 
     def test_is_explicit_about_error(self):
         try:
             restorepgsql_validate_options_and_args(
                 self.options,
-                []
+                ['one']
                 )
         except Exception, e:
             print 'Exception', e
-            self.assertTrue('name of the pgsql file to retrieve' in str(e))
+            self.assertTrue('called with no arguments' in str(e))
         else:
             self.assertTrue(False, 'should never get here')
 
     def test_returns_true_with_valid_arguments(self):
         retval = restorepgsql_validate_options_and_args(
             self.options,
-            ['pgsqlfilename', 'destdirname']
+            []
             )
         self.assertTrue(retval)
-'''
