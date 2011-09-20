@@ -1,5 +1,5 @@
 from tests.cmdline_test_skeleton import Cmdline_test_skeleton
-#from bbpgsql.configuration.repository import get_archive_repository
+from bbpgsql.configuration.repository import get_Snapshot_repository
 #from bbpgsql.restore_pgsql import Restore_pgsql
 #from bbpgsql.archive_pgsql import commit_pgsql_to_repository
 #import os.path
@@ -9,26 +9,44 @@ from tests.cmdline_test_skeleton import Cmdline_test_skeleton
 
 
 class Test_restorepgsql(Cmdline_test_skeleton):
-    pass
-'''
-class Test_restorepgsql(Cmdline_test_skeleton):
     __test__ = True  # to make nose run these tests
     exe_script = 'restorepgsql'
+
+    def setup_environment_and_paths_customize(self):
+        self.pgsql_data_dir = self.tempdir.makedir('datadir')
+        self.snapshot_archive = self.tempdir.makedir('snapshotdir')
+        self.test_data_dir = self.tempdir.makedir('testdir')
+        pass
 
     def setup_config(self):
         self.config_dict = {
             'General': {
-                'pgsql_data_directory': self.destdirpath
+                'pgsql_data_directory': self.pgsql_data_dir,
             },
             'Snapshot': {
-                'driver': 'memory',
+                'driver': 'filesystem',
+                'path': self.snapshot_archive,
             },
             'WAL': {
-                'driver': 'filesystem',
-                'path': self.archivepath,
-            }
+                'driver': 'memory',
+            },
         }
         return self.config_dict
+
+    def setup_customize(self):
+        self.respository = get_Snapshot_repository(self.config)
+        # fill template data dir with some files and subdirs
+        # copy template data dir to data dir
+        # run archivepgsql to put tar in archive
+        # Now we are ready for tests
+
+    def teardown_customize(self):
+        pass
+
+    def null_test(self):
+        pass
+'''
+class Test_restorepgsql(Cmdline_test_skeleton):
 
     def setup_customize(self):
         self.setup_repository()
