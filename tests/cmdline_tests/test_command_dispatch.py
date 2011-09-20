@@ -54,6 +54,19 @@ class Test_command_dispatch(TestCase):
         self.assertFalse(mock_restorewal_main.called)
         self.assertFalse(mock_bbpgsql_error.called)
 
+    def test_dispatch_calls_only_restorewal_main(self,
+        mock_restorewal_main,
+        mock_archivepgsql_main,
+        mock_archivewal_main,
+        mock_bbpgsql_error
+        ):
+        bbpgsql_main(self.get_argv_for_cmd(self.restorewal_exe))
+        mock_restorewal_main.assert_called_once_with()
+        self.assertFalse(mock_archivepgsql_main.called)
+        self.assertFalse(mock_archivewal_main.called)
+        self.assertFalse(mock_bbpgsql_error.called)
+
+
     def test_dispatch_calls_only_bbpgsql_error(self,
         mock_restorewal_main,
         mock_archivepgsql_main,
