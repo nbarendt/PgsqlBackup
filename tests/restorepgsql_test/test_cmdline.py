@@ -1,11 +1,13 @@
 from tests.cmdline_test_skeleton import Cmdline_test_skeleton
 from bbpgsql.configuration.repository import get_Snapshot_repository
+from tests.archivepgsql_test.tar_archive_helpers import fill_directory_tree
+from testfixtures import TempDirectory
 #from bbpgsql.restore_pgsql import Restore_pgsql
 #from bbpgsql.archive_pgsql import commit_pgsql_to_repository
 #import os.path
 #import filecmp
 #from bbpgsql.repository_exceptions import UnknownTagError
-#from subprocess import Popen, PIPE, STDOUT, check_call, CalledProcessError
+from subprocess import Popen, PIPE, STDOUT, check_call, CalledProcessError
 
 
 class Test_restorepgsql(Cmdline_test_skeleton):
@@ -35,10 +37,11 @@ class Test_restorepgsql(Cmdline_test_skeleton):
 
     def setup_customize(self):
         self.respository = get_Snapshot_repository(self.config)
-        # fill template data dir with some files and subdirs
-        # copy template data dir to data dir
-        # run archivepgsql to put tar in archive
-        # Now we are ready for tests
+        fill_directory_tree(TempDirectory(self.test_data_dir))
+        fill_directory_tree(TempDirectory(self.pgsql_data_dir))
+        self.archive_cmd = ['archivepgsql', '--config', self.config_path]
+        proc = Popen(self.archive_cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
+        proc.wait()
 
     def teardown_customize(self):
         pass
