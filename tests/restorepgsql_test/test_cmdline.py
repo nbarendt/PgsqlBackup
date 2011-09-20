@@ -2,6 +2,8 @@ from tests.cmdline_test_skeleton import Cmdline_test_skeleton
 from bbpgsql.configuration.repository import get_Snapshot_repository
 from tests.archivepgsql_test.tar_archive_helpers import fill_directory_tree
 from testfixtures import TempDirectory
+from mock import patch
+from bbpgsql.restore_pgsql import restorepgsql_handle_args
 #from bbpgsql.restore_pgsql import Restore_pgsql
 #from bbpgsql.archive_pgsql import commit_pgsql_to_repository
 #import os.path
@@ -46,8 +48,34 @@ class Test_restorepgsql(Cmdline_test_skeleton):
     def teardown_customize(self):
         pass
 
-    def null_test(self):
-        pass
+    def test_restorepgsql_raises_exception_if_destination_contains_data(self):
+
+        def raises_exception():
+            check_call(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
+
+        self.assertRaises(CalledProcessError, raises_exception)
+
+    def test_data_in_destination_produces_proper_message(self):
+        proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
+        proc.wait()
+        process_output = proc.stdout.read()
+        print(process_output)
+        self.assertTrue(
+            'Data exists in PostgreSQL data directory.  Aborting restore'
+            in process_output
+            )
+
+    @patch('bbpgsql.restore_pgsql.restorepgsql_validate_options_and_args')
+    @patch('bbpgsql.restore_pgsql.restorepgsql_parse_args')
+    def test_handle_args_calls_restorepgsql_parse_arg(
+        self,
+        mock_parse_args,
+        mock_validate
+        ):
+        mock_parse_args.return_value = ('one', 'two', 'three')
+        restorepgsql_handle_args()
+        self.assertTrue(mock_parse_args.called)
+        self.assertTrue(mock_validate.called)
 '''
 class Test_restorepgsql(Cmdline_test_skeleton):
 
