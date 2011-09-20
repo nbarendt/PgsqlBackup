@@ -10,6 +10,7 @@ from bbpgsql.configuration import write_config_to_filename
 @patch('bbpgsql.bbpgsql_main.archivewal_main')
 @patch('bbpgsql.bbpgsql_main.archivepgsql_main')
 @patch('bbpgsql.bbpgsql_main.restorewal_main')
+@patch('bbpgsql.bbpgsql_main.restorepgsql_main')
 class Test_command_dispatch(TestCase):
     archivepgsql_exe = 'archivepgsql'
     archivewal_exe = 'archivewal'
@@ -31,6 +32,7 @@ class Test_command_dispatch(TestCase):
         return [cmd, '-c', self.config_path]
 
     def test_dispatch_calls_only_archivepgsql_main(self,
+        mock_restorepgsql_main,
         mock_restorewal_main,
         mock_archivepgsql_main,
         mock_archivewal_main,
@@ -43,6 +45,7 @@ class Test_command_dispatch(TestCase):
         self.assertFalse(mock_bbpgsql_error.called)
 
     def test_dispatch_calls_only_archivewal_main(self,
+        mock_restorepgsql_main,
         mock_restorewal_main,
         mock_archivepgsql_main,
         mock_archivewal_main,
@@ -55,6 +58,7 @@ class Test_command_dispatch(TestCase):
         self.assertFalse(mock_bbpgsql_error.called)
 
     def test_dispatch_calls_only_restorewal_main(self,
+        mock_restorepgsql_main,
         mock_restorewal_main,
         mock_archivepgsql_main,
         mock_archivewal_main,
@@ -66,8 +70,22 @@ class Test_command_dispatch(TestCase):
         self.assertFalse(mock_archivewal_main.called)
         self.assertFalse(mock_bbpgsql_error.called)
 
+    def test_dispatch_calls_only_restorepgsql_main(self,
+        mock_restorepgsql_main,
+        mock_restorewal_main,
+        mock_archivepgsql_main,
+        mock_archivewal_main,
+        mock_bbpgsql_error
+        ):
+        bbpgsql_main(self.get_argv_for_cmd(self.restorepgsql_exe))
+        mock_restorepgsql_main.assert_called_once_with()
+        self.assertFalse(mock_archivepgsql_main.called)
+        self.assertFalse(mock_archivewal_main.called)
+        self.assertFalse(mock_restorewal_main.called)
+        self.assertFalse(mock_bbpgsql_error.called)
 
     def test_dispatch_calls_only_bbpgsql_error(self,
+        mock_restorepgsql_main,
         mock_restorewal_main,
         mock_archivepgsql_main,
         mock_archivewal_main,
