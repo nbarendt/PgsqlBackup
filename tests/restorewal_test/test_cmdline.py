@@ -51,9 +51,6 @@ class Test_restorewal(Cmdline_test_skeleton):
     def teardown_tempdirs(self):
         self.tempdir.cleanup()
 
-    def null_test(self):
-        pass
-
     def test_restorewal_sets_repository_attr(self):
         self.assertEqual(self.repository, self.restorer.repository)
 
