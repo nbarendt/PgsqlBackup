@@ -21,6 +21,8 @@ class Test_restorepgsql(Cmdline_test_skeleton):
         self.pgsql_data_dir = self.tempdir.makedir('datadir')
         self.snapshot_archive = self.tempdir.makedir('snapshotdir')
         self.test_data_dir = self.tempdir.makedir('testdir')
+        self.file1_contents = 'some contents'
+        self.filename1 = self.tempdir.write('file1', self.file1_contents)
         pass
 
     def setup_config(self):
@@ -53,6 +55,13 @@ class Test_restorepgsql(Cmdline_test_skeleton):
 
     def teardown_customize(self):
         pass
+
+    def commit_filename1(self, tag, message=None):
+        self.repository.create_commit_from_filename(
+            tag,
+            self.filename1,
+            message
+            )
 
     def test_restorepgsql_raises_exception_if_destination_contains_data(self):
 

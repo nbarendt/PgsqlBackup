@@ -205,3 +205,12 @@ class Skeleton_Repository_Operations_With_SpecificCommitStorage(TestCase):
         file_contents = file_contents[3:]
         expected_size = len(file_contents)
         self.assertEqual(expected_size, self.repo.get_number_of_items())
+
+    def test_can_get_sorted_list_of_keys(self):
+        self.commit_filename1('a')
+        self.commit_filename1('b')
+        self.commit_filename1('c')
+        self.commit_filename1('d')
+        keys = self.repo.keys()
+        expected_keys = ['a', 'b', 'c', 'd']
+        self.assertEqual(expected_keys, keys)

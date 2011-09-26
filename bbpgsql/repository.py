@@ -71,3 +71,6 @@ class BBRepository(object):
 
     def get_number_of_items(self):
         return len(self.store.get_tags())
+
+    def keys(self):
+        return self._sorted_tags()
