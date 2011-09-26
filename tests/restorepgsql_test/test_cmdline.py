@@ -78,7 +78,7 @@ class Test_restorepgsql(Cmdline_test_skeleton):
         mock_validate
         ):
         mock_parse_args.return_value = ('one', 'two', 'three')
-        restorepgsql_handle_args()
+        options, args = restorepgsql_handle_args()
         self.assertTrue(mock_parse_args.called)
         self.assertTrue(mock_validate.called)
 '''
