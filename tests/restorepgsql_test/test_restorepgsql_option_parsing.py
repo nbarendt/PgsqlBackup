@@ -1,6 +1,7 @@
 from unittest import TestCase
 from bbpgsql.option_parser import restorepgsql_parse_args
 from bbpgsql.option_parser import restorepgsql_validate_options_and_args
+from bbpgsql.option_parser import TooManyArgumentsException
 from bbpgsql.configuration import write_config_to_filename
 from mock import patch, Mock
 from testfixtures import TempDirectory
@@ -72,12 +73,14 @@ class Test_restorepgsql_validate_options_Uses_Common_Functions(TestCase):
         self.assertFalse(retval)
 
 
-class Test_restorepgsql_requires_pgsql_file_and_destination(TestCase):
+class Test_restorepgsql_argument_validation(TestCase):
     def setUp(self):
         self.tempdir = TempDirectory()
+        self.data_dir_path = self.tempdir.makedir('data_directory')
+        self.data_directory = TempDirectory(path=self.data_dir_path)
         self.config_dict = {
             'General': {
-                'pgsql_data_directory': self.tempdir.path,
+                'pgsql_data_directory': self.data_dir_path
             },
         }
         self.config_file = os.path.join(self.tempdir.path, 'config_file')
@@ -90,19 +93,19 @@ class Test_restorepgsql_requires_pgsql_file_and_destination(TestCase):
 
     def test_will_raise_exception_if_not_exactly_zero_args(self):
         self.assertRaises(
-            Exception,
+            TooManyArgumentsException,
             restorepgsql_validate_options_and_args,
             self.options,
             ['one']
             )
         self.assertRaises(
-            Exception,
+            TooManyArgumentsException,
             restorepgsql_validate_options_and_args,
             self.options,
             ['one', 'two']
             )
         self.assertRaises(
-            Exception,
+            TooManyArgumentsException,
             restorepgsql_validate_options_and_args,
             self.options,
             ['one', 'two', 'three']
@@ -114,7 +117,7 @@ class Test_restorepgsql_requires_pgsql_file_and_destination(TestCase):
                 self.options,
                 ['one']
                 )
-        except Exception, e:
+        except TooManyArgumentsException, e:
             print 'Exception', e
             self.assertTrue('called with no arguments' in str(e))
         else:
@@ -126,3 +129,26 @@ class Test_restorepgsql_requires_pgsql_file_and_destination(TestCase):
             []
             )
         self.assertTrue(retval)
+
+    def test_raises_exception_if_destination_directory_contains_data(self):
+        self.data_directory.write(
+            'some_file',
+            'This should be some file contents'
+            )
+        self.data_directory.makedir('some_directory')
+        print(self.data_directory.path, os.listdir(self.data_directory.path))
+        try:
+            restorepgsql_validate_options_and_args(
+                self.options,
+                []
+                )
+        except Exception, e:
+            print('Exception', e, str(e))
+            self.assertTrue(
+                'Data exists in PostgreSQL data directory.' in str(e)
+                )
+        else:
+            self.assertTrue(
+                False,
+                'Failed to raise exception on data directory'
+                )

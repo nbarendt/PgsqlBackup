@@ -41,6 +41,14 @@ class UsedArchivepgsqlAsArchiveWAL(Exception):
         return self.msg
 
 
+class DestinationNotEmpty(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
+
+
 def get_version():
     # override "version" with a constant string for release
     version = VERSION or check_output(['git', 'describe']).strip()
@@ -193,6 +201,13 @@ def restorepgsql_validate_options_and_args(options=None, args=None):
     if nargs > 0:
         raise TooManyArgumentsException(
             'restorepgsql should be called with no arguments'
+            )
+    conf = get_config_from_filename_and_set_up_logging(options.config_file)
+    data_dir = get_data_dir(conf)
+    contents = os.listdir(data_dir)
+    if contents:
+        raise DestinationNotEmpty(
+            'Data exists in PostgreSQL data directory.  Aborting restore'
             )
     return True
 
