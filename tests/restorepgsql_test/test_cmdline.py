@@ -42,7 +42,12 @@ class Test_restorepgsql(Cmdline_test_skeleton):
         fill_directory_tree(TempDirectory(self.test_data_dir))
         fill_directory_tree(TempDirectory(self.pgsql_data_dir))
         self.archive_cmd = ['archivepgsql', '--config', self.config_path]
-        proc = Popen(self.archive_cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
+        proc = Popen(
+            self.archive_cmd,
+            env=self.env,
+            stdout=PIPE,
+            stderr=STDOUT
+            )
         proc.wait()
 
     def teardown_customize(self):

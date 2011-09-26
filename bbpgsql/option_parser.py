@@ -191,7 +191,9 @@ def restorepgsql_validate_options_and_args(options=None, args=None):
         return False
     nargs = len(args)
     if nargs > 0:
-        raise Exception('restorepgsql should be called with no arguments')
+        raise TooManyArgumentsException(
+            'restorepgsql should be called with no arguments'
+            )
     return True
 
 
