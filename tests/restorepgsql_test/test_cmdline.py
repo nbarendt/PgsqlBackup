@@ -4,6 +4,7 @@ from tests.archivepgsql_test.tar_archive_helpers import fill_directory_tree
 from testfixtures import TempDirectory
 from mock import patch
 from bbpgsql.restore_pgsql import restorepgsql_handle_args
+from bbpgsql.restore_pgsql import Restore_pgsql
 #from bbpgsql.restore_pgsql import Restore_pgsql
 #from bbpgsql.archive_pgsql import commit_pgsql_to_repository
 #import os.path
@@ -38,7 +39,7 @@ class Test_restorepgsql(Cmdline_test_skeleton):
         return self.config_dict
 
     def setup_customize(self):
-        self.respository = get_Snapshot_repository(self.config)
+        self.repository = get_Snapshot_repository(self.config)
         fill_directory_tree(TempDirectory(path=self.test_data_dir))
         fill_directory_tree(TempDirectory(path=self.pgsql_data_dir))
         self.archive_cmd = ['archivepgsql', '--config', self.config_path]
@@ -81,6 +82,12 @@ class Test_restorepgsql(Cmdline_test_skeleton):
         options, args = restorepgsql_handle_args()
         self.assertTrue(mock_parse_args.called)
         self.assertTrue(mock_validate.called)
+
+    def test_Restore_pgsql_class_instantiation(self):
+        restorer = Restore_pgsql(self.repository, self.pgsql_data_dir)
+        self.assertEqual(restorer.repository, self.repository)
+        self.assertEqual(restorer.data_dir, self.pgsql_data_dir)
+        self.assertEqual(type(restorer.restore), type(self.setUp))
 '''
 class Test_restorepgsql(Cmdline_test_skeleton):
 

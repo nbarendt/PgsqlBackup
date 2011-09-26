@@ -3,10 +3,18 @@ from bbpgsql.option_parser import (
     restorepgsql_validate_options_and_args
 )
 from sys import stdout
+from bbpgsql.configuration import get_config_from_filename_and_set_up_logging
+from bbpgsql.configuration.general import get_data_dir
 
 
 class Restore_pgsql(object):
-    pass
+    def __init__(self, repository, data_dir):
+        self.repository = repository
+        self.data_dir = data_dir
+        self.latest_snapshot = repository
+
+    def restore(self):
+        pass
 
 
 def restorepgsql_handle_args():
@@ -21,7 +29,10 @@ def restorepgsql_handle_args():
 
 
 def restorepgsql_main():
-    restorepgsql_handle_args()
+    options, args = restorepgsql_handle_args()
+    conf = get_config_from_filename_and_set_up_logging(options.config_file)
+    repository = get_Snapshot_repository(conf)
+    data_dir = get_data_dir(conf)
 
 
 if __name__ == '__main__':
