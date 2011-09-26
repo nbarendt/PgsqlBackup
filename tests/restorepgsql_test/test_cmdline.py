@@ -39,8 +39,8 @@ class Test_restorepgsql(Cmdline_test_skeleton):
 
     def setup_customize(self):
         self.respository = get_Snapshot_repository(self.config)
-        fill_directory_tree(TempDirectory(self.test_data_dir))
-        fill_directory_tree(TempDirectory(self.pgsql_data_dir))
+        fill_directory_tree(TempDirectory(path=self.test_data_dir))
+        fill_directory_tree(TempDirectory(path=self.pgsql_data_dir))
         self.archive_cmd = ['archivepgsql', '--config', self.config_path]
         proc = Popen(
             self.archive_cmd,

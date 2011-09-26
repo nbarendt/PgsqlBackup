@@ -14,6 +14,7 @@ def restorepgsql_handle_args():
 
 
 def restorepgsql_main():
-    raise Exception(
-        'Data exists in PostgreSQL data directory.  Aborting restore'
-        )
+    restorepgsql_handle_args()
+
+if __name__ == '__main__':
+    restorepgsql_main()
