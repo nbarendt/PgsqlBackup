@@ -18,7 +18,10 @@ class Restore_pgsql(object):
         self.latest_snapshot = repository
 
     def restore(self):
-        pass
+        with TemporaryDirectory(suffix='restorepgsql') as tempdir:
+            commit = self._get_commit_to_restore()
+            filename = self._write_commit_to_temporary_storage(commit, tempdir)
+            self._extract_commit_to_data_dir(filename)
 
     def _get_commit_to_restore(self):
         tags = self.repository.keys()
@@ -27,9 +30,10 @@ class Restore_pgsql(object):
     def _write_commit_to_temporary_storage(self, commit, tempdir):
         tempfile = os.path.join(tempdir, 'snapshot.tar')
         commit.get_contents_to_filename(tempfile)
+        return tempfile
 
-    def _extract_commit_to_data_dir(self, filename, data_dir):
-        pass
+    def _extract_commit_to_data_dir(self, filename):
+        extract_archive(filename, self.data_dir)
 
 
 def restorepgsql_handle_args():

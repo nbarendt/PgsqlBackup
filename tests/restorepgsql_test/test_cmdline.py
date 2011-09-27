@@ -5,12 +5,11 @@ from testfixtures import TempDirectory
 from mock import patch
 from bbpgsql.restore_pgsql import restorepgsql_handle_args
 from bbpgsql.restore_pgsql import Restore_pgsql
-#from bbpgsql.restore_pgsql import Restore_pgsql
-#from bbpgsql.archive_pgsql import commit_pgsql_to_repository
 import os.path
 #import filecmp
 #from bbpgsql.repository_exceptions import UnknownTagError
 from subprocess import Popen, PIPE, STDOUT, check_call, CalledProcessError
+from bbpgsql.create_archive import create_archive
 
 
 class Test_restorepgsql(Cmdline_test_skeleton):
@@ -25,6 +24,7 @@ class Test_restorepgsql(Cmdline_test_skeleton):
         self.file2_contents = 'other contents'
         self.filename1 = self.tempdir.write('file1', self.file1_contents)
         self.filename2 = self.tempdir.write('file2', self.file2_contents)
+        self.archive_name = os.path.join(self.tempdir.path, 'test_archive')
         pass
 
     def setup_config(self):
@@ -46,14 +46,8 @@ class Test_restorepgsql(Cmdline_test_skeleton):
         self.repository = get_Snapshot_repository(self.config)
         fill_directory_tree(TempDirectory(path=self.test_data_dir))
         fill_directory_tree(TempDirectory(path=self.pgsql_data_dir))
-        self.archive_cmd = ['archivepgsql', '--config', self.config_path]
-        proc = Popen(
-            self.archive_cmd,
-            env=self.env,
-            stdout=PIPE,
-            stderr=STDOUT
-            )
-        proc.wait()
+        create_archive(self.pgsql_data_dir, self.archive_name)
+        self.repository.create_commit_from_filename('00tag', self.archive_name)
 
     def teardown_customize(self):
         pass
@@ -129,30 +123,23 @@ class Test_restorepgsql(Cmdline_test_skeleton):
         filename = os.path.join(self.tempdir.path, 'snapshot.tar')
         fileobj = open(filename)
         self.assertEqual(self.file2_contents, fileobj.read())
-'''
-class Test_restorepgsql(Cmdline_test_skeleton):
 
-    def setup_customize(self):
-        self.setup_repository()
-        self.restorer = Restore_WAL(self.repository)
-        commit_wal_to_repository(self.repository, self.srcfilepath)
-        self.basename = os.path.basename(self.srcfilepath)
-        self.destfilepath = os.path.join(self.destdirpath, self.basename)
-
-    def setup_repository(self):
-        self.repository = get_WAL_repository(self.config)
-
-    def setup_environment_and_paths_customize(self):
-        self.srcfilepath = self.tempdir.write(
-            os.path.join('source', 'WALFileName0001'),
-            'Some Data goes here',
-        )
-        self.destdirpath = self.tempdir.makedir('destination')
-        self.archivepath = self.tempdir.makedir('walarchive')
-
-    def teardown_customize(self):
-        self.teardown_tempdirs()
-
-    def teardown_tempdirs(self):
-        self.tempdir.cleanup()
-'''
+    def test_successful_restore(self):
+        for root, dirs, files in os.walk(self.pgsql_data_dir, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                os.rmdir(os.path.join(root, name))
+        proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
+        stdoutdata, stderrdata = proc.communicate()
+        self.assertEqual(proc.returncode, 0)
+        diff_cmd = [
+            '/usr/bin/diff',
+            '-qr',
+            self.test_data_dir,
+            self.pgsql_data_dir
+            ]
+        procdiff = Popen(diff_cmd, stdout=PIPE, stderr=STDOUT)
+        stdoutdata, stderrdata = procdiff.communicate()
+        print(stdoutdata)
+        self.assertFalse(stdoutdata)
