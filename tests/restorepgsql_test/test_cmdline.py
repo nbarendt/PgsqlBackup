@@ -97,6 +97,18 @@ class Test_restorepgsql(Cmdline_test_skeleton):
         self.assertEqual(restorer.repository, self.repository)
         self.assertEqual(restorer.data_dir, self.pgsql_data_dir)
         self.assertEqual(type(restorer.restore), type(self.setUp))
+
+    def test_restore_method_requests_last_snapshot(self):
+        self.commit_filename1('a')
+        self.commit_filename1('b')
+        self.commit_filename1('c')
+        self.commit_filename1('d')
+        restorer = Restore_pgsql(self.repository, self.pgsql_data_dir)
+        commit = restorer._get_commit_to_restore()
+        self.assertEqual(commit.tag, 'd')
+        self.commit_filename1('e')
+        commit = restorer._get_commit_to_restore()
+        self.assertEqual(commit.tag, 'e')
 '''
 class Test_restorepgsql(Cmdline_test_skeleton):
 
@@ -123,56 +135,4 @@ class Test_restorepgsql(Cmdline_test_skeleton):
 
     def teardown_tempdirs(self):
         self.tempdir.cleanup()
-
-    def null_test(self):
-        pass
-
-    def test_restorewal_sets_repository_attr(self):
-        self.assertEqual(self.repository, self.restorer.repository)
-
-    def test_restorewal_has_method_restore(self):
-        self.assertEqual(type(self.restorer.restore), type(self.setUp))
-
-    def test_restorewal_takes_two_arguments(self):
-        self.restorer.restore(self.basename, self.destfilepath)
-
-    def test_restorewal_restores_a_wal_file(self):
-        self.restorer.restore(self.basename, self.destfilepath)
-        self.assertTrue(filecmp.cmp(
-            self.srcfilepath,
-            self.destfilepath,
-            shallow=False
-            ))
-
-    def test_restorewal_raises_unknown_tag_error(self):
-        self.assertRaises(
-            UnknownTagError,
-            self.restorer.restore,
-            'tag1',
-            self.destfilepath
-        )
-
-    def test_raises_exception_if_too_few_args(self):
-
-        def raises_exception():
-            check_call(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
-
-        self.assertRaises(CalledProcessError, raises_exception)
-
-    def test_too_few_arguments_produces_proper_message(self):
-        proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
-        proc.wait()
-        self.assertTrue('restorewal must be given the name of the WAL'
-            in proc.stdout.read())
-
-    def test_restorewal_success_restoring_file(self):
-        self.cmd.append(self.basename)
-        self.cmd.append(self.destfilepath)
-        proc = Popen(self.cmd, env=self.env, stdout=PIPE, stderr=STDOUT)
-        proc.wait()
-        self.assertTrue(filecmp.cmp(
-            self.srcfilepath,
-            self.destfilepath,
-            shallow=False
-            ))
 '''
