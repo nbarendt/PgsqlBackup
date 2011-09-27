@@ -7,7 +7,7 @@ from bbpgsql.restore_pgsql import restorepgsql_handle_args
 from bbpgsql.restore_pgsql import Restore_pgsql
 #from bbpgsql.restore_pgsql import Restore_pgsql
 #from bbpgsql.archive_pgsql import commit_pgsql_to_repository
-#import os.path
+import os.path
 #import filecmp
 #from bbpgsql.repository_exceptions import UnknownTagError
 from subprocess import Popen, PIPE, STDOUT, check_call, CalledProcessError
@@ -22,7 +22,9 @@ class Test_restorepgsql(Cmdline_test_skeleton):
         self.snapshot_archive = self.tempdir.makedir('snapshotdir')
         self.test_data_dir = self.tempdir.makedir('testdir')
         self.file1_contents = 'some contents'
+        self.file2_contents = 'other contents'
         self.filename1 = self.tempdir.write('file1', self.file1_contents)
+        self.filename2 = self.tempdir.write('file2', self.file2_contents)
         pass
 
     def setup_config(self):
@@ -63,6 +65,13 @@ class Test_restorepgsql(Cmdline_test_skeleton):
             message
             )
 
+    def commit_filename2(self, tag, message=None):
+        self.repository.create_commit_from_filename(
+            tag,
+            self.filename2,
+            message
+            )
+
     def test_restorepgsql_raises_exception_if_destination_contains_data(self):
 
         def raises_exception():
@@ -98,7 +107,7 @@ class Test_restorepgsql(Cmdline_test_skeleton):
         self.assertEqual(restorer.data_dir, self.pgsql_data_dir)
         self.assertEqual(type(restorer.restore), type(self.setUp))
 
-    def test_restore_method_requests_last_snapshot(self):
+    def test_get_commit_to_restore_gets_last_commit(self):
         self.commit_filename1('a')
         self.commit_filename1('b')
         self.commit_filename1('c')
@@ -109,6 +118,17 @@ class Test_restorepgsql(Cmdline_test_skeleton):
         self.commit_filename1('e')
         commit = restorer._get_commit_to_restore()
         self.assertEqual(commit.tag, 'e')
+
+    def test_write_commit_to_temporary_storage_works(self):
+        self.commit_filename1('a')
+        self.commit_filename1('b')
+        self.commit_filename2('c')
+        commit = self.repository['c']
+        r = Restore_pgsql(self.repository, self.pgsql_data_dir)
+        r._write_commit_to_temporary_storage(commit, self.tempdir.path)
+        filename = os.path.join(self.tempdir.path, 'snapshot.tar')
+        fileobj = open(filename)
+        self.assertEqual(self.file2_contents, fileobj.read())
 '''
 class Test_restorepgsql(Cmdline_test_skeleton):
 

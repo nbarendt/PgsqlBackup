@@ -6,6 +6,9 @@ from sys import stdout
 from bbpgsql.configuration import get_config_from_filename_and_set_up_logging
 from bbpgsql.configuration.general import get_data_dir
 from bbpgsql.configuration.repository import get_Snapshot_repository
+from bbpgsql.temporarydirectory import TemporaryDirectory
+from bbpgsql.extract_archive import extract_archive
+import os.path
 
 
 class Restore_pgsql(object):
@@ -21,10 +24,11 @@ class Restore_pgsql(object):
         tags = self.repository.keys()
         return self.repository[tags[-1]]
 
-    def _write_commit_to_temporary_storage(self):
-        pass
+    def _write_commit_to_temporary_storage(self, commit, tempdir):
+        tempfile = os.path.join(tempdir, 'snapshot.tar')
+        commit.get_contents_to_filename(tempfile)
 
-    def _extract_commit_to_data_dir(self):
+    def _extract_commit_to_data_dir(self, filename, data_dir):
         pass
 
 
