@@ -5,6 +5,7 @@ from bbpgsql.option_parser import (
 from sys import stdout
 from bbpgsql.configuration import get_config_from_filename_and_set_up_logging
 from bbpgsql.configuration.general import get_data_dir
+from bbpgsql.configuration.repository import get_Snapshot_repository
 
 
 class Restore_pgsql(object):
@@ -14,6 +15,16 @@ class Restore_pgsql(object):
         self.latest_snapshot = repository
 
     def restore(self):
+        pass
+
+    def _get_commit_to_restore(self):
+        tags = self.repository.keys()
+        return self.repository[tags[-1]]
+
+    def _write_commit_to_temporary_storage(self):
+        pass
+
+    def _extract_commit_to_data_dir(self):
         pass
 
 
@@ -33,6 +44,8 @@ def restorepgsql_main():
     conf = get_config_from_filename_and_set_up_logging(options.config_file)
     repository = get_Snapshot_repository(conf)
     data_dir = get_data_dir(conf)
+    restorer = Restore_pgsql(repository, data_dir)
+    restorer.restore()
 
 
 if __name__ == '__main__':
