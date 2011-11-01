@@ -1,6 +1,6 @@
-.. _trouble shooting:
+.. _trouble_shooting:
 
-Trouble Shooting (SP?)
+Troubleshooting
 ======================
 
 .. todo::
