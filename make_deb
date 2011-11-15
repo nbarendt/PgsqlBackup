@@ -10,6 +10,11 @@ then
     echo "Cannot find built package in './pyintsaller/dist'  Aborting."
     exit 1
 fi
+if test ! -f docs/_build/latex/PostgreSQLBackupandRestoreTools.pdf
+then
+    echo "Cannot find documentation file in 'docs/_build/latex'  Aborting."
+    exit 1
+fi
 
 export DEB_BUILD_OPTIONS=nostrip
 
@@ -27,6 +32,8 @@ echo 'Creating package directory'
 mkdir ${pkgdir}
 echo 'Copying package file'
 cp pyinstaller/dist/bbpgsql ${pkgdir}
+echo 'Copying documentation file'
+cp docs/_build/latex/PostgreSQLBackupandRestoreTools.pdf ${pkgdir}
 echo 'Creating changlog file'
 cd ${pkgdir}
 yada yada
