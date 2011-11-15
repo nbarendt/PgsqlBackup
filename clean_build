@@ -1,0 +1,12 @@
+#!/bin/bash
+rm -rf pyinstaller/build/
+rm -rf pyinstaller/dist/
+rm -rf pyinstaller/logdict2.7.1.final.0-1.log
+rm -rf pyinstaller/logdict2.7.1.final.0-2.log
+rm -rf pyinstaller/pyinstaller-1.5-rc1/bincache10/
+rm -rf pyinstaller/pyinstaller-1.5-rc1/config.dat
+rm -rf pyinstaller/pyinstaller-1.5-rc1/support/useUnicode.py
+rm -rf pyinstaller/warnbbpgsql.txt
+rm -rf sandbox/
+rm -rf docs/_build
+
