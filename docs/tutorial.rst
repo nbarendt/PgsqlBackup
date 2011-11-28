@@ -21,13 +21,18 @@ bbpgsql
 
 .. todo:: drop sample file inline in this section (try literalinclude::)
 
-Edit the sample /etc/bbpgsql.ini configuration file as the PostgreSQL user.
+Edit the sample /etc/bbpgsql.ini (shown below) configuration file as the PostgreSQL user.
+
+Sample Configuration File
+_________________________
+.. literalinclude:: sample_configs/bbpgsql.ini
+
 At a minimum, the following options must be configured:
 
-    1. aws_access_key_id should be set to your AWS access key.
-    2. aws_secret_key_id should be set to your AWS secret key.
-    3. bucket should be set to the string identifying the S3 bucket for the archives.
-    4. pgsql_data_directory should be set to the same value as the data_directory in the PostgreSQL configuration file.
+    1. **aws_access_key_id** should be set to your AWS access key.
+    2. **aws_secret_key_id** should be set to your AWS secret key.
+    3. **bucket** should be set to the string identifying the S3 bucket for the archives.
+    4. **pgsql_data_directory** should be set to the same value as the data_directory in the PostgreSQL configuration file.
 
 If logging is desired, either or both of the following two sets of options should be set:
 
@@ -38,17 +43,15 @@ If logging is desired, either or both of the following two sets of options shoul
 File Logging
 ````````````
 
-    1. logifle should be set to the base filename for the bbpgsql log file.
+    1. **logifle** should be set to the base filename for the bbpgsql log file.
 
 Syslog Logging
 ``````````````
 
-    1. loghost should be set to the hostname for the syslog host
-    2. logport should be set to the proper port number for the syslog host.  Note that this will vary with the specific syslog facility and OS.  Consult your system documentation.
+    1. **loghost** should be set to the hostname for the syslog host
+    2. **logport** should be set to the proper port number for the syslog host.  Note that this will vary with the specific syslog facility and OS.
 
-.. todo:: syslog - tcp or udp ?
-
-All remaining options have default values and may be set as needed by the database administrator.
+All remaining options have default values and may be set as needed by the database administrator.  The **logtcp** option is available to perform logging over TCP instead of UDP (the default).  **logfacility** exists to route log messages to the proper logging facility.  Consult your system documentation for more information.
 
 Important:  make sure the /etc/bbpgsql.ini file is owned by the PostgreSQL user account and has permission restricting it to user access only (i.e. not group or world accessible).  It contains AWS credentials and needs to be kept private.  The bbpgsql tools check the file's permissions and will exit with an error if the permissions are incorrect.
 
