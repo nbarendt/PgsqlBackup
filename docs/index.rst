@@ -22,7 +22,7 @@ Contents:
     configuration
     glossary
 
-ToDo List
+
 
 .. todolist::
 
