@@ -11,7 +11,7 @@ Installing BBPGSQL
 BBPGSQL is provided in the form of a Debian package and should be
 installed using sudo and dpkg:
 
-    sudo dpkg -i bbpgsql_1.0.0-1_i386.deb
+    sudo dpkg -i bbpgsql_0.4.0-rc1-1_i386.deb
 
 Initial Configuration and Setup
 -------------------------------
