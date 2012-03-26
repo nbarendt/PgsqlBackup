@@ -9,11 +9,11 @@ Section: unknown
 Priority: extra
 Maintainer: Nick Barendt <nickbarendt@bitbacker.com>
 Standards-Version: 3.7.2
-Upstream-Source: 
+Upstream-Source: None
 Homepage: http://www.bitbacker.com/
 Description: BitBacker Postgresql Backup and Restore Utilities
 Copyright: .
- Copyright 2011, BitBacker, Inc.  All Rights Reserved
+ Copyright 2012, BitBacker, Inc.  All Rights Reserved
 Major-Changes:
  First release as a Debian Package
 Build: sh
