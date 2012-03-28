@@ -31,12 +31,12 @@ Configuration File Permissions
 
 It is important that the |config_file| file permissions be carefully set.  It should be owned by the same system account that the PostgreSQL server runs as, and should have have owner read and write permission, and no group or world permissions (e.g., octal permissions of 0600).
 
-.. _config_file_backup:
-
-Backing Up the Configuration File
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. todo::
+    .. _config_file_backup:
+
+    Backing Up the Configuration File
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     The configuration file |config_file| itself should be backed up itself.
     The values contained within are crucial for restoring a database.
     Should we back up the configuration file each time we take a snapshot?
@@ -90,16 +90,20 @@ General backup configuration.
 |                      |           |             | ``data_directory`` in       |
 |                      |           |             | ``postgresql.conf``)        |
 +----------------------+-----------+-------------+-----------------------------+
-| backup_days          | Integer   | 7           | Number of days of backup    |
-|                      |           |             | history                     |
-|                      |           |             | to retain.  Backup data     |
-|                      |           |             | (:term:`snapshots` and      |
-|                      |           |             | :term:`WAL files`)          |
-|                      |           |             | older                       |
-|                      |           |             | than this will be           |
-|                      |           |             | deleted during the cleanup  |
-|                      |           |             | phase of :ref:`archivepgsql`|
-+----------------------+-----------+-------------+-----------------------------+
+
+.. todo::
+
+    +----------------------+-----------+-------------+-----------------------------+
+    | backup_days          | Integer   | 7           | Number of days of backup    |
+    |                      |           |             | history                     |
+    |                      |           |             | to retain.  Backup data     |
+    |                      |           |             | (:term:`snapshots` and      |
+    |                      |           |             | :term:`WAL files`)          |
+    |                      |           |             | older                       |
+    |                      |           |             | than this will be           |
+    |                      |           |             | deleted during the cleanup  |
+    |                      |           |             | phase of :ref:`archivepgsql`|
+    +----------------------+-----------+-------------+-----------------------------+
 
 .. _config_snapshot:
 

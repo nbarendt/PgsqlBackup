@@ -11,7 +11,7 @@ Installing BBPGSQL
 BBPGSQL is provided in the form of a Debian package and should be
 installed using sudo and dpkg:
 
-    sudo dpkg -i bbpgsql_0.4.0-rc1-1_i386.deb
+    sudo dpkg -i \bbpgsql_\ |release|\_i386.deb
 
 Initial Configuration and Setup
 -------------------------------
@@ -53,9 +53,9 @@ Syslog Logging
 
 All remaining options have default values and may be set as needed by the database administrator.  The **logtcp** option is available to perform logging over TCP instead of UDP (the default).  **logfacility** exists to route log messages to the proper logging facility.  Consult your system documentation for more information.
 
-Important:  make sure the /etc/bbpgsql.ini file is owned by the PostgreSQL user account and has permission restricting it to user access only (i.e. not group or world accessible).  It contains AWS credentials and needs to be kept private.  The bbpgsql tools check the file's permissions and will exit with an error if the permissions are incorrect.
+*Important:*  make sure the /etc/bbpgsql.ini file is owned by the PostgreSQL user account and has permission restricting it to user access only (i.e. not group or world accessible).  It contains AWS credentials and needs to be kept private.  The bbpgsql tools check the file's permissions and will exit with an error if the permissions are incorrect.
 
-Important:  make sure that the /etc/bbpgsql.ini file is correctly installed by running the storagestats utility as the PostgreSQL user before configuring the PostgreSQL server for continuous WAL archiving.
+*Important:*  make sure that the /etc/bbpgsql.ini file is correctly installed by running the storagestats utility as the PostgreSQL user before configuring the PostgreSQL server for continuous WAL archiving.
 
 PostgreSQL
 ~~~~~~~~~~
@@ -84,6 +84,14 @@ Periodic Snapshots
 
 Configure your server to use the archivepgsql command to create periodic snapshots of the server data directory.  The cron utility can be used for this purpose.
 
+Choosing the frequency of periodic snapshots is a compromise between the overhead of creating and uploading the snapshot (Internet bandwidth, run-time effects on the PostgreSQL cluster as the snapshot is created, etc.) and the time required to restore a database cluster - the larger the time between snapshots, the more WAL files that will need to be downloaded and "replayed" by the PostgreSQL server during a restore operation.
+
+For many installations, generating a snapshot once per day is a reasonable compromise.  A crontab entry for taking a snapshot every day at 3AM might look like:
+
+    0 3 * * * /usr/bin/archivepgsql
+
+
+
 Verify BBPGSQL Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -100,13 +108,15 @@ This tutorial assumes you are restoring to the production server or an exact dup
 
 .. todo:: just a thought, borrow the steps in the postgres manual, and expand with our stuff?  e.g., take the exact text from postgres 8.4 restore manual, and stich in our operations in a different color text or something?
 
-Consult the PostgreSQL documentation, Server Administration, Backup and Restore, Recovering Using a Continuous Archive Backup, for the standard procedure for preparing a server for a full restore.  This includes backing up the existing data directory or, at a minimum, any unarchived WAL files.  It may also include modifying the pg_hba.conf file to disallow ordinary users from connecting until the restore is complete.
+Consult the PostgreSQL documentation, Server Administration, Backup and Restore, Recovering Using a Continuous Archive Backup for the standard procedure for preparing a server for a full restore (e.g., `for PostrgreSQL 8.3 <http://www.postgresql.org/docs/8.3/static/continuous-archiving.html#BACKUP-PITR-RECOVERY>`_).  This includes backing up the existing data directory or, at a minimum, any unarchived WAL files.  It may also include modifying the pg_hba.conf file to disallow ordinary users from connecting until the restore is complete.
+
+Stop the PostgreSQL server.
 
 With the server cluster data directory completely empty, run restorepgsql as the PostgreSQL user account.  This will download and restore the latest snapshot from S3.
 
 Remove the contents of the pg_xlog directory in the server cluster data directory and then copy any unarchived WAL segments saved earlier into the now empty pg_xlog directory.
 
-Create the recovery.conf file in the cluster data directory, setting the restore_command option to the string '/usr/bin/restorewal %f %p'.  This is the only required setting in recovery.conf.
+Create the recovery.conf file in the cluster data directory, setting the restore_command option to the string '/usr/bin/restorewal %f %p'.  This is the only required setting in recovery.conf to restore up the last WAL file archived.
 
 Start the PostgreSQL server and wait until it completes recovery.
 

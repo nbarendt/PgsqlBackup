@@ -31,5 +31,7 @@ Install: sh
  yada symlink -bin -as archivepgsql bbpgsql
  yada symlink -bin -as archivewal bbpgsql
  yada symlink -bin -as storagestats bbpgsql
+ yada symlink -bin -as restorewal bbpgsql
+ yada symlink -bin -as restorepgsql bbpgsql
  yada install -doc PostgreSQLBackupandRestoreTools.pdf
 

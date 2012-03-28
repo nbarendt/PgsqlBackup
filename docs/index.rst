@@ -8,8 +8,6 @@
 Welcome to PostgreSQL Backup and Restore Tools's documentation!
 ===============================================================
 
-Contents:
-
 .. toctree::
     :maxdepth: 2
 

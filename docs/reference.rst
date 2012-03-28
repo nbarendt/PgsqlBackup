@@ -15,7 +15,8 @@ The :program:`archivepgsql` program archives a PostgreSQL database.  It is calle
 The operation of the :program:`archivepgsql` is controlled by the
 :ref:`configuration_file`.  It accepts no options.
 
-In addition to creating :term:`snapshots` of the PostgreSQL database and uploading them to S3, :ref:`archivepgsql` is also responsible for cleanup.  After completing a snapshot upload, :ref:`archivepgsql` deletes any backup data (:term:`snapshots` and :term:`WAL files` older than ``backup_days`` (see :ref:`config_general`) from S3.
+.. todo::
+    In addition to creating :term:`snapshots` of the PostgreSQL database and uploading them to S3, :ref:`archivepgsql` is also responsible for cleanup.  After completing a snapshot upload, :ref:`archivepgsql` deletes any backup data (:term:`snapshots` and :term:`WAL files` older than ``backup_days`` (see :ref:`config_general`) from S3.
 
 .. _restorepgsql:
 
@@ -27,7 +28,10 @@ restorepgsql
 The :program:`restorepgsql` program restores a PostgreSQL database.
 
 The operation of the :program:`restorepgsql` program is controlled by the
-:ref:`configuration_file`, but unlike the other programs provided, it is an interactive application, since restoring a PostgreSQL database is a multi-step operation that requires operator intervention and confirmations at various points.
+:ref:`configuration_file`.  It restores the most recent full system snapshot from S3.
+
+.. todo::
+    , but unlike the other programs provided, it is an interactive application, since restoring a PostgreSQL database is a multi-step operation that requires operator intervention and confirmations at various points.
 
 .. _archivewal:
 
